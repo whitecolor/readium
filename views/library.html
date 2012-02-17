@@ -172,7 +172,7 @@
 				<div class='caption book-info'>
 					<h3 class='green info-item title'><%= title %></h3>
 					<h3 class='info-item author'><%= author || "Unknown" %></h3>
-					<h3 class='info-item epub-version'><%= "ePUB 2.1" %></h3>
+					<h3 class='info-item epub-version'>ePUB <%= epub_version || "?" %></h3>
 					
 				</div>
 				
@@ -204,7 +204,7 @@
 					<div class='modal-detail'>Publisher: <%= publisher || "Unknown" %></div>
 					<div class='modal-detail'>Pub Date: Todo 29, 2011</div>
 					<div class='modal-detail gap'>ID: <%= id || "Unknown" %></div>
-					<div class='modal-detail green'>Format: ePUB 2.2</div>
+					<div class='modal-detail green'>Format: ePUB <%= epub_version || "Unknown" %></div>
 					<div class='modal-detail'>Added: <%= created_at || "Unknown" %></div>
 				</div>
 				<div class='modal-detail source'>
