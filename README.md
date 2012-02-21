@@ -32,7 +32,7 @@ If you are a developer interested in hacking on the project, clone the repositor
 
 ## Contact
 
-* someone@tobedecided.com
+* matthewr@evidentpoint.com
 
 
 ## Download
