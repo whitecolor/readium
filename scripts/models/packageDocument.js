@@ -40,6 +40,16 @@ Readium.PackageDocument = function(domString) {
 		// seems like there isn't one, thats ok...
 		return null;
 	};
+
+	var getVersionNumber = function() {
+		var version = $('package', _dom).attr('version');
+		if(version) {
+			return version;
+		}
+		else {
+			return "UNKNOWN";
+		}
+	}
 	
 	var parseMetaData = function() {
 		var metaDom; var ns; var metaData;
@@ -66,6 +76,7 @@ Readium.PackageDocument = function(domString) {
 		metaData.publisher = getTagHelper('publisher');
 		metaData.author = getTagHelper('creator');
 		metaData.cover_href = getCoverHref();
+		metaData.epub_version = getVersionNumber();
 
 		
 		return metaData;
