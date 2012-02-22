@@ -296,7 +296,9 @@ Readium.TocManager = function(book) {
 	var linkClickHandler = function(e) {
 		var href = this.attributes["href"].value;
 		e.preventDefault();
-		if( _book.goToHref(href) ) {
+		if(href.match(/^http(s)?:/)) {
+			chrome.tabs.create({"url":href});
+		} else if( _book.goToHref(href) ) {
 			openCurrentSection();
 		} else {
 			console.log('failed to navigate spine to ' + href);
