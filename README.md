@@ -4,6 +4,9 @@ _an open source library for handling EPUB documents_
 
 Readium is in early beta stages. The goal of the project is to create an open source set of libraries for viewing and developing EPUB 2.0.1 and EPUB 3 content. Currently the project is available as a google chrome extension that enables viewing of EPUB content in the browser. For high-level information see the [Readium Project](http://readium.org/)  website.
 
+## Contributing
+
+Readium is in active development and we are keen to build a community of developers to help make it awesome. If you would like to be invited as a contributor leave a message in the issue tracker or [send Matthew an email](mailto:matthewr@evidentpoint.com)
 
 ## Dependencies
 
@@ -12,12 +15,11 @@ Google Chrome Version 15+
 
 ## Install
 
-Use the one click install link below to add the extension to chrome.
-
-* [Add To Chrome](http://github.readium.org/releases/readium.crx)
-
 If you are a developer interested in hacking on the project, clone the repository and then follow the instruction for loading an unpacked extension from the [chrome extensions page](http://code.google.com/chrome/extensions/getstarted.html#load-ext)
 
+If you want to give the latest release a whirl, use teh one click install link below to add the extension to chrome.
+
+* [Add To Chrome](http://github.readium.org/releases/readium.crx)
 
 ## License
 [BSD](https://github.com/readium/readium/blob/master/LICENSE)
