@@ -21,6 +21,19 @@ If you want to give the latest release a whirl, use teh one click install link b
 
 * [Add To Chrome](http://github.readium.org/releases/readium.crx)
 
+##  Testing
+
+We are using [Jasmine](https://github.com/pivotal/jasmine/wiki) to perform javascript unit tests. The best way to get these running is to install the [Jasmine rubygem](http://rubygems.org/gems/jasmine).
+
+    $ gem install jasmine
+
+Then the specs can be run via the command:
+
+    $ rake jasmine
+
+This will start a webserver running on `port 8888`. To run the spect navigate to (or refresh) `localhost:8888`.
+
+
 ## License
 [BSD](https://github.com/readium/readium/blob/master/LICENSE)
 
