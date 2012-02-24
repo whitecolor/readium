@@ -1,6 +1,8 @@
 // I would really like to port our packageDocument class over to a 
 // backbone object. This is the spec for this port. It is using Jath
 // to conver the XML => JSON
+// 
+// I wrote my own library to do the XML => JSON it is called 
 describe('packDocNew', function() {
 
   // an example of an epub 2 package doc
@@ -17,6 +19,9 @@ describe('packDocNew', function() {
   xmlString += "<dc:language>fr</dc:language>"
   xmlString += "</metadata>"
   xmlString += '<manifest>'
+  xmlString += '<item id="Page_1"  href="Page_1.html"  media-type="application/xhtml+xml"/>'
+  xmlString += '<item id="Page_2"  href="Page_2.html"  media-type="application/xhtml+xml"/>'
+  xmlString += '<item id="Page_3"  href="Page_3.html"  media-type="application/xhtml+xml"/>'
   xmlString += '<item id="css" href="styles.css" media-type="text/css" />'
   xmlString += '<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />'
   xmlString += '<item id="cover" href="images/cover.jpg" media-type="image/jpeg"/>'
@@ -26,6 +31,9 @@ describe('packDocNew', function() {
   xmlString += '<spine toc="ncx">'
   xmlString += '<itemref idref="Page_1"/><itemref idref="Page_2"/><itemref idref="Page_3"/>'
   xmlString += '</spine>'
+  xmlString += "<bindings>"
+  xmlString += '<mediaType handler="figure-gallery-impl" media-type="application/x-epub-figure-gallery"/>'
+  xmlString += '</bindings>'
   xmlString += '</package>';
 
   var packDoc;
@@ -109,6 +117,19 @@ describe('packDocNew', function() {
     it("sets the file_path if passed to constructor", function() {
       ebook = new Readium.Models.EBook({}, {file_path: "/public/sample_data/sample.opf"});
       expect(ebook.file_path).toEqual("/public/sample_data/sample.opf");
+    });
+
+    describe("goToHref", function() {
+      it("sets the spine position correctly", function() {
+        ebook.goToHref("Page_3.html");
+        expect(ebook.get("spine_position") ).toEqual(2);
+      })
+
+      it("does not change the spine position on invalid href", function() {
+        ebook.set({spine_position: 2})
+        ebook.goToHref("Pafdsafasge_3.html");
+        expect(ebook.get("spine_position") ).toEqual(2);
+      })
     });
 
     it('can fetch itself from the fs', function() {

@@ -99,6 +99,10 @@ Readium.Models.EBook = Readium.Models.PackageDocumentBase.extend({
 		}
 	},
 
+	// not sure what these were for but here they are...
+	XHTML_MIME: "application/xhtml+xml",	
+	NCX_MIME: "application/x-dtbncx+xml",
+
 	sync: BBFileSystemSync,
 
 	defaults: {
@@ -130,9 +134,16 @@ Readium.Models.EBook = Readium.Models.PackageDocumentBase.extend({
 	goToHref: function(href) {
 		var spine = this.get("spine");
 		var manifest = this.get("manifest");
-		var id = manifest.find(function(x) { 
+		var node = manifest.find(function(x) { 
 					if(x.get("href") === href) return x;
-				}).get("id");
+				});
+
+		// didn't find the spine node, href invalid
+		if(!node) {
+			return null;
+		}
+
+		var id = node.get("id");
 		
 		for(var i = 0; i < spine.length; ++i ) {
 			if(spine[i].idref === id) {
