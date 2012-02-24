@@ -21,8 +21,8 @@ Readium.Collections.ManifestItems = Backbone.Collection.extend({
 Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	
 	initialize: function(attributes, options) {
-		if(options && options.url) {
-			this.url = options.url; 	
+		if(options && options.file_path) {
+			this.file_path = options.file_path; 	
 		}
     },
 
@@ -49,6 +49,10 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	parse: function(xmlDom) {
 		var json;
 		var manifest;
+		if(typeof(xmlDom) === "string" ) {
+			var parser = new window.DOMParser;
+      		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
+		}
 		
 		Jath.resolver = function( prefix ) {
     		var mappings = { 
@@ -82,13 +86,20 @@ Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.ext
 
 Readium.Models.EBook = Readium.Models.PackageDocumentBase.extend({
 
+
 	// just want to make sure that we do not slip into an
 	// invalid state
 	validate: function(attrs) {
-		if(attrs.spine_position < 0 || attrs.spine_position >= this.get("manifest").length)	{
+		var manifest = attrs.manifest || this.get("manifest");
+		if(!manifest) {
+			return "ERROR: All ebooks must have a manifest";
+		}
+		if(attrs.spine_position < 0 || attrs.spine_position >= manifest.length)	{
 			return "ERROR: invalid spine position";
 		}
 	},
+
+	sync: BBFileSystemSync,
 
 	defaults: {
 		spine_position: 0
@@ -99,7 +110,7 @@ Readium.Models.EBook = Readium.Models.PackageDocumentBase.extend({
 	},
 
 	hasNextSection: function() {
-		return this.get("spine_position") < (this.get("manifest").length - 1);
+		return this.get("spine_position") < (this.get("spine").length - 1);
 	},
 
 	hasPrevSection: function() {

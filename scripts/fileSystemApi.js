@@ -1,6 +1,10 @@
-// Define a namespace for the library
-if (typeof Readium === "undefined" || Readium === null) {
-	Readium = {};
+if( !window.Readium ) {
+	window.Readium = {
+		Models: {},
+		Collections: {},
+		Views: {},
+		Routers: {}
+	};
 }
 
 Readium.FileSystemApi = function(initCallback) {
@@ -78,7 +82,6 @@ Readium.FileSystemApi = function(initCallback) {
 				fileEntry.createWriter(function(fileWriter) {
 
 					fileWriter.onwriteend = function(e) {
-						console.log(e);
 						successCallback(e);
 					};
 
