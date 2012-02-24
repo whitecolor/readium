@@ -6,7 +6,7 @@ if (typeof Readium === "undefined" || Readium === null) {
 Readium.FileSystemApi = function(initCallback) {
 	
 	var _fs;
-	var FILE_SYSTEM_SIZE = 1024 * 1024 * 8; // ~ 80 megaBytes
+	var FILE_SYSTEM_SIZE = 1024 * 1024 * 80; // ~ 80 megaBytes
 	
 	// Initialize the persistent storage file system ONLY after
 	// the user has already granted permission
