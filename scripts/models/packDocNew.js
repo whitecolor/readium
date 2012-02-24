@@ -3,7 +3,8 @@ if( !window.Readium ) {
 		Models: {},
 		Collections: {},
 		Views: {},
-		Routers: {}
+		Routers: {},
+		Utils: {}
 	};
 }
 
@@ -95,7 +96,7 @@ Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.ext
  * The working package doc, used to to navigate a package document
  * vai page turns, cfis, etc etc
  */
-Readium.Models.EBook = Readium.Models.PackageDocumentBase.extend({
+Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 
 	// just want to make sure that we do not slip into an
