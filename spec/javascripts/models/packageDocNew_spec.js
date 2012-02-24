@@ -61,6 +61,12 @@ describe('packDocNew', function() {
       expect(res.metadata.version).toEqual("2.0");
     });
 
+    it('parses the identifier', function() {
+      var res = packDoc.parse(dom);
+      expect(res.metadata.id).toEqual("9782035862464");
+    });
+
+
     it('parses the title', function() {
       var res = packDoc.parse(dom);
       expect(res.metadata.title).toEqual("L'espagnol dans votre poche");

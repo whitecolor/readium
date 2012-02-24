@@ -26,8 +26,10 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		}
     },
 
+	// todo: Cover image? is identifier ok?
 	jath_template: {
 		metadata:  { 
+			id: "//def:metadata/dc:identifier",
 			version: "//def:package/@version",
 			title: "//def:metadata/dc:title",
 			creator: "//def:metadata/dc:creator",
@@ -89,6 +91,10 @@ Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.ext
 	}
 });
 
+/**
+ * The working package doc, used to to navigate a package document
+ * vai page turns, cfis, etc etc
+ */
 Readium.Models.EBook = Readium.Models.PackageDocumentBase.extend({
 
 
