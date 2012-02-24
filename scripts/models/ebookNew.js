@@ -20,7 +20,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 
 	defaults: {
     	"current_page":  1,
-    	"num_pages": "0",
+    	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false
   	},

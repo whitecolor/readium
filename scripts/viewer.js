@@ -327,6 +327,7 @@ Readium.TocManager = function(book) {
 					loadErrorHandler();
 					return;
 				}
+				/*
 				Readium.Ebook(result, function(book) {
 					_book = book;
 					if(_book.isFixedLayout()) {
@@ -339,6 +340,12 @@ Readium.TocManager = function(book) {
 				}, function(e) {
 					loadErrorHandler();
 				});
+				*/
+				_book = new Readium.Models.EbookBase(result);
+				window.debugBook = _book;
+				_nav = new Readium.Views.NavWidgetView({model: _book});
+				_nav.render();
+
 			});		
 		});
 	}

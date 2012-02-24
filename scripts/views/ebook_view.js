@@ -16,11 +16,13 @@ Readium.Views.EBookView = Backbone.View.extend({
 
 Readium.Views.NavWidgetView = Backbone.View.extend({
 
-	el: $('#settings'),
+	el: '#settings',
 
 	initialize: function() {
-		this.model.on("change:two_up", this.render);
-		this.model.on("change:full_screen", this.render);
+		
+		this.model.on("change:two_up", this.render, this);
+		this.model.on("change:full_screen", this.render, this);
+		
 	},
 
 	render: function() {
@@ -32,13 +34,13 @@ Readium.Views.NavWidgetView = Backbone.View.extend({
 	},
 
 	events: {
-    	"#show-toc-button": this.model.toggleToc,
-		"#increase-font-button": this.model.increaseFont,
-		"#decrease-font-button": this.model.decreaseFont,
-		"#fullscreen-button": this.model.toggleFullScreen,
-		"#two-up-button": this.model.toggleTwoUp,
-		"#page-back-button": this.model.prevPage,
-		"#page-fwd-button": this.model.nextPage
+    	"click #show-toc-button": function() { this.model.toggleToc() },
+		"click #increase-font-button": function() { this.model.increaseFont() },
+		"click #decrease-font-button": function() { this.model.decreaseFont() },
+		"click #fullscreen-button": function() { this.model.toggleFullScreen() },
+		"click #two-up-button": function() { this.model.toggleTwoUp() },
+		"click #page-back-button": function() { this.model.prevPage() },
+		"click #page-fwd-button": function() { this.model.nextPag() }
   	},
 });
 
