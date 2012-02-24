@@ -31,6 +31,17 @@ Readium.PackageDocument = function(domString) {
 			return $imageNode.attr("href");
 		}
 
+		// some epub2's cover image is like this:
+		/*<meta name="cover" content="cover-image-item-id" />*/
+		var metaNode = $('meta[name="cover"]', _dom);
+		var contentAttr = metaNode.attr("content");
+		if(metaNode.length === 1 && contentAttr) {
+			$imageNode = $('item[id="'+contentAttr+'"]', manifest);
+			if($imageNode.length === 1 && $imageNode.attr("href")) {
+				return $imageNode.attr("href");
+			}
+		}
+
 		// that didn't seem to work so, it think epub2 just uses item with id=cover
 		$imageNode = $('#cover', manifest);
 		if($imageNode.length === 1 && $imageNode.attr("href")) {
