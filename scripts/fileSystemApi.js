@@ -3,7 +3,8 @@ if( !window.Readium ) {
 		Models: {},
 		Collections: {},
 		Views: {},
-		Routers: {}
+		Routers: {},
+		Utils: {}
 	};
 }
 

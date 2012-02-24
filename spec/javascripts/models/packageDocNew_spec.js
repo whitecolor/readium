@@ -105,7 +105,7 @@ describe('packDocNew', function() {
       var parser = new window.DOMParser;
       var dom = parser.parseFromString(xmlString, 'text/xml');
       var res = packDoc.parse(dom);
-      ebook = new Readium.Models.EBook(res) 
+      ebook = new Readium.Models.PackageDocument(res) 
     });
 
     it('sets the default spine position', function() {
@@ -127,7 +127,7 @@ describe('packDocNew', function() {
     });
 
     it("sets the file_path if passed to constructor", function() {
-      ebook = new Readium.Models.EBook({}, {file_path: "/public/sample_data/sample.opf"});
+      ebook = new Readium.Models.PackageDocument({}, {file_path: "/public/sample_data/sample.opf"});
       expect(ebook.file_path).toEqual("/public/sample_data/sample.opf");
     });
 
@@ -160,7 +160,7 @@ describe('packDocNew', function() {
         })
       });
       
-      ebook = new Readium.Models.EBook({}, {file_path: "path"});
+      ebook = new Readium.Models.PackageDocument({}, {file_path: "path"});
       waitsFor(isDone);
       runs(function() {
         done = false;

@@ -18,7 +18,9 @@ src_files:
   - lib/jath.js
   - scripts/fileSystemApi.js
   - scripts/utils/bb_file_system_sync.js
+  - scripts/utils/cookie_utils.js
   - scripts/models/packDocNew.js
+  - scripts/models/ebookNew.js
 
 # stylesheets
 #
