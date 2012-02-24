@@ -224,7 +224,7 @@ $(function() {
 
 })(jQuery);
 
-var beginExtraction = function(url) {
+var beginExtraction = function(url, filename) {
 	 // Create a new window to the info page.
 	 window.extraction.start();
 
@@ -239,7 +239,9 @@ var beginExtraction = function(url) {
 			window.extraction.updateProgress(x,y);
 		}
 	};
-	
+	if (filename) {
+		extractOptions.src_filename = filename;
+	}
 	Readium.ExtractBook(url, function(book) {
 			window.extraction.end();
 			window.Library.add(new window.LibraryItem(book));
@@ -258,7 +260,7 @@ var resetAndHideForm = function() {
 var handleFileSelect = function(evt) {
 	var files = evt.target.files; // FileList object
 	var url = window.webkitURL.createObjectURL(files[0]);
-	beginExtraction(url);
+	beginExtraction(url, files[0].name);
 	resetAndHideForm();
 };
 

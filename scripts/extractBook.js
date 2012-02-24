@@ -107,6 +107,7 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 		metaData.fixed_layout = _fixedLayout;
 		metaData.open_to_spread = _openToSpread;
 		metaData.cover_href = generateCoverImageUrl( metaData );
+		metaData.src_url = _options.src_filename || url;
 		new Lawnchair(function() {
 			this.save(metaData, function() {
 				_metaData = metaData;
