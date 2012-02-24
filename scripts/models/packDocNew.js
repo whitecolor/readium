@@ -44,6 +44,11 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		} ],
 							 
 		spine: [ "//def:itemref", { idref: "@idref" } ],
+
+		bindings: ["//def:bindings/def:mediaType", { 
+			handler: "@handler",
+			media_type: "@media-type"
+		} ]
 	},
 	
 	parse: function(xmlDom) {

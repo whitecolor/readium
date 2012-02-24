@@ -70,6 +70,12 @@ describe('packDocNew', function() {
       var res = packDoc.parse(dom);
       expect(typeof res.manifest.reset).toEqual("function")
     });
+
+    it("parses the bindings", function() {
+      var res = packDoc.parse(dom);
+      expect(res.bindings.length).toEqual(1);
+      expect(res.bindings[0].media_type).toEqual("application/x-epub-figure-gallery");
+    })
   });
 
   describe('default values', function() {
@@ -134,21 +140,32 @@ describe('packDocNew', function() {
 
     it('can fetch itself from the fs', function() {
       var done = false;
+      var isDone = function() {
+        return done;
+      }
 
       Readium.FileSystemApi(function(api) { 
         api.writeFile("path", xmlString, function(e) {
           console.log("write succeeded")
+          done=true;
         }, function() {
           console.log("write failed")
+          done=true;
         })
       });
-      waits(1000);
+      
       ebook = new Readium.Models.EBook({}, {file_path: "path"});
+      waitsFor(isDone);
       runs(function() {
-        ebook.fetch();  
+        done = false;
+        ebook.fetch({
+          success: function() {
+            done = true;
+          }
+        });  
       })
       
-      waits(1000);
+      waitsFor(isDone);
       runs(function() {
         expect(ebook.get("spine").length).toEqual(3);  
       })
