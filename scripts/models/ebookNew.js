@@ -104,6 +104,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		}
 		else {
 			this.packageDocument.goToNextSection();
+			this.set({current_page: 1})
 		}
 	},
 	
@@ -242,6 +243,6 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 
 	isFixedLayout: true,
 
-	
+
 
 });

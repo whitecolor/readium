@@ -78,6 +78,7 @@ Readium.TocManager = function(book) {
 		}
 	}
 */
+/*
 	var addPageTurnHandlers = function(pagerObj) {
 		var keydownHandler = function(e) {
 			
@@ -92,7 +93,7 @@ Readium.TocManager = function(book) {
 		}
 
 		$(document).keydown(keydownHandler);
-/*		
+		
 		
 		$('#page-fwd-button').click(function(e) {
 			e.preventDefault();
@@ -114,7 +115,7 @@ Readium.TocManager = function(book) {
 			e.preventDefault();
 			_paginator.toggleTwoUp();
 		});
-		*/
+		
 		
 		$('#fullscreen-button').click(function(e) {
 			e.preventDefault();
@@ -129,34 +130,17 @@ Readium.TocManager = function(book) {
 		
 		if(!_book.isFixedLayout()) {
 			// just prevent wheel scrolling for now, it's too buggy
-			/*document.onmousewheel = function(e) { 
+			document.onmousewheel = function(e) { 
 				if(!document.getElementById('menu').contains(e.srcElement)) {
 					e.preventDefault();
 				}
 				
-			};*/
+			};
 		}
 	}
+	*/
 
-	var parseUrlArgs = function() {
-		var hash;
-		var args = [];
-		var searchStr = window.location.search.substr(1);
-		var hashes = searchStr.split('&');
-		
-		for(var i = 0; i < hashes.length; i++)
-		{
-			hash = hashes[i].split('=');
-			args.push(hash[0]);
-			args[hash[0]] = hash[1];
-		}
-		
-		if(args["book"] && typeof args["book"] === "string") {
-			_fsPath = args["book"].substr(0, args["book"].lastIndexOf("/") + 1);
-		}
 
-		return args;
-	}
 
 /*
 	var fixLinks = function() {
@@ -191,6 +175,26 @@ Readium.TocManager = function(book) {
 		}
 	}
 	*/
+
+	var parseUrlArgs = function() {
+		var hash;
+		var args = [];
+		var searchStr = window.location.search.substr(1);
+		var hashes = searchStr.split('&');
+		
+		for(var i = 0; i < hashes.length; i++)
+		{
+			hash = hashes[i].split('=');
+			args.push(hash[0]);
+			args[hash[0]] = hash[1];
+		}
+		
+		if(args["book"] && typeof args["book"] === "string") {
+			_fsPath = args["book"].substr(0, args["book"].lastIndexOf("/") + 1);
+		}
+
+		return args;
+	}
 
 	parseViewportTag = function(viewportTag) {
 		// this is going to be ugly
@@ -375,11 +379,6 @@ Readium.TocManager = function(book) {
 						_book.prevPage();
 					}
 				});
-
-				
-
-				
-				
 
 			});		
 		});
