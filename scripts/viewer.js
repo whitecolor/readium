@@ -314,6 +314,8 @@ Readium.TocManager = function(book) {
 	}
 	*/
 
+		
+
 	var addToc = function() {
 		$('#top-bar').append(_book.getProperties().title);
 		_book.getTocText(function(res) { 
@@ -355,7 +357,29 @@ Readium.TocManager = function(book) {
 				_nav = new Readium.Views.NavWidgetView({model: _book});
 				_paginator = new Readium.Views.PaginationViewBase({model: _book});
 				_nav.render();
-				//_paginator.render();
+
+				_book.on("change:full_screen", function() {
+					if(_book.get("full_screen")) {
+						document.documentElement.webkitRequestFullScreen();	
+					}
+					else {
+						document.webkitCancelFullScreen();				
+					}
+				});
+				$(document).keydown(function(e) {
+					if(e.which == 39) {
+						_book.nextPage();
+					}
+									
+					if(e.which == 37) {
+						_book.prevPage();
+					}
+				});
+
+				
+
+				
+				
 
 			});		
 		});
