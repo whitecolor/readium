@@ -17,13 +17,49 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.on("change:current_content", this.render, this);
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.page_template = _.template( $('#reflowing-page-template').html() );
+
 	},
 
 	render: function() {
-		this.replaceContent(this.model.get("current_content") );
+		var htmlText = this.model.get("current_content");
+		var parser = new window.DOMParser();
+		var dom = parser.parseFromString( htmlText, 'text/xml' );
+		this.addStyleSheets( dom );
+		this.replaceContent( dom.body.innerHTML );
 		// need to add one page for calculation to work (TODO: this can be fixed)
 		this.$('#container').html( this.page_template({page_num: 1}) );
 		this.renderPages();
+
+	},
+
+	linkClickHandler: function(e) {
+		e.preventDefault();
+
+		var href = e.srcElement.attributes["href"].value;
+		if(href.match(/^http(s)?:/)) {
+			chrome.tabs.create({"url": href});
+		} else {
+			this.model.goToHref(href);
+		}
+	},
+
+
+	addStyleSheets: function(bookDom) {
+		var link; var href; var $link; var links;
+		
+		// first remove anything we already put up there
+		$('.readium-dynamic-sh').remove();
+
+		links = bookDom.getElementsByTagName("link");
+		
+		for (var j = 0; j < links.length; j++) {
+			link = links[j];
+			if(typeof link.rel === "string" && link.rel.toUpperCase() === "STYLESHEET") {
+				$link = $(link);
+				$link.addClass('readium-dynamic-sh');
+				$('head').prepend($link);
+			}
+		}
 	},
 
 	renderPages: function() {
@@ -50,6 +86,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		},
 		"click #readium-content-container": function() {
 			alert("click page-margin");
+		},
+
+		"click #readium-content-container a": function(e) {
+			this.linkClickHandler(e)
 		}
 	},
 
@@ -107,36 +147,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 });
 
 Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
-
-});
-
-Readium.Views.NavWidgetView = Backbone.View.extend({
-
-	el: '#settings',
-
-	initialize: function() {
-		this.model.on("change:two_up", this.render, this);
-		this.model.on("change:full_screen", this.render, this);
-	},
-
-	render: function() {
-		var ebook = this.model;
-		this.$('#to-fs-icon').toggle( !ebook.get("full_screen") );
-		this.$('#from-fs-icon').toggle( ebook.get("full_screen") );
-		this.$('#two-up-icon').toggle( !ebook.get("two_up") );
-		this.$('#one-up-icon').toggle( ebook.get("two_up") );
-	},
-
 	events: {
-    	"click #show-toc-button": 		function() { this.model.toggleToc() },
-		"click #increase-font-button": 	function() { this.model.increaseFont() },
-		"click #decrease-font-button": 	function() { this.model.decreaseFont() },
-		"click #fullscreen-button": 	function() { this.model.toggleFullScreen() },
-		"click #two-up-button": 		function() { this.model.toggleTwoUp() },
-		"click #page-back-button": 		function() { this.model.prevPage() },
-		"click #page-fwd-button": 		function() { this.model.nextPage() }
-  	},
+		'click #page-wrap a': function(e) {
+			this.linkClickHandler(e)
+		}
+	}
 });
-
 			
 		

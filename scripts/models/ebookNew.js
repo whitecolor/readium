@@ -27,12 +27,16 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	*/
 
 	initialize: function() {
+		var that = this;
 		this.packageDocument = new Readium.Models.PackageDocument({}, {
 			file_path: this.get("package_doc_path")
 		});
 		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
-		this.packageDocument.fetch();
-		
+		this.packageDocument.fetch({
+			success: function() {
+				that.packageDocument.set({spine_position: 1});
+			}
+		});
 	},
 
 	defaults: {
@@ -41,7 +45,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
     	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false,
-    	"current_content": "loading...", // should I really be setting a default?
   	},
 
 	spinePositionChangedHandler: function() {
@@ -238,5 +241,7 @@ Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
 Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 
 	isFixedLayout: true,
+
+	
 
 });

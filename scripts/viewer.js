@@ -92,7 +92,7 @@ Readium.TocManager = function(book) {
 		}
 
 		$(document).keydown(keydownHandler);
-		
+/*		
 		
 		$('#page-fwd-button').click(function(e) {
 			e.preventDefault();
@@ -114,7 +114,7 @@ Readium.TocManager = function(book) {
 			e.preventDefault();
 			_paginator.toggleTwoUp();
 		});
-		
+		*/
 		
 		$('#fullscreen-button').click(function(e) {
 			e.preventDefault();
@@ -129,12 +129,12 @@ Readium.TocManager = function(book) {
 		
 		if(!_book.isFixedLayout()) {
 			// just prevent wheel scrolling for now, it's too buggy
-			document.onmousewheel = function(e) { 
+			/*document.onmousewheel = function(e) { 
 				if(!document.getElementById('menu').contains(e.srcElement)) {
 					e.preventDefault();
 				}
 				
-			};
+			};*/
 		}
 	}
 
@@ -158,15 +158,20 @@ Readium.TocManager = function(book) {
 		return args;
 	}
 
+/*
 	var fixLinks = function() {
 		if(_book.isFixedLayout() ) {
 			$('#page-wrap a').click(linkClickHandler);
 		}
+
+		
 		else {
 			$('#readium-content-container a').click(linkClickHandler);
 		}
 		
+		
 	}
+
 
 	var removeAddedStyleSheets = function() {
 		$('.readium-dynamic-sh').remove();
@@ -185,6 +190,7 @@ Readium.TocManager = function(book) {
 			}
 		}
 	}
+	*/
 
 	parseViewportTag = function(viewportTag) {
 		// this is going to be ugly
@@ -287,12 +293,13 @@ Readium.TocManager = function(book) {
 		
 			
 	};
-	
+	/*
 	var parseBookCallback = function(domString) {
 		var parser = new window.DOMParser();
 		var xmlDoc = parser.parseFromString(domString,"text/xml");
 		showBook(xmlDoc);
 	}
+	
 
 	var linkClickHandler = function(e) {
 		var href = this.attributes["href"].value;
@@ -305,6 +312,7 @@ Readium.TocManager = function(book) {
 			console.log('failed to navigate spine to ' + href);
 		}
 	}
+	*/
 
 	var addToc = function() {
 		$('#top-bar').append(_book.getProperties().title);
@@ -347,7 +355,7 @@ Readium.TocManager = function(book) {
 				_nav = new Readium.Views.NavWidgetView({model: _book});
 				_paginator = new Readium.Views.PaginationViewBase({model: _book});
 				_nav.render();
-				_paginator.render();
+				//_paginator.render();
 
 			});		
 		});
