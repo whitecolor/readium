@@ -164,7 +164,40 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 				break;
 			}
 		}
-	}
+	},
+
+	/* TODO getTOC()
+	getTocText: function(successCallback, failureCallback) {
+		var path = this.packageDocument.getTocPath();
+		if(!path) {
+			failureCallback();
+			return;
+		}
+
+		if(this.packageDocument.getTocType() === this.packageDocument.XHTML_MIME) {
+			Readium.FileSystemApi(function(fs) {
+				fs.readTextFile(resolvePath(path), function(result) { 
+					var parser = new window.DOMParser();
+					var dom = parser.parseFromString(result, 'text/xml');
+					successCallback( $('body', dom).html() ); 
+				}, failureCallback);
+			});		
+		}
+
+		else if(this.packageDocument.getTocType() === this.packageDocument.NCX_MIME) {
+			Readium.FileSystemApi(function(fs) {
+				fs.readTextFile(resolvePath(path), function(result) { 
+					buildTocHtml(result, successCallback) 
+				}, failureCallback);
+			});				
+		}
+
+		else {
+			
+		}
+
+	},
+	*/
 
 
 });

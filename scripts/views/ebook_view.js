@@ -81,15 +81,14 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	// this doesn't seem to be working...
 	events: {
-		"click .page": function() {
-			alert("click page");
+
+		"click #page-margin": function(e) {
+			this.trigger("toggle_ui");
 		},
-		"click #readium-content-container": function() {
-			alert("click page-margin");
-		},
+		
 
 		"click #readium-content-container a": function(e) {
-			this.linkClickHandler(e)
+			this.linkClickHandler(e);
 		}
 	},
 

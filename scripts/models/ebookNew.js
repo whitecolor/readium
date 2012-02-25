@@ -93,7 +93,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		else {
 			this.packageDocument.goToPrevSection();
 		}
-
 	},
 	
 	nextPage: function() {
@@ -127,7 +126,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 		
 	resolveUrl: function(path) {
-
 		// this wont work
 		return _rootUrl + resolvePath(path);
 	},
@@ -185,37 +183,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 			temp[i] = resolveUrl(temp[i]);
 		}
 		return temp;
-	},
-
-	getTocText: function(successCallback, failureCallback) {
-		var path = this.packageDocument.getTocPath();
-		if(!path) {
-			failureCallback();
-			return;
-		}
-
-		if(this.packageDocument.getTocType() === this.packageDocument.XHTML_MIME) {
-			Readium.FileSystemApi(function(fs) {
-				fs.readTextFile(resolvePath(path), function(result) { 
-					var parser = new window.DOMParser();
-					var dom = parser.parseFromString(result, 'text/xml');
-					successCallback( $('body', dom).html() ); 
-				}, failureCallback);
-			});		
-		}
-
-		else if(this.packageDocument.getTocType() === this.packageDocument.NCX_MIME) {
-			Readium.FileSystemApi(function(fs) {
-				fs.readTextFile(resolvePath(path), function(result) { 
-					buildTocHtml(result, successCallback) 
-				}, failureCallback);
-			});				
-		}
-
-		else {
-			
-		}
-
 	},
 
 	goToHref: function(href) {

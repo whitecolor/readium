@@ -360,6 +360,9 @@ Readium.TocManager = function(book) {
 				window.debugBook = _book;
 				_nav = new Readium.Views.NavWidgetView({model: _book});
 				_paginator = new Readium.Views.PaginationViewBase({model: _book});
+				_paginator.on("toggle_ui", function() {
+					toggleUi();
+				});
 				_nav.render();
 
 				_book.on("change:full_screen", function() {
