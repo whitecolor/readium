@@ -15,18 +15,20 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	initialize: function(options) {
 		this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:current_content", this.render, this);
+		this.model.on("change:font_size", this.setFontSize, this);
 		this.page_template = _.template( $('#reflowing-page-template').html() );
 	},
 
 	render: function() {
-		var i; var html; var num;
 		this.replaceContent(this.model.get("current_content") );
+		// need to add one page for calculation to work (TODO: this can be fixed)
+		this.$('#container').html( this.page_template({page_num: 1}) );
+		this.renderPages();
+	},
 
+	renderPages: function() {
+		var i; var html; var num;
 		num = this.guessPageNumber();
-
-
-		
-		
 		html = "";
 		for( i = 1; i <= num; i++) {
 			html += this.page_template({page_num: i});
@@ -39,7 +41,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 		*/
 		this.model.set({num_pages: num});
-	
 	},
 
 	// this doesn't seem to be working...
@@ -83,17 +84,20 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	guessPageNumber: function() {
-
-		return 5;
-		/*
+		
 		var quotient;
 		quotient = $('#readium-content-container').height() / $('.page').first().height();
 		if(quotient < 1) {
 			return 1;
 		}
 		return Math.ceil(quotient);
-		*/
-	}
+	},
+
+	setFontSize: function() {
+		var size = this.model.get("font_size") / 10;
+		$('#readium-content-container').css("font-size", size + "em");
+		this.renderPages();
+	},
 
 	
 });

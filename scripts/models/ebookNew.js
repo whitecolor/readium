@@ -30,21 +30,32 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		this.packageDocument = new Readium.Models.PackageDocument({}, {
 			file_path: this.get("package_doc_path")
 		});
-		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler);
+		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.fetch();
 		
 	},
 
 	defaults: {
+		"font_size": 10,
     	"current_page":  1,
     	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false,
-    	"current_content": "some stuff for example",
+    	"current_content": "loading...", // should I really be setting a default?
   	},
 
 	spinePositionChangedHandler: function() {
-		this.trigger("changed_spine");
+		var that = this;
+		var sect = this.packageDocument.currentSection();
+		var path = sect.get("href");
+		path = this.resolvePath(path);
+		Readium.FileSystemApi(function(api) {
+			api.readTextFile(path, function(result) {
+				that.set( {current_content: result} );
+			}, function() {
+				console.log("Failed to load file: " + path);
+			})
+		});
 	},
 
 	toggleTwoUp: function() {
@@ -58,11 +69,13 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 
 	increaseFont: function() {
-
+		var size = this.get("font_size");
+		this.set({font_size: size + 1})
 	},
 
 	decreaseFont: function() {
-
+		var size = this.get("font_size");
+		this.set({font_size: size - 1})
 	},
 
 	toggleToc: function() {
@@ -95,19 +108,23 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		Readium.Utils.setCookie(_properties.key, _packageDocument.getPosition(), 365);
 	},
 
+	// TODO: do move this into package doc class (no sense it being here)
 	resolvePath: function(path) {
 		var suffix;
+		var pack_doc_path = this.packageDocument.file_path;
 		if(path.indexOf("../") === 0) {
 			suffix = path.substr(3);
 		}
 		else {
 			suffix = path;
 		}
-		var ind = _properties.package_doc_path.lastIndexOf("/")
-		return _properties.package_doc_path.substr(0, ind) + "/" + suffix;
+		var ind = pack_doc_path.lastIndexOf("/")
+		return pack_doc_path.substr(0, ind) + "/" + suffix;
 	},
 		
 	resolveUrl: function(path) {
+
+		// this wont work
 		return _rootUrl + resolvePath(path);
 	},
 	

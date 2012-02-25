@@ -26,6 +26,7 @@ Readium.TocManager = function(book) {
 		$('#readium-content-container').bind("content-size-changed", doneSwapping);
 	}
 
+/*
 	var flipTheSection = function() {
 		if(_book.goToNextSection()) {
 			openCurrentSection();
@@ -76,7 +77,7 @@ Readium.TocManager = function(book) {
 			setFontSize();	
 		}
 	}
-	
+*/
 	var addPageTurnHandlers = function(pagerObj) {
 		var keydownHandler = function(e) {
 			
