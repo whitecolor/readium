@@ -21,11 +21,15 @@ html, body {
 }
 
 #content {
-  /*  -webkit-flow: 'foo';
-    -webkit-flow-into: foo;*/
     color: #444;
     font: normal 16px/1.25 'Helvetica Neue', sans-serif;
 }
+
+#readium-content-container {
+	-webkit-flow: 'foo';
+    -webkit-flow-into: foo;
+}
+
 ::-webkit-scrollbar {
     visibility: hidden;
 }

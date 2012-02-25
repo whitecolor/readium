@@ -10,19 +10,37 @@ if( !window.Readium ) {
 
 Readium.Models.EbookBase = Backbone.Model.extend({
 
+	/* All these attrs are being passed in right now for historical reasons
+			author: "Rudyard Kipling"
+			cover_href: "/images/library/missing-cover-image.png"
+			created_at: "2012-02-24T21:22:27.613Z"
+			epub_version: "2.0"
+			fixed_layout: false
+			id: "urn:uuid:1EECAADE-E17A-11E0-90DD-014376811DC8"
+			key: "069871a83831f401042cccc04d6ab714"
+			lang: "en-us"
+			open_to_spread: false
+			package_doc_path: "069871a83831f401042cccc04d6ab714/OPS/content.opf"
+			publisher: "epubBooks (www.epubbooks.com)"
+			title: "Plain Tales from the Hills"
+			updated_at: "2012-02-24T21:22:27.613Z"
+	*/
+
 	initialize: function() {
-		this.packageDocument = new Readium.Models.PackageDocument({
-			file_path: "some path"
+		this.packageDocument = new Readium.Models.PackageDocument({}, {
+			file_path: this.get("package_doc_path")
 		});
 		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler);
-		//this.packageDocument.fetch();
+		this.packageDocument.fetch();
+		
 	},
 
 	defaults: {
     	"current_page":  1,
     	"num_pages": 0,
     	"two_up": false,
-    	"full_screen": false
+    	"full_screen": false,
+    	"current_content": "some stuff for example",
   	},
 
 	spinePositionChangedHandler: function() {
@@ -38,12 +56,18 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		var fullScreen = this.get("full_screen");
 		this.set({full_screen: !fullScreen});
 	},
-/*
-	"#show-toc-button": this.model.toggleToc,
-	"#increase-font-button": this.model.increaseFont,
-	"#decrease-font-button": this.model.decreaseFont,
-	"#fullscreen-button": this.model.toggleFullScreen,
-	*/
+
+	increaseFont: function() {
+
+	},
+
+	decreaseFont: function() {
+
+	},
+
+	toggleToc: function() {
+
+	},
 	
 	prevPage: function() {
 		var pageNum = this.get("current_page") - 1;

@@ -344,7 +344,9 @@ Readium.TocManager = function(book) {
 				_book = new Readium.Models.EbookBase(result);
 				window.debugBook = _book;
 				_nav = new Readium.Views.NavWidgetView({model: _book});
+				_paginator = new Readium.Views.PaginationViewBase({model: _book});
 				_nav.render();
+				_paginator.render();
 
 			});		
 		});
