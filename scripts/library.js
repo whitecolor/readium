@@ -299,7 +299,10 @@ var flash = function(text, type) {
 	});
 	$("#row-view-btn").click(function(e) {
 		$('#library-items-container').addClass("row-view").removeClass("block-view")
-	})
+	});
+	$("#options-btn").click(function(e) {
+		window.location = "/views/options.html";
+	});
 	
 });
 
