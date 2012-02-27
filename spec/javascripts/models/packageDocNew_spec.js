@@ -96,7 +96,7 @@ describe('packDocNew', function() {
     });
   });
 
-  describe("EBook", function() {
+  describe("PackageDocument", function() {
     
     var ebook;
 
@@ -125,6 +125,17 @@ describe('packDocNew', function() {
       ebook.set({spine_position: 100});
       expect(ebook.get("spine_position") === 100).toBeFalsy()
     });
+
+    it('fires and increased:spine pos event', function() {
+      var stub = {
+        called: function() {}
+      }
+
+      spyOn(stub, "called")
+      ebook.on("increased:spine_position", stub.called)
+      ebook.set({spine_position: 2});
+      //expect(stub.callback).toHaveBeenCalled();
+    })
 
     it("sets the file_path if passed to constructor", function() {
       ebook = new Readium.Models.PackageDocument({}, {file_path: "/public/sample_data/sample.opf"});

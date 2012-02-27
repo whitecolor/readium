@@ -11,13 +11,22 @@ if( !window.Readium ) {
 Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	el: "#readium-book-view-el",
+	renderToLastPage: false,
 
 	initialize: function(options) {
 		this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:current_content", this.render, this);
 		this.model.on("change:font_size", this.setFontSize, this);
-		this.page_template = _.template( $('#reflowing-page-template').html() );
+		// TODO: should I break layers here or pass through?
+		this.model.packageDocument.on("increased:spine_position", function() {
+			this.renderToLastPage = false;
+		}, this);
+		this.model.packageDocument.on("decreased:spine_position", function() {
+			this.renderToLastPage = true;
+		}, this);
 
+
+		this.page_template = _.template( $('#reflowing-page-template').html() );
 	},
 
 	render: function() {
@@ -29,6 +38,12 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		// need to add one page for calculation to work (TODO: this can be fixed)
 		this.$('#container').html( this.page_template({page_num: 1}) );
 		this.renderPages();
+		if(this.renderToLastPage) {
+			this.model.goToLastPage();
+		}
+		else {
+			this.model.goToFirstPage();
+		}
 
 	},
 
@@ -100,12 +115,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		var that = this;
 		var currentPage = this.model.get("current_page")
 		this.$(".page-wrap").each(function(index) {
-			if( that.isPageVisible(index + 1, currentPage) ) {
-				$(this).css({visibility: "visible"});
-			}
-			else {
-				$(this).css({visibility: "hidden"});
-			}
+			$(this).toggleClass("hidden-page", !that.isPageVisible(index + 1, currentPage))
 		});
 	},
 

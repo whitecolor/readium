@@ -1,8 +1,9 @@
 html, body { 
 	margin: 0; 
 	padding: 0; 
-/*	height: 100%;  
-	width: 100%; */
+	height: 100%;  
+	width: 100%;
+	overflow: hidden;
 	background-color: #BBB;
 }
 
@@ -34,12 +35,26 @@ html, body {
     visibility: hidden;
 }
 
+#page-wrap #container {
+	position: relative;
+}
+
+
+
 .page-wrap {
 	height: 100%;
 	width: 100%;
+	position: fixed;
 	padding: 0;
 	margin: 0;
 	overflow: visible;
+	z-index: 1;
+
+}
+
+.page-wrap.hidden-page {
+	visibility: hidden;
+	z-index: -10000;
 }
 
 
@@ -135,6 +150,7 @@ span.setting-button:hover {
 	border-left: 1px solid black;	
 	border-right: 1px solid #353F5E;
 }
+
 
 /* stop buttons from highlighting on double click */
 #settings, #settings span, #settings img {

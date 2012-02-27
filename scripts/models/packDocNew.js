@@ -99,6 +99,25 @@ Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.ext
 Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 
+	initialize: function(attributes, options) {
+		// TODO make this a call to the super ctor
+		//Readium.Models.PackageDocument.prototype.initialize.call(this, attributes, options);
+		if(options && options.file_path) {
+			this.file_path = options.file_path; 	
+		}
+		this.on('change:spine_position', this.onSpinePosChanged);
+    },
+
+    onSpinePosChanged: function() {
+    	if( this.get("spine_position") > this.previous("spine_position") ) {
+    		this.trigger("increased:spine_position");
+    	}
+    	else {
+    		this.trigger("decreased:spine_position");
+    	}
+    },
+
+
 	// just want to make sure that we do not slip into an
 	// invalid state
 	validate: function(attrs) {

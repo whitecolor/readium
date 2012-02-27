@@ -103,10 +103,19 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		}
 		else {
 			this.packageDocument.goToNextSection();
-			this.set({current_page: 1})
+			this.set({current_page: 1}) // TODO SHOULD I KEEP THIS?
 		}
 	},
 	
+	goToFirstPage: function() {
+		this.set("current_page", 1)
+	},
+
+	goToLastPage: function() {
+		var page = this.get("num_pages");
+		this.set("current_page", page);
+	},
+
 	savePosition: function() {
 		Readium.Utils.setCookie(_properties.key, _packageDocument.getPosition(), 365);
 	},
