@@ -11,10 +11,9 @@ function getClickHandler() {
 
 chrome.extension.onRequest.addListener(
   function(request, sender, sendResponse) {
-    if (request.storage == "rewrite_link")
-      sendResponse({storage: localStorage["rewrite_link"]});
-    else
-      sendResponse({}); // snub them.
+    var optionString = localStorage["READIUM_OPTIONS"];
+    var options = (optionString && JSON.parse(optionString) ) || {};
+    sendResponse(options[request.storage]); // snub them.
   });
 
 // create a context menu item
