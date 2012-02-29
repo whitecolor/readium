@@ -37,6 +37,8 @@ html, body {
 
 #page-wrap #container {
 	position: relative;
+	width: 100%;
+	height: 100%;
 }
 
 
@@ -226,6 +228,14 @@ span.setting-button:hover {
 	width: 50%;
 }
 
+.two-up .page-wrap.odd {
+	left: 50%;
+}
+
+.two-up .page-wrap.even {
+	left: 0;
+}
+
 .two-up .odd, .two-up .even .page-margin {
 	float: right;
 }
@@ -255,6 +265,7 @@ span.setting-button:hover {
 	display: none;
 	background-color: #444;
 	opacity: 0.6;
+	z-index: 10;
 }
 
 

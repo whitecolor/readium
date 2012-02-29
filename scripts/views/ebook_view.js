@@ -17,6 +17,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:current_content", this.render, this);
 		this.model.on("change:font_size", this.setFontSize, this);
+		this.model.on("change:two_up", this.renderPages, this);
 		// TODO: should I break layers here or pass through?
 		this.model.packageDocument.on("increased:spine_position", function() {
 			this.renderToLastPage = false;
@@ -38,6 +39,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		// need to add one page for calculation to work (TODO: this can be fixed)
 		this.$('#container').html( this.page_template({page_num: 1}) );
 		this.renderPages();
+		this.toggleTwoUp();
 		if(this.renderToLastPage) {
 			this.model.goToLastPage();
 		}
@@ -63,8 +65,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		var link; var href; var $link; var links;
 		
 		// first remove anything we already put up there
+
 		$('.readium-dynamic-sh').remove();
 
+		// TODO USE jQUERY for this (bug reported and fixed in master)
 		links = bookDom.getElementsByTagName("link");
 		
 		for (var j = 0; j < links.length; j++) {
@@ -79,10 +83,19 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	renderPages: function() {
 		var i; var html; var num;
+		var two_up = this.model.get("two_up");
 		num = this.guessPageNumber();
 		html = "";
+
+		this.$el.toggleClass("two-up", two_up);
+		this.$('#spine-divider').toggle(two_up);
+		if(two_up) {
+
+		}
+
+
 		for( i = 1; i <= num; i++) {
-			html += this.page_template({page_num: i});
+			html += this.page_template({page_num: i, empty: false});
 		}
 
 		this.$('#container').html( html );
@@ -91,7 +104,13 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			_pageAddCallback($('.page-wrap'));
 		}
 		*/
+		if(two_up && num % 2 === 1) {
+			num += 1;
+			this.$('#container').append( this.page_template({page_num: i, empty: false}) );
+		}
 		this.model.set({num_pages: num});
+		// dunno that I should be calling this explicitly
+		this.changePage();
 	},
 
 	// this doesn't seem to be working...
@@ -108,7 +127,23 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	isPageVisible: function(pageNum, currentPage) {
-		return currentPage === pageNum;
+		
+		if(currentPage === pageNum) return true;
+		
+		if(this.model.get("two_up")) {
+			// in two up mode, things are more complicated
+			// even pages are always on the left, so...
+			if(currentPage % 2 === 0) {
+				return pageNum === (currentPage + 1);
+			}
+
+			if(currentPage % 2 === 1) {
+				return pageNum === (currentPage - 1);
+			}
+		}
+
+		return false;
+		
 	},
 
 	changePage: function() {
@@ -129,7 +164,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	toggleTwoUp: function() {
-
+		
+		//this.render();
 	},
 
 	guessPageNumber: function() {
