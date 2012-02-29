@@ -1,7 +1,7 @@
 $(function() {
 
 (function($) {
-	
+	// todo move this stuff into the proper namespaces
 	window.LibraryItem = Backbone.Model.extend({
 
 		idAttribute: "key",
@@ -210,6 +210,90 @@ $(function() {
 			return this;
 		}
 	});
+
+
+	// the options
+	window.ReadiumOptions = Backbone.Model.extend({
+
+		defaults: {
+			hijack_epub_urls: true,
+			verbose_unpacking: true
+		},
+
+		sync: function(method, model, options) {
+			// "create" create the model on the server
+			// "read" : read this model from the server and return it
+			// "update" : update the model on the server with the argument
+			// "delete" : delete the model from the server.
+			var json;
+			var key = "READIUM_OPTIONS"
+
+			if(method === "read") {
+				json = window.localStorage.getItem(key);
+				if(json) {
+					// DON'T CHANGE IF NOTHING IN STORAGE
+					model.attributes = (json && JSON.parse(json)) || {};	
+				}
+				else {
+					options.error('Failed to load settings from local storage')
+					return;
+				}
+			}
+
+			if(method === "create" || method === "update") {
+				window.localStorage.setItem(key, JSON.stringify(model.attributes) );
+				
+			}
+			
+			if(method === "delete") {
+				// TODO: this is not deleting stuff...
+				window.localStorage.removeItem(key);
+			}
+			options.success(model);
+			
+		}
+	});
+
+	window.ReadiumOptionsView = Backbone.View.extend({
+		el: "#readium-options-modal",
+
+		initialize: function() {
+			this.model.on("change", this.render, this);
+		},
+
+		render: function() {
+			var m = this.model;
+			this.$('#verbose_unpacking').prop('checked', m.get("verbose_unpacking"));
+			this.$('#hijack_epub_urls').prop('checked', m.get("hijack_epub_urls"));
+		},
+
+		events: {
+    		"change #verbose_unpacking": "updateSettings",
+    		"change #hijack_epub_urls": "updateSettings",
+    		"click #save-settings-btn": "save"
+  		},
+
+  		updateSettings: function() {
+  			var hijack = this.$('#hijack_epub_urls').prop('checked')
+  			var unpack = this.$('#verbose_unpacking').prop('checked')
+  			
+			this.model.set({"verbose_unpacking": unpack});
+			this.model.set({"hijack_epub_urls": hijack});
+  		},
+
+  		save: function() {
+  			this.model.save();
+  		}
+
+	});
+
+	window.options = new ReadiumOptions;
+	window.optionsView = new ReadiumOptionsView({model: window.options});
+	window.options.fetch({
+		success: function() {
+			//optionsView.render();
+		}
+	});
 		
 	window.extraction = new ExtractItem({extracting: false});
 	window.extract_view = new ExtractItemView({model: extraction});
@@ -224,7 +308,7 @@ $(function() {
 
 })(jQuery);
 
-var beginExtraction = function(url) {
+var beginExtraction = function(url, filename) {
 	 // Create a new window to the info page.
 	 window.extraction.start();
 
@@ -239,7 +323,9 @@ var beginExtraction = function(url) {
 			window.extraction.updateProgress(x,y);
 		}
 	};
-	
+	if (filename) {
+		extractOptions.src_filename = filename;
+	}
 	Readium.ExtractBook(url, function(book) {
 			window.extraction.end();
 			window.Library.add(new window.LibraryItem(book));
@@ -258,7 +344,7 @@ var resetAndHideForm = function() {
 var handleFileSelect = function(evt) {
 	var files = evt.target.files; // FileList object
 	var url = window.webkitURL.createObjectURL(files[0]);
-	beginExtraction(url);
+	beginExtraction(url, files[0].name);
 	resetAndHideForm();
 };
 
@@ -299,7 +385,17 @@ var flash = function(text, type) {
 	});
 	$("#row-view-btn").click(function(e) {
 		$('#library-items-container').addClass("row-view").removeClass("block-view")
-	})
+	});
+
+	// TODO: use a Backbone router for this
+	if(window.location.hash === "#options") {
+		$('#readium-options-modal').modal('show')
+	}
+	/*
+	$("#options-btn").click(function(e) {
+		window.location = "/views/options.html";
+	});
+*/
 	
 });
 

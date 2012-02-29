@@ -61,6 +61,12 @@
 						</a>
 					</div>
 
+					<div class="bar-icon">
+						<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
+							<img src="/images/top_bar/options.png" class="small"/>
+						</a>
+					</div>
+
 
 					<a class="pull-right" data-toggle="modal" href="#readium-info" id='bar-logo'>
 						<img src="/images/top_bar/READIUM_TOOLBAR_LOGO.png"/>
@@ -160,6 +166,52 @@
 
 			</div><!-- end add le book -->
 
+
+		<div class="modal fade" id="readium-options-modal" ><!-- le settings modal -->
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal">&times;</a>
+				<h2>Readium Options:</h2>
+			</div>
+			
+			<div class="modal-body">
+		
+				<form class="form">
+        <fieldset>
+          
+			
+          
+           
+          <div class="control-group">
+            <label class="control-label" for="optionsCheckbox"></label>
+            <div class="controls">
+              <label class="checkbox">
+                <input type="checkbox" id="hijack_epub_urls" value="hijack_epub_urls">
+                Automatically open *.epub urls in readium
+              </label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="optionsCheckbox"></label>
+            <div class="controls">
+              <label class="checkbox">
+                <input type="checkbox" id="verbose_unpacking" value="verbose_unpacking">
+                Show warning messages when unpacking EPUB files
+              </label>
+            </div>
+          </div>
+          
+        </fieldset>
+      </form>
+      </div>
+			
+			<div class="modal-footer">
+                <a href="#" class="btn btn-primary" id="save-settings-btn">Save changes</a>
+                <a href="#" class="btn" data-dismiss="modal">Close</a>
+            </div>
+		</div><!-- end le settings modal -->
+
+
 			<div id='progress-container' class='span5' style="display: none">
 			</div>
 
@@ -202,14 +254,14 @@
 					<h3 class='green modal-title'><%= title %></h3>
 					<div class='modal-detail gap'>Author: <%= author || "Unknown" %></div>
 					<div class='modal-detail'>Publisher: <%= publisher || "Unknown" %></div>
-					<div class='modal-detail'>Pub Date: Todo 29, 2011</div>
+					<div class='modal-detail'>Pub Date: <%= pubdate || "Unknown" %></div>
 					<div class='modal-detail gap'>ID: <%= id || "Unknown" %></div>
 					<div class='modal-detail green'>Format: ePUB <%= epub_version || "Unknown" %></div>
 					<div class='modal-detail'>Added: <%= created_at || "Unknown" %></div>
 				</div>
 				<div class='modal-detail source'>
 				<span class='green' style="padding-right: 10px">Source:</span>
-					file://todo/capture/this/and/storeit.epub
+					<%= src_url || "Unknown" %>
 				</div>
 			</div>			
 		</script>

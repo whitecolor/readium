@@ -29,5 +29,6 @@
       "js": ["lib/jquery-1.7.1.min.js", "background/hijack-ebooks.js"]
     }
   ],
+   "options_page": "views/library.html#options",
    "version": "0.1.7"
 }

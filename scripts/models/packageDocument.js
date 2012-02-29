@@ -80,6 +80,35 @@ Readium.PackageDocument = function(domString) {
 				return "UNKNOWN";
 			}
 		}
+            var parseDateTime = function(datetime) {
+                var re = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z/;
+                var matched = datetime.match(re);
+                if (matched) {
+                    return matched[1]+"/"+matched[2]+"/"+matched[3]+" "+matched[4]+":"+matched[5]+":"+matched[6];
+                } else {
+                    // unknown format; return itself
+                    return datetime;
+                }
+            }
+            var getPubDateHelper = function() {
+                var date = null;
+                var elems = null;
+                var mDom = _dom.getElementsByTagName('metadata')[0];
+                elems = $('date', mDom);
+                if(elems.length >= 1) {
+                    date = elems[0].textContent;
+                } else {
+                    elems = $('meta[property="dcterms:modified"]', mDom);
+                    if(elems.length >= 1) {
+                        date = elems[0].textContent;
+                    }
+                }
+                if (date) {
+                    return parseDateTime(date);
+                } else {
+                    return "UNKNOWN";
+                }
+            }
 		
 		metaData.title = getTagHelper('title');
 		metaData.id = getTagHelper('identifier');
@@ -88,6 +117,7 @@ Readium.PackageDocument = function(domString) {
 		metaData.author = getTagHelper('creator');
 		metaData.cover_href = getCoverHref();
 		metaData.epub_version = getVersionNumber();
+		metaData.pubdate = getPubDateHelper();
 
 		
 		return metaData;

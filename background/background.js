@@ -9,6 +9,13 @@ function getClickHandler() {
   };
 };
 
+chrome.extension.onRequest.addListener(
+  function(request, sender, sendResponse) {
+    var optionString = localStorage["READIUM_OPTIONS"];
+    var options = (optionString && JSON.parse(optionString) ) || {};
+    sendResponse(options[request.storage]); // snub them.
+  });
+
 // create a context menu item
 chrome.contextMenus.create({
   "title" : "Add to Readium Library",

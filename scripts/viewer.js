@@ -163,7 +163,7 @@ Readium.TocManager = function(book) {
 
 	var addStyleSheets = function(bookDom) {
 		removeAddedStyleSheets();
-		var links = bookDom.getElementsByTagName("link");
+		var links = $("link", bookDom);
 		var link; var href; var $link;
 		for (var j = 0; j < links.length; j++) {
 			link = links[j];
