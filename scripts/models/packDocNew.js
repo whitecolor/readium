@@ -121,11 +121,17 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	// just want to make sure that we do not slip into an
 	// invalid state
 	validate: function(attrs) {
-		var manifest = attrs.manifest || this.get("manifest");
-		if(!manifest) {
-			return "ERROR: All ebooks must have a manifest";
+		
+		if( !( attrs.manifest || this.get("manifest") ) ) {
+			return "ERROR: All ePUBs must have a manifest";
 		}
-		if(attrs.spine_position < 0 || attrs.spine_position >= manifest.length)	{
+
+		//validate the spine exists and the position is valids
+		var spine = attrs.spine || this.get("spine") ;
+		if( !spine ) {
+			return "ERROR: All ePUBs must have a spine";
+		}
+		if(attrs.spine_position < 0 || attrs.spine_position >= spine.length)	{
 			return "ERROR: invalid spine position";
 		}
 	},
