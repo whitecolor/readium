@@ -103,7 +103,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		}
 		else {
 			this.packageDocument.goToNextSection();
-			this.set({current_page: 1}) // TODO SHOULD I KEEP THIS?
 		}
 	},
 	
@@ -218,7 +217,5 @@ Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
 Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 
 	isFixedLayout: true,
-
-
 
 });
