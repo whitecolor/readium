@@ -305,7 +305,7 @@ Readium.Ebook = function(properties, successCallback, errorCallback) {
 		},
 
 		goToHref: function(href) {
-			if(_packageDocument.goToHref(href)) {
+			if(_packageDocument.goToHref(href,this)) {
 				savePosition();
 				return true;
 			}

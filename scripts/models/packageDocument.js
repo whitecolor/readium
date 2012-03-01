@@ -13,6 +13,8 @@ Readium.PackageDocument = function(domString) {
 	var _spinePosition = -1;
 	var _currentFileUrl = null;
 	var _bindingHandlers = null;
+	var _fs = null;
+	var _resolver = null;
 	
 	// initialization code
 	var init = function() {
@@ -172,8 +174,25 @@ Readium.PackageDocument = function(domString) {
 		}
 	};
 
-	var getSpineNodePositionFromHref = function(href) {
-		var elem = $('item[href="' + href + '"]', _dom);
+	var getSpineNodePositionFromHref = function(href, book) {
+		var findItemByHref = function(href, book) {
+			var elems = $('item', _dom);
+			var hrefFilePath = href.replace(/#.*$/, "");
+			for(var i = 0; i< elems.length; i++) {
+				var itemHref = elems[i].attributes["href"].value;
+				itemHref = itemHref.replace(/#.*$/, "");
+				if(itemHref === hrefFilePath ||
+					_resolver.resolve(book.resolvePath(itemHref)).toString() === hrefFilePath) {
+					return $(elems[i]);
+				}
+			}
+			return null;
+		};
+
+		var elem = findItemByHref(href, book);
+		if (elem === null) {
+			return -1;
+		}
 		var id = elem.attr('id');
 		var sns = spineNodes();
 		for(var i = 0; i < sns.length; i++) {
@@ -196,6 +215,11 @@ Readium.PackageDocument = function(domString) {
 	};
 	
 	init();
+	Readium.FileSystemApi(function(fs) {
+		_fsApi = fs;
+		var rootUrl = _fsApi.getFileSystem().root.toURL();
+		_resolver = new PathResolver(rootUrl);
+	});
 	// return pubic interface
 	return {
 
@@ -278,8 +302,8 @@ Readium.PackageDocument = function(domString) {
 			return !!( _dom.getElementsByTagName('spine')[0] );
 		},
 
-		goToHref: function(href) {
-			var pos = getSpineNodePositionFromHref(href);
+		goToHref: function(href, book) {
+			var pos = getSpineNodePositionFromHref(href, book);
 			if(pos === -1) {
 				// failed to find the spine node
 				return false;
