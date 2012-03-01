@@ -41,7 +41,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 
 	defaults: {
 		"font_size": 10,
-    	"current_page":  1,
+    	"current_page":  [1],
     	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false,
@@ -86,33 +86,42 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 	
 	prevPage: function() {
-		var pageNum = this.get("current_page") - 1;
-		if( pageNum > 0) {
-			this.set({current_page: pageNum });
+		var curr_pg = this.get("current_page");
+		var lastPage = curr_pg[0] - 1;
+
+		if(curr_pg[0] <= 1) {
+			this.packageDocument.goToPrevSection();
+		}
+		else if(!this.get("two_up")){
+			this.set("current_page", [lastPage]);
 		}
 		else {
-			this.packageDocument.goToPrevSection();
+			this.set("current_page", [lastPage - 1, lastPage]);
 		}
 	},
 	
 	nextPage: function() {
-		var cp = this.get("current_page");
-		var np = this.get("num_pages");
-		if(cp < np) {
-			this.set({current_page: (cp + 1) });
+		var curr_pg = this.get("current_page");
+		var firstPage =curr_pg[curr_pg.length-1] + 1;
+		if (curr_pg[curr_pg.length-1] >= this.get("num_pages") ) {
+			this.packageDocument.goToNextSection();
+		}
+		else if(!this.get("two_up")){
+			return this.set("current_page", [firstPage]);
 		}
 		else {
-			this.packageDocument.goToNextSection();
+			return this.set("current_page", [firstPage, firstPage+1]);
 		}
 	},
 	
 	goToFirstPage: function() {
-		this.set("current_page", 1)
+		(!this.get("two_up")) ? this.set("current_page", [1]) : this.set("current_page", [0,1]);
 	},
 
 	goToLastPage: function() {
 		var page = this.get("num_pages");
-		this.set("current_page", page);
+
+		(!this.get("two_up")) ? this.set("current_page", [page]) : this.set("current_page", [page-1, page]);
 	},
 
 	savePosition: function() {
