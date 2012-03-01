@@ -37,7 +37,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.addStyleSheets( dom );
 		this.replaceContent( dom.body.innerHTML );
 		// need to add one page for calculation to work (TODO: this can be fixed)
-		this.$('#container').html( this.page_template({page_num: 1}) );
+		this.$('#container').html( this.page_template({page_num: 1, empty: false}) );
 		this.renderPages();
 		this.toggleTwoUp();
 		if(this.renderToLastPage) {
@@ -90,11 +90,11 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.$el.toggleClass("two-up", two_up);
 		this.$('#spine-divider').toggle(two_up);
 		if(two_up) {
-
+			html += this.page_template({page_num: 0, empty: true})
 		}
 
-
-		for( i = 1; i <= num; i++) {
+		i = two_up ? 0 : 1;
+		for( i ; i <= num; i++) {
 			html += this.page_template({page_num: i, empty: false});
 		}
 
