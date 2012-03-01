@@ -37,6 +37,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 				that.packageDocument.set({spine_position: 1});
 			}
 		});
+		this.on("change:num_pages", this.adjustCurrentPage, this)
 	},
 
 	defaults: {
@@ -98,6 +99,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 	
 	prevPage: function() {
+
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
@@ -127,13 +129,23 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 	
 	goToFirstPage: function() {
-		(!this.get("two_up")) ? this.set("current_page", [1]) : this.set("current_page", [0,1]);
+		if( this.get("two_up") ) {
+			this.set("current_page"[0,1])
+		}
+		else {
+			this.set("current_page", [1]);
+		} 
 	},
 
 	goToLastPage: function() {
 		var page = this.get("num_pages");
 
-		(!this.get("two_up")) ? this.set("current_page", [page]) : this.set("current_page", [page-1, page]);
+		if( this.get("two_up") ) {
+			this.set("current_page", [page-1, page])
+		}
+		else {
+			this.set("current_page", [page])
+		}
 	},
 
 	savePosition: function() {
@@ -158,6 +170,15 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		// this wont work
 		return _rootUrl + resolvePath(path);
 	},
+
+	adjustCurrentPage: function() {
+		var cp = this.get("current_page");
+		var num = this.get("num_pages");
+		var two_up = this.get("two_up")
+		if(cp[cp.length - 1] > num) {
+			this.goToLastPage();
+		}
+	},	
 	
 	goToNextSection: function() {
 		// Is this check even necessary?
