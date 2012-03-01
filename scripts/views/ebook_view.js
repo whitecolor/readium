@@ -148,9 +148,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	changePage: function() {
 		var that = this;
-		var currentPage = this.model.get("current_page")
+		var currentPage = this.model.get("current_page")[0];
 		this.$(".page-wrap").each(function(index) {
-			$(this).toggleClass("hidden-page", !that.isPageVisible(index + 1, currentPage))
+			$(this).toggleClass("hidden-page", !that.isPageVisible(index + 1, currentPage));
 		});
 	},
 
