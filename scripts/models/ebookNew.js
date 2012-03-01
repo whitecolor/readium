@@ -63,7 +63,19 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 
 	toggleTwoUp: function() {
 		var twoUp = this.get("two_up");
-		this.set({two_up: !twoUp});
+		var displayed = this.get("current_page");
+		if(twoUp) {
+			// delete the second elem
+			displayed.splice(1,1);
+		}
+		else if(displayed[0] % 2 === 0) {
+			displayed.push(displayed[0] + 1)
+		}
+		else {
+			displayed.push(displayed[0])
+			displayed[0] -= 1;
+		}
+		this.set({two_up: !twoUp, current_page: displayed});
 	},
 
 	toggleFullScreen: function() {

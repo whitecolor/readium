@@ -93,8 +93,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			html += this.page_template({page_num: 0, empty: true})
 		}
 
-		i = two_up ? 0 : 1;
-		for( i ; i <= num; i++) {
+		
+		for( i = 1; i <= num; i++) {
 			html += this.page_template({page_num: i, empty: false});
 		}
 
@@ -104,7 +104,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			_pageAddCallback($('.page-wrap'));
 		}
 		*/
-		if(two_up && num % 2 === 1) {
+		if(two_up && num % 2 === 0) {
 			num += 1;
 			this.$('#container').append( this.page_template({page_num: i, empty: false}) );
 		}
@@ -126,31 +126,21 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
-	isPageVisible: function(pageNum, currentPage) {
+	isPageVisible: function(pageNum, currentPages) {
 		
-		if(currentPage === pageNum) return true;
-		
-		if(this.model.get("two_up")) {
-			// in two up mode, things are more complicated
-			// even pages are always on the left, so...
-			if(currentPage % 2 === 0) {
-				return pageNum === (currentPage + 1);
-			}
-
-			if(currentPage % 2 === 1) {
-				return pageNum === (currentPage - 1);
-			}
-		}
-
-		return false;
+		return currentPages.indexOf(pageNum) !== -1;
 		
 	},
 
 	changePage: function() {
 		var that = this;
-		var currentPage = this.model.get("current_page")[0];
+		var currentPage = this.model.get("current_page");
+		var two_up = this.model.get("two_up")
 		this.$(".page-wrap").each(function(index) {
-			$(this).toggleClass("hidden-page", !that.isPageVisible(index + 1, currentPage));
+			if(!two_up) { 
+				index += 1;
+			}
+			$(this).toggleClass("hidden-page", !that.isPageVisible(index, currentPage));
 		});
 	},
 
