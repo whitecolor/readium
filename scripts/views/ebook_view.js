@@ -109,6 +109,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			this.$('#container').append( this.page_template({page_num: i, empty: false}) );
 		}
 		this.model.set({num_pages: num});
+		
 		// dunno that I should be calling this explicitly
 		this.changePage();
 	},
@@ -166,6 +167,13 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			return 1;
 		}
 		return Math.ceil(quotient);
+	},
+
+	needsMorePages: function() {
+		return false;
+		$()
+		//return getContentBottom() < getLastPage().children().children().offset().top;
+	
 	},
 
 	setFontSize: function() {

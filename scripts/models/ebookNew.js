@@ -130,7 +130,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	
 	goToFirstPage: function() {
 		if( this.get("two_up") ) {
-			this.set("current_page"[0,1])
+			this.set("current_page", [0,1])
 		}
 		else {
 			this.set("current_page", [1]);
