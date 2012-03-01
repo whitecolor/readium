@@ -65,7 +65,11 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	toggleTwoUp: function() {
 		var twoUp = this.get("two_up");
 		var displayed = this.get("current_page");
-		if(twoUp) {
+		if(twoUp && displayed[0] === 0) {
+			// delete the first elem which is 0
+			displayed.splice(0,1);
+		}
+		else if(twoUp) {
 			// delete the second elem
 			displayed.splice(1,1);
 		}
