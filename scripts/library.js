@@ -49,7 +49,7 @@ $(function() {
 		},
 
 		render: function() {
-			var renderedContent = this.template(this.model.toJSON());
+			var renderedContent = this.template({data: this.model.toJSON()});
 			$(this.el).html(renderedContent);
 			return this;
 		},
