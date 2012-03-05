@@ -79,7 +79,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 
 /**
  * Used to validate a freshly unzipped package doc. Once we have 
- * validated it one time, we don't care if it valid any more, we
+ * validated it one time, we don't care if it is valid any more, we
  * just want to do our best to display it without failing
  */
 Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.extend({
