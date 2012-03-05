@@ -148,7 +148,11 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 	currentSection: function() {
 		var spine_pos = this.get("spine_position");
-		return this.get("manifest").at(spine_pos);
+		var target = this.get("spine")[spine_pos];
+		var node = this.get("manifest").find(function(x) { 
+					if(x.get("id") === target.idref) return x;
+				});
+		return node;
 	},
 
 	hasNextSection: function() {
