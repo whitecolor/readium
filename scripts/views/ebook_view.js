@@ -27,8 +27,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			this.renderToLastPage = true;
 		}, this);
 
+		//this.$el.zoomAndScale(); <= this was a little buggy last I checked but it is a super cool feature
 
-		this.page_template = _.template( $('#reflowing-page-template').html() );
+		
 	},
 
 	render: function() {
@@ -203,6 +204,15 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend({
 
+	initialize: function() {
+		// call the super ctor
+		this.page_template = _.template( $('#reflowing-page-template').html() );
+		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
+
+	},
+
+	
+
 	// decide if should open in two up based on viewport
 	// width
 	/*
@@ -215,6 +225,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 });
 
 Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
+
+	initialize: function() {
+		// call the super ctor
+		this.page_template = _.template( $('#fixed-page-template').html() );
+		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
+		
+	},
+
 	events: {
 		'click #page-wrap a': function(e) {
 			this.linkClickHandler(e)

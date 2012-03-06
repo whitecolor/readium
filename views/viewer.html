@@ -121,6 +121,16 @@
 			</div>
 		</script>
 
+		<!-- templates -->
+		<script type="text/template" id='fixed-page-template'>
+			<div id="page-<%= page_num %>" class="page-wrap <%= (page_num % 2 === 0) ? "even" : "odd" %>">
+				<div class="page-margin">
+					<% if(!empty) { %>
+					<div class="page"></div>
+					<% } %>
+				</div>
+			</div>
+		</script>
 		
 	</body>
 </html>
