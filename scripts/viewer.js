@@ -360,6 +360,10 @@ Readium.TocManager = function(book) {
 				window.debugBook = _book;
 				_nav = new Readium.Views.NavWidgetView({model: _book});
 				_paginator = new Readium.Views.PaginationViewBase({model: _book});
+				window.onresize = function(event) {
+					_book.trigger("repagination_event");
+				}
+				
 				_paginator.on("toggle_ui", function() {
 					toggleUi();
 				});

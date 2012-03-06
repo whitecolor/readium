@@ -247,7 +247,19 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		return _properties;
 	},
 
-
+	changPageNumber: function(num) {
+		var cp = this.get("current_page");
+		var np = [];
+		var diff = num - cp[cp.length - 1];
+		if( diff > 0 ) {
+			diff = 0;
+		}
+		for(var i = 0; i < cp.length; i++) {
+			np[i] = cp[i] + diff;	
+		}
+		this.set({num_pages: num, current_page: np});
+	}
+	
 });
 
 

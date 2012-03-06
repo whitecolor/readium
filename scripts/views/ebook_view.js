@@ -18,6 +18,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.on("change:current_content", this.render, this);
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:two_up", this.renderPages, this);
+		this.model.on("repagination_event", this.renderPages, this);
 		// TODO: should I break layers here or pass through?
 		this.model.packageDocument.on("increased:spine_position", function() {
 			this.renderToLastPage = false;
@@ -38,15 +39,19 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.replaceContent( dom.body.innerHTML );
 		// need to add one page for calculation to work (TODO: this can be fixed)
 		this.$('#container').html( this.page_template({page_num: 1, empty: false}) );
-		this.renderPages();
-		this.toggleTwoUp();
-		if(this.renderToLastPage) {
-			this.model.goToLastPage();
-		}
-		else {
-			this.model.goToFirstPage();
-		}
-
+		
+		// we need to let the stylesheets be parsed (TODO use an event?)
+		var that = this;
+		setTimeout(function() {
+			that.renderPages();
+			that.toggleTwoUp();
+			if(that.renderToLastPage) {
+				that.model.goToLastPage();
+			}
+			else {
+				that.model.goToFirstPage();
+			}
+		}, 3);
 	},
 
 	linkClickHandler: function(e) {
@@ -89,26 +94,31 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 		this.$el.toggleClass("two-up", two_up);
 		this.$('#spine-divider').toggle(two_up);
+		
+		// start with an empty page in two up mode
 		if(two_up) {
 			html += this.page_template({page_num: 0, empty: true})
 		}
 
-		
+		// added the guessed number of pages
 		for( i = 1; i <= num; i++) {
 			html += this.page_template({page_num: i, empty: false});
 		}
-
 		this.$('#container').html( html );
-		/*
-		if(_pageAddCallback) {
-			_pageAddCallback($('.page-wrap'));
+
+		// now touch it up
+		while( this.needsMorePages() ) {
+			this.$('#container').append( this.page_template({page_num: i, empty: false}) )
+			i += 1;
 		}
-		*/
+		
 		if(two_up && num % 2 === 0) {
 			num += 1;
 			this.$('#container').append( this.page_template({page_num: i, empty: false}) );
 		}
-		this.model.set({num_pages: num});
+
+		
+		this.model.changPageNumber(num);
 		
 		// dunno that I should be calling this explicitly
 		this.changePage();
@@ -170,10 +180,16 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	needsMorePages: function() {
+		// this should be part of the regions API but last I checked it wasn't there yet
+		// for now we just check if content bottom is lower than page bottom
+		var getBotHelper = function( $elem ) {
+			return $elem.outerHeight(true) + $elem.offset().top;
+		};
+		
+		var pageEnd = getBotHelper( this.$('.page').last() );
+		var contEnd = getBotHelper( $('#content-end') );
+		return pageEnd < contEnd;
 		return false;
-		$()
-		//return getContentBottom() < getLastPage().children().children().offset().top;
-	
 	},
 
 	setFontSize: function() {
