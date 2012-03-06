@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<!-- Keep track of usage stats via google analytics -->
+	  	<script>
+	    	var _gaq = _gaq || [];
+	    	_gaq.push(['_setAccount', 'UA-29665823-1']);
+	    	_gaq.push(['_trackPageview']);
+
+	    	(function() {
+	    		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    		ga.src = 'https://ssl.google-analytics.com/ga.js';
+	    		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	    	})();
+		</script>
 		<title>Readium Library</title>
 
 		<!-- Le styles -->
@@ -103,10 +115,10 @@
 					<img src="/images/info_modal/about_readium_logo.png">
 				</div>
 				<div>
-					<h3 id="version-info">Version 0.1.7 Release Date 2.14.12</h3>
+					<h3 id="version-info">Version 0.1.8 Release Date 3.2.12</h3>
 				</div>
 				<p>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+				Readium<sup>TM</sup>, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the <a href="http://readium.org/">project homepage</a>. To date, the project development has been lead by <a href="http://evidentpoint.com/">Evident Point</a> and <a href="http://www.bluefirereader.com/">Bluefire Productions</a>. To contribute visit the <a href="https://github.com/readium/readium">github repository</a>
 				</p>
 				<div>
 					<img src="/images/info_modal/partner_logos.png">
@@ -222,46 +234,46 @@
 		<script type="text/template" id='library-item-template'>
 			<div class='info-wrap clearfix'>
 				<div class='caption book-info'>
-					<h3 class='green info-item title'><%= title %></h3>
-					<h3 class='info-item author'><%= author || "Unknown" %></h3>
-					<h3 class='info-item epub-version'>ePUB <%= epub_version || "?" %></h3>
+					<h3 class='green info-item title'><%= data.title %></h3>
+					<h3 class='info-item author'><%= data.author || "Unknown" %></h3>
+					<h3 class='info-item epub-version'>ePUB <%= data.epub_version || "?" %></h3>
 					
 				</div>
 				
-				<img class='cover-image read' src='<%= cover_href %>' width='150' height='220' >
+				<img class='cover-image read' src='<%= data.cover_href %>' width='150' height='220' >
 				
-				<a href="#details-modal-<%= key %>" class="info-icon" data-toggle="modal">
+				<a href="#details-modal-<%= data.key %>" class="info-icon" data-toggle="modal">
 					<img class='info-icon pull-right' src='/images/library/info-icon.png' height="39px" width="39px"  >
 				</a>
 			</div>
 			
 			<div class="caption clearfix buttons">
-				<a href="#todo" class="btn read" data-book='<%= key %>'>Read</a>
-				<a href="#details-modal-<%= key %>" class="btn details" data-toggle="modal" >
+				<a href="#todo" class="btn read" data-book='<%= data.key %>'>Read</a>
+				<a href="#details-modal-<%= data.key %>" class="btn details" data-toggle="modal" >
 					Details
 				</a>
 			</div>
 
-			<div id='details-modal-<%= key %>' class='modal fade details-modal'>
+			<div id='details-modal-<%= data.key %>' class='modal fade details-modal'>
 				<div class="pull-left modal-cover-wrap">
-					<img class='details-cover-image' src='<%= cover_href %>' width='150' height='220' >
+					<img class='details-cover-image' src='<%= data.cover_href %>' width='150' height='220' >
 					<div class="caption clearfix modal-buttons">
-				<a href="#todo" class="btn read" data-book='<%= key %>'>Read</a>
+				<a href="#todo" class="btn read" data-book='<%= data.key %>'>Read</a>
 				<a class="btn btn-danger delete pull-right">Delete</a>
 			</div>
 				</div>
 				<div class='caption modal-book-info'>
-					<h3 class='green modal-title'><%= title %></h3>
-					<div class='modal-detail gap'>Author: <%= author || "Unknown" %></div>
-					<div class='modal-detail'>Publisher: <%= publisher || "Unknown" %></div>
-					<div class='modal-detail'>Pub Date: <%= pubdate || "Unknown" %></div>
-					<div class='modal-detail gap'>ID: <%= id || "Unknown" %></div>
-					<div class='modal-detail green'>Format: ePUB <%= epub_version || "Unknown" %></div>
-					<div class='modal-detail'>Added: <%= created_at || "Unknown" %></div>
+					<h3 class='green modal-title'><%= data.title %></h3>
+					<div class='modal-detail gap'>Author: <%= data.author || "Unknown" %></div>
+					<div class='modal-detail'>Publisher: <%= data.publisher || "Unknown" %></div>
+					<div class='modal-detail'>Pub Date: <%= data.pubdate || "Unknown" %></div>
+					<div class='modal-detail gap'>ID: <%= data.id || "Unknown" %></div>
+					<div class='modal-detail green'>Format: ePUB <%= data.epub_version || "Unknown" %></div>
+					<div class='modal-detail'>Added: <%= data.created_at || "Unknown" %></div>
 				</div>
 				<div class='modal-detail source'>
 				<span class='green' style="padding-right: 10px">Source:</span>
-					<%= src_url || "Unknown" %>
+					<%= data.src_url || "Unknown" %>
 				</div>
 			</div>			
 		</script>
