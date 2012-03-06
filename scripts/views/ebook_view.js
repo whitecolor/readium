@@ -203,6 +203,15 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend({
 
+	// decide if should open in two up based on viewport
+	// width
+	/*
+	var shouldOpenInTwoUp = function() {
+		var width = document.documentElement.clientWidth;
+		var height = document.documentElement.clientHeight;
+		return width > 300 && width / height > 1.3;
+	}
+*/
 });
 
 Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({

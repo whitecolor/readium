@@ -8,174 +8,10 @@ Readium.TocManager = function(book) {
 	var _paginator;
 	var _fsPath;
 	var _urlArgs;
-	var _book;
 	var _fontSize = 10; // 10 => 1.0em
 	
-	var fireRepaginateEvent = function() {
-		$('#readium-content-container').trigger("content-size-changed");
-	}
-	
-	var openCurrentSection = function() {
-		_book.getSectionText(parseBookCallback, loadErrorHandler);
-			
-		var doneSwapping = function() {
-			_paginator.goToFirstPage();
-			$("#readium-content-container").css("visibility", "visible");
-			$('#readium-content-container').unbind("content-size-changed", doneSwapping);
-		}
-		$('#readium-content-container').bind("content-size-changed", doneSwapping);
-	}
 
-/*
-	var flipTheSection = function() {
-		if(_book.goToNextSection()) {
-			openCurrentSection();
-		}
-	}
-	
-	var flipThePage = function() {
-		if( !_paginator.pageForward() && !_book.isFixedLayout() ) {
-			flipTheSection();
-		}
-	}
-	
-	var flipBackASection = function() {
-		if(_book.goToPrevSection()) {
-			_paginator.replaceContent("");
-			_book.getSectionText(parseBookCallback, loadErrorHandler);
-			var doneSwapping = function() {
-				//$("#readium-content-container").hide();
-				_paginator.goTolastPage();
-				$("#readium-content-container").css("visibility", "visible");
-				$('#readium-content-container').unbind("content-size-changed", doneSwapping);
-			}
-			$('#readium-content-container').bind("content-size-changed", doneSwapping);
-		}
-	}
-	
-	var flipBackAPage = function() {
-		if(!_paginator.pageBack() && !_book.isFixedLayout() ) {
-			flipBackASection();
-		}
-	}
-	
-	var setFontSize = function () {
-		var size = ( _fontSize / 10 ).toString(); 
-		$('#readium-content-container').css("font-size", size + "em");
-		fireRepaginateEvent();
-	}
-	
-	var increaseFont = function(e) {
-		// TODO should there be some limit?
-		_fontSize += 1;
-		setFontSize();
-	}
-	
-	var decreaseFont = function(e) {
-		if(_fontSize > 1) {
-			_fontSize -= 1;
-			setFontSize();	
-		}
-	}
-*/
-/*
-	var addPageTurnHandlers = function(pagerObj) {
-		var keydownHandler = function(e) {
-			
-			if(e.which == 39) {
-				flipThePage();
-			}
-				
-			if(e.which == 37) {
-				flipBackAPage();
-			}
-				
-		}
-
-		$(document).keydown(keydownHandler);
-		
-		
-		$('#page-fwd-button').click(function(e) {
-			e.preventDefault();
-			flipThePage();
-		});
-		$('#page-back-button').click(function(e) {
-			e.preventDefault();
-			flipBackAPage();
-		});
-		$('#increase-font-button').click(function(e) {
-			e.preventDefault();
-			increaseFont();
-		});
-		$('#decrease-font-button').click(function(e) {
-			e.preventDefault();
-			decreaseFont();
-		});
-		$('#two-up-button').click(function(e) {
-			e.preventDefault();
-			_paginator.toggleTwoUp();
-		});
-		
-		
-		$('#fullscreen-button').click(function(e) {
-			e.preventDefault();
-			if(document.webkitIsFullScreen) {
-				document.webkitCancelFullScreen();
-			}
-			else {
-				document.documentElement.webkitRequestFullScreen();					
-			}
-		});
-		
-		
-		if(!_book.isFixedLayout()) {
-			// just prevent wheel scrolling for now, it's too buggy
-			document.onmousewheel = function(e) { 
-				if(!document.getElementById('menu').contains(e.srcElement)) {
-					e.preventDefault();
-				}
-				
-			};
-		}
-	}
-	*/
-
-
-
-/*
-	var fixLinks = function() {
-		if(_book.isFixedLayout() ) {
-			$('#page-wrap a').click(linkClickHandler);
-		}
-
-		
-		else {
-			$('#readium-content-container a').click(linkClickHandler);
-		}
-		
-		
-	}
-
-
-	var removeAddedStyleSheets = function() {
-		$('.readium-dynamic-sh').remove();
-	}
-
-	var addStyleSheets = function(bookDom) {
-		removeAddedStyleSheets();
-		var links = $("link", bookDom);
-		var link; var href; var $link;
-		for (var j = 0; j < links.length; j++) {
-			link = links[j];
-			if(typeof link.rel === "string" && link.rel.toUpperCase() === "STYLESHEET") {
-				$link = $(link);
-				$link.addClass('readium-dynamic-sh');
-				$('head').prepend($link);
-			}
-		}
-	}
-	*/
-
+	// this just needs to be a backbone router
 	var parseUrlArgs = function() {
 		var hash;
 		var args = [];
@@ -297,27 +133,6 @@ Readium.TocManager = function(book) {
 		
 			
 	};
-	/*
-	var parseBookCallback = function(domString) {
-		var parser = new window.DOMParser();
-		var xmlDoc = parser.parseFromString(domString,"text/xml");
-		showBook(xmlDoc);
-	}
-	
-
-	var linkClickHandler = function(e) {
-		var href = this.attributes["href"].value;
-		e.preventDefault();
-		if(href.match(/^http(s)?:/)) {
-			chrome.tabs.create({"url":href});
-		} else if( _book.goToHref(href) ) {
-			openCurrentSection();
-		} else {
-			console.log('failed to navigate spine to ' + href);
-		}
-	}
-	*/
-
 		
 
 	var addToc = function() {
@@ -327,6 +142,29 @@ Readium.TocManager = function(book) {
 			$tocArea.html(res);
 			$('a', $tocArea).click(linkClickHandler);
 		}, loadErrorHandler );
+	};
+
+	var addGenericEventListeners = function(book) {
+		window.onresize = function(event) {
+			book.trigger("repagination_event");
+		}
+		book.on("change:full_screen", function() {
+			if(book.get("full_screen")) {
+				document.documentElement.webkitRequestFullScreen();	
+			}
+			else {
+				document.webkitCancelFullScreen();				
+			}
+		});
+		$(document).keydown(function(e) {
+			if(e.which == 39) {
+				_book.nextPage();
+			}
+							
+			if(e.which == 37) {
+				_book.prevPage();
+			}
+		});
 	};
 	
 	var openBook = function() {
@@ -342,50 +180,25 @@ Readium.TocManager = function(book) {
 					loadErrorHandler();
 					return;
 				}
-				/*
-				Readium.Ebook(result, function(book) {
-					_book = book;
-					if(_book.isFixedLayout()) {
-						showFixedLayoutBook();
-					}
-					else {
-						_book.getSectionText(parseBookCallback, loadErrorHandler);	
-					}
-					addToc();							
-				}, function(e) {
-					loadErrorHandler();
-				});
-				*/
-				_book = new Readium.Models.EbookBase(result);
-				window.debugBook = _book;
-				_nav = new Readium.Views.NavWidgetView({model: _book});
-				_paginator = new Readium.Views.PaginationViewBase({model: _book});
-				window.onresize = function(event) {
-					_book.trigger("repagination_event");
+				if(result.fixed_layout) {
+					console.log('initializing fixed layout book');
+					window._book = new Readium.Models.AppleFixedEbook(result);
+				}
+				else {
+					console.log('initializing reflowable book');
+					window._book = new Readium.Models.ReflowableEbook(result);
 				}
 				
+				_paginator = _book.CreatePaginator();
 				_paginator.on("toggle_ui", function() {
 					toggleUi();
 				});
+
+				// the little overlay
+				_nav = new Readium.Views.NavWidgetView({model: _book});
 				_nav.render();
 
-				_book.on("change:full_screen", function() {
-					if(_book.get("full_screen")) {
-						document.documentElement.webkitRequestFullScreen();	
-					}
-					else {
-						document.webkitCancelFullScreen();				
-					}
-				});
-				$(document).keydown(function(e) {
-					if(e.which == 39) {
-						_book.nextPage();
-					}
-									
-					if(e.which == 37) {
-						_book.prevPage();
-					}
-				});
+				addGenericEventListeners(_book);
 
 			});		
 		});
@@ -409,7 +222,6 @@ Readium.TocManager = function(book) {
 		style.top = pos;
 		pos = temp;
 		settings.toggleClass('hover-fade');
-		
 	};
 
 	var initTopBar = function() {		
@@ -417,26 +229,11 @@ Readium.TocManager = function(book) {
 		$('.page-margin').click(toggleUi);
 	};
 
-	var initTocClick = function() {
-		$('#show-toc-button').click(function(e) {
-			$('body').toggleClass('show-toc');
-			fireRepaginateEvent();
-		});
-	};
-
-	// decide if should open in two up based on viewport
-	// width
-	var shouldOpenInTwoUp = function() {
-		var width = document.documentElement.clientWidth;
-		var height = document.documentElement.clientHeight;
-		return width > 300 && width / height > 1.3;
-	}
 
 	$(function() {
 		_urlArgs = parseUrlArgs();
 		openBook();
 		displaySettingsAtFirstLoad();
 		initTopBar();
-		initTocClick();
 	});
 })();

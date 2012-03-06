@@ -96,7 +96,8 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 
 	toggleToc: function() {
-
+		// todo this is not the way to do this
+		$('body').toggleClass('show-toc');
 	},
 	
 	prevPage: function() {
@@ -267,10 +268,67 @@ Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
 
 	isFixedLayout: false,
 
+	initialize: function() {
+		// call the super ctor
+		Readium.Models.EbookBase.prototype.initialize.call(this);
+	},
+
+	CreatePaginator: function() {
+		return new Readium.Views.ReflowablePaginationView({model: _book});	
+	}
+
 });
 
 Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 
 	isFixedLayout: true,
+
+	defaults: {
+		"font_size": 10,
+    	"current_page":  [1, 2],
+    	"num_pages": 0,
+    	"two_up": true,
+    	"full_screen": false,
+  	},
+
+	initialize: function() {
+		// call the super ctor
+		Readium.Models.EbookBase.prototype.initialize.call(this);
+	},
+
+	CreatePaginator: function() {
+		return new Readium.Views.FixedPaginationView({model: _book});	
+	},
+
+
+	parseViewportTag: function(viewportTag) {
+		// this is going to be ugly
+		var str = viewportTag.getAttribute('content');
+		str = str.replace(/\s/g, '');
+		var valuePairs = str.split(',');
+		var values = {};
+		var pair;
+		for(var i = 0; i < valuePairs.length; i++) {
+			pair = valuePairs[i].split('=');
+			if(pair.length === 2) {
+				values[ pair[0] ] = pair[1];
+			}
+		}
+		values['width'] = parseFloat(values['width']);
+		values['height'] = parseFloat(values['height']);
+		return values;
+	},
+
+	addMetaHeadTags: function(bookDom) {
+		// the desktop does not obey meta viewport tags so
+		// dynamically add in some css
+		var tag = bookDom.getElementsByName("viewport")[0];
+		if(tag) {
+			var pageSize = parseViewportTag(tag);
+			document.head.appendChild(tag);
+			_paginator.setPageSize(pageSize.width, pageSize.height);
+		}
+		
+	}
 
 });

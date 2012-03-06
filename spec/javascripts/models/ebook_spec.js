@@ -112,10 +112,11 @@ describe("ebook", function() {
 			expect(ebook.get("current_page")[0]).toEqual(2);
 			expect(ebook.get("current_page")[1]).toEqual(3);
 
-			ebook.toggleTwoUp();
+			// una mas
+			ebook.toggleTwoUp(); 
 			ebook.set({"current_page": [3]});
-
 			ebook.toggleTwoUp();
+
 			expect(ebook.get("current_page")[0]).toEqual(2);
 			expect(ebook.get("current_page")[1]).toEqual(3);
 
