@@ -28,7 +28,7 @@ Readium.PackageDocument = function(domString) {
 
 		// epub3 spec for a cover image is like this:
 		/*<item properties="cover-image" id="ci" href="cover.svg" media-type="image/svg+xml" />*/
-		$imageNode = $('item[properties="cover-image"]', manifest);
+		$imageNode = $('item[properties~="cover-image"]', manifest);
 		if($imageNode.length === 1 && $imageNode.attr("href") ) {
 			return $imageNode.attr("href");
 		}
