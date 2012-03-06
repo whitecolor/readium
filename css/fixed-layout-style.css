@@ -7,23 +7,35 @@
 
 .fixed-page-wrap {
 	position: absolute;
-	top: 50px;
-	left: 50%;
+	left: 25%;
 	overflow: hidden; 
 	-webkit-box-shadow: 0 0 5px 5px rgba(80,80,80,0.5);
 	background-color: #FFF;
 }
 
 .apple-fixed-layout #spine-divider {
-	top: 50px;
+	height: 100%;
+	top: 0;
+}
+
+.two-up .fixed-page-wrap {
+	width: 50%;
 }
 
 .two-up .fixed-page-wrap.odd { 
-	margin-left: 0px; 
+	left: 50%;
+}
+
+.two-up .fixed-page-wrap.even { 
+	left: 0%;
 }
 
 body.apple-fixed-layout {
 	height: 100%;
 	width: 100%;
 	overflow: scroll;
+}
+
+.apple-fixed-layout #readium-book-view-el {
+	margin: auto;
 }
