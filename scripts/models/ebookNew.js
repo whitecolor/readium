@@ -205,6 +205,8 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		});
 	},
 
+
+	// this is not used?
 	getAllSectionTexts: function(sectionCallback, failureCallback, completeCallback) {
 		var i = 0;
 		var spine = this.packageDocument.getSpineArray();
@@ -294,10 +296,30 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 	initialize: function() {
 		// call the super ctor
 		Readium.Models.EbookBase.prototype.initialize.call(this);
+		this.on("change:current_content", this.parseMetaTags, this);
 	},
 
 	CreatePaginator: function() {
 		return new Readium.Views.FixedPaginationView({model: _book});	
+	},
+
+	buildSectionJSON: function(manifest_item) {
+		var section = {};
+		section.width = this.get("meta_width");
+		section.height = this.get("meta_height");
+		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
+
+
+		return section;
+	},
+
+	getAllSections: function() {
+		var spine = this.packageDocument.getResolvedSpine();
+		var sections = [];
+		for(var i = 0; i < spine.length; i++) {
+			sections.push(this.buildSectionJSON( spine[i] ));
+		}
+		return sections;
 	},
 
 
@@ -319,16 +341,21 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 		return values;
 	},
 
-	addMetaHeadTags: function(bookDom) {
-		// the desktop does not obey meta viewport tags so
-		// dynamically add in some css
-		var tag = bookDom.getElementsByName("viewport")[0];
+	parseMetaTags: function() {
+		var parser = new window.DOMParser();
+		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
+		var tag = dom.getElementsByName("viewport")[0];
 		if(tag) {
-			var pageSize = parseViewportTag(tag);
-			document.head.appendChild(tag);
-			_paginator.setPageSize(pageSize.width, pageSize.height);
+			var pageSize = this.parseViewportTag(tag);
+			this.set({meta_width: pageSize.width, meta_height: pageSize.height});
 		}
-		
-	}
+		this.packageDocument.off("change:spine_position");
+		this.off("current_content")
+		this.trigger("first_render_ready")
+	},
+
+
+
+	
 
 });

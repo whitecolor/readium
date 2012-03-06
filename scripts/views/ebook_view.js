@@ -15,7 +15,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.model.on("change:current_page", this.changePage, this);
-		this.model.on("change:current_content", this.render, this);
+		
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:two_up", this.renderPages, this);
 		this.model.on("repagination_event", this.renderPages, this);
@@ -27,7 +27,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			this.renderToLastPage = true;
 		}, this);
 
-		//this.$el.zoomAndScale(); <= this was a little buggy last I checked but it is a super cool feature
+		this.$el.zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
 
 		
 	},
@@ -53,6 +53,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 				that.model.goToFirstPage();
 			}
 		}, 3);
+		return this;
 	},
 
 	linkClickHandler: function(e) {
@@ -208,6 +209,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// call the super ctor
 		this.page_template = _.template( $('#reflowing-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
+		this.model.on("change:current_content", this.render, this);
 
 	},
 
@@ -230,7 +232,35 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		// call the super ctor
 		this.page_template = _.template( $('#fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
+		this.model.on("first_render_ready", this.render, this);
+	},
+
+	render: function() {
+		// add all the pages
+		var sections = this.model.getAllSections();
+		console.log("render")
+		for(var i = 0; i < sections.length; i++) {
+			sections[i].page_num = i;
+			this.$('#container').append(this.page_template(sections[i]));
+		}
+		this.model.changPageNumber(i);
+		return this.renderPages();
+	},
+
+	renderPages: function() {
 		
+		// lost myself in the complexity here but this seems right
+		this.changePage();
+		return this;
+	},
+
+	changePage: function() {
+		var that = this;
+		var currentPage = this.model.get("current_page");
+		var two_up = this.model.get("two_up")
+		this.$(".fixed-page-wrap").each(function(index) {
+			$(this).toggle(that.isPageVisible(index + 1, currentPage));
+		});
 	},
 
 	events: {

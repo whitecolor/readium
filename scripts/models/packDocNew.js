@@ -25,6 +25,8 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(options && options.file_path) {
 			this.file_path = options.file_path; 	
 		}
+		
+			
     },
 
 	// todo: Cover image? is identifier ok?
@@ -106,6 +108,12 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 			this.file_path = options.file_path; 	
 		}
 		this.on('change:spine_position', this.onSpinePosChanged);
+		var that = this;
+		Readium.FileSystemApi(function(api) {
+			api.getFsUri(that.file_path, function(uri) {
+				that.uri_obj = new URI(uri);
+			})
+		});
     },
 
     onSpinePosChanged: function() {
@@ -146,13 +154,17 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		spine_position: 0
 	},
 
-	currentSection: function() {
-		var spine_pos = this.get("spine_position");
-		var target = this.get("spine")[spine_pos];
+	getManifestItem: function(spine_position) {
+		var target = this.get("spine")[spine_position];
 		var node = this.get("manifest").find(function(x) { 
 					if(x.get("id") === target.idref) return x;
 				});
 		return node;
+	},
+
+	currentSection: function() {
+		var spine_pos = this.get("spine_position");
+		return this.getManifestItem(spine_pos);
 	},
 
 	hasNextSection: function() {
@@ -193,6 +205,20 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 				break;
 			}
 		}
+	},
+
+	getResolvedSpine: function() {
+		var spine_length = this.get("spine").length;
+		var res_spine = [];
+		for(var i = 0; i < spine_length; i++) {
+			res_spine.push( this.getManifestItem(i) );
+		}
+		return res_spine;
+	},
+
+	resolveUri: function(rel_uri) {
+		uri = new URI(rel_uri);
+		return uri.resolve(this.uri_obj).toString();
 	},
 
 	/* TODO getTOC()

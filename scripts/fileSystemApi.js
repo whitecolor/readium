@@ -168,6 +168,12 @@ Readium.FileSystemApi = function(initCallback) {
 			    }, fileSystemErrorHandler);
 			}, fileSystemErrorHandler);
 		},
+
+		getFsUri: function(path, win, fail) {
+			_fs.root.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
+				win(fileEntry.toURL());
+			}, fail || fileSystemErrorHandler);
+		},
 		
 		// recursively create dirs from an array of dir names
 		mkdir: createDirsRecursively,
