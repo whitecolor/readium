@@ -167,11 +167,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		var ind = pack_doc_path.lastIndexOf("/")
 		return pack_doc_path.substr(0, ind) + "/" + suffix;
 	},
-		
-	resolveUrl: function(path) {
-		// this wont work
-		return _rootUrl + resolvePath(path);
-	},
 
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
@@ -205,32 +200,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		});
 	},
 
-
-	// this is not used?
-	getAllSectionTexts: function(sectionCallback, failureCallback, completeCallback) {
-		var i = 0;
-		var spine = this.packageDocument.getSpineArray();
-		var thatFs;
-
-		var callback = function(content, fileEntry) {
-			sectionCallback(content);
-			i += 1;
-			if(i < spine.length) {
-				thatFs.readTextFile(resolvePath(spine[i]), callback, failureCallback);
-			}
-			else {
-				completeCallback();
-			}
-		
-		};
-
-		Readium.FileSystemApi(function(fs) {
-			thatFs = fs;
-			thatFs.readTextFile(resolvePath(spine[i]), callback, failureCallback);
-		});
-
-	},
-
 	getAllSectionUris: function() {
 		var temp = this.packageDocument.get("spine");
 		for(var i = 0; i < temp.length; i++) {
@@ -240,14 +209,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 
 	goToHref: function(href) {
-		// I dunno if this is the right way to do
-		// this anymore.
 		this.packageDocument.goToHref(href);
-	},
-
-	getProperties: function() {
-		// TODO override TOJSON / SAVE
-		return _properties;
 	},
 
 	changPageNumber: function(num) {
@@ -353,5 +315,46 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 		this.off("current_content")
 		this.trigger("first_render_ready")
 	},
+
+
+	/*
+
+
+	var showFixedLayoutBook = function() {
+		addFixedLayoutCssFlag();
+
+		var uris = _book.getAllSectionUris();
+		// need to parse one viewport tag
+		window.webkitResolveLocalFileSystemURL(uris[0], function(fileEntry) {
+			Readium.FileSystemApi(function(fs) {
+				fs.readEntry(fileEntry, function(content) {
+					var parser = new window.DOMParser();
+					var dom = parser.parseFromString(content, 'text/xml');
+					var options = parseViewportTag(dom.getElementsByName("viewport")[0]);
+					options.pageAddCallback = function($newPage) {
+						$newPage.click(toggleUi);
+						var iframe = $('iframe', $newPage)[0];
+						if(iframe) {
+							$('iframe', $newPage)[0].onload = function() {
+								_book.applyBindings(this.contentDocument);
+							}
+						}
+						
+					};
+					_paginator = Readium.FixedPaginator($('#container'), uris, options);
+					_paginator.toggleTwoUp();
+					fixLinks();
+					addPageTurnHandlers(_paginator);
+
+				}, function() {
+					console.log('failed to load fixed layout book');
+				})
+			});
+		});
+			
+		
+			
+	};
+		*/
 
 });
