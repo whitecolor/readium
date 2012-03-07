@@ -1,76 +1,89 @@
-Readium.TocManager = function(book) {
-	var callback = function() {};
-	var parser = window.DOMParser;
-	var dom = parser.parseFromString()
+if( !window.Readium ) {
+	window.Readium = {
+		Models: {},
+		Collections: {},
+		Views: {},
+		Routers: {},
+		Utils: {}
+	};
 };
 
-(function() {
-	var _paginator;
-	var _fsPath;
-	var _urlArgs;
-	var _fontSize = 10; // 10 => 1.0em
-	
+Readium.Views.ViewerApplicationView = Backbone.View.extend({
+	el: 'body',
 
-	// this just needs to be a backbone router
-	var parseUrlArgs = function() {
-		var hash;
-		var args = [];
-		var searchStr = window.location.search.substr(1);
-		var hashes = searchStr.split('&');
+	uiVisible: false,
+
+	initialize: function() {
+		this.model.on("change:full_screen", this.toggleFullscreen, this);
 		
-		for(var i = 0; i < hashes.length; i++)
-		{
-			hash = hashes[i].split('=');
-			args.push(hash[0]);
-			args[hash[0]] = hash[1];
+		// the book's pages
+		this.paginator = this.model.CreatePaginator();
+		this.paginator.on("toggle_ui", this.toggleUI, this);
+
+		// the little overlay
+		this.navWidget = new Readium.Views.NavWidgetView({model: _book});
+		this.navWidget.render();
+
+		this.addGlobalEventHandlers();
+
+	},
+
+	toggleUI: function() {
+		this.uiVisible = !this.uiVisible;
+		$('#top-bar').css("top", (this.uiVisible ? "0px" : "-44px") );
+		$('#settings').toggleClass('hover-fade', !this.uiVisible);
+	},
+
+	toggleFullscreen: function() {
+		if(this.model.get("full_screen")) {
+			document.documentElement.webkitRequestFullScreen();	
 		}
-		
-		if(args["book"] && typeof args["book"] === "string") {
-			_fsPath = args["book"].substr(0, args["book"].lastIndexOf("/") + 1);
+		else {
+			document.webkitCancelFullScreen();				
 		}
+	},
 
-		return args;
-	}
-
-	// todo add this somewhere
-	// document.title = bookDom.title;
-
-
-
-	var addGenericEventListeners = function(book) {
+	addGlobalEventHandlers: function() {
+		var book = this.model;
 		window.onresize = function(event) {
 			book.trigger("repagination_event");
 		}
-		book.on("change:full_screen", function() {
-			if(book.get("full_screen")) {
-				document.documentElement.webkitRequestFullScreen();	
-			}
-			else {
-				document.webkitCancelFullScreen();				
-			}
-		});
+
 		$(document).keydown(function(e) {
 			if(e.which == 39) {
-				_book.nextPage();
+				book.nextPage();
 			}
 							
 			if(e.which == 37) {
-				_book.prevPage();
+				book.prevPage();
 			}
 		});
-	};
-	
-	var openBook = function() {
-		if(_urlArgs["book"] === undefined) {
-			console.log("No book was specifiec to load");
-			loadErrorHandler();
-			return;
-		}
+	},
 
+	render: function() {
+		this.toggleUI();
+		var that = this;
+		setTimeout(function() {
+			that.toggleUI();
+		}, 2000);
+	}
+});
+
+Readium.Routers.ViewerRouter = Backbone.Router.extend({
+
+	routes: {
+		"views/viewer.html?book=:key": "openBook",
+		"*splat": "splat_handler"
+	},
+
+	openBook: function(key) {
+		// the "right" way to do this is probably to call fetch()
+		// on the book, but I needed to know what kind of book to 
+		// initialize at early on. This is a pragmatic solution
 		Lawnchair(function() {
-			this.get(_urlArgs["book"], function(result) {
+			this.get(key, function(result) {
 				if(result === null) {
-					loadErrorHandler();
+					alert('Could not load book, try refeshing your browser.')
 					return;
 				}
 				if(result.fixed_layout) {
@@ -82,51 +95,22 @@ Readium.TocManager = function(book) {
 					window._book = new Readium.Models.ReflowableEbook(result);
 				}
 				
-				_paginator = _book.CreatePaginator();
-				_paginator.on("toggle_ui", function() {
-					toggleUi();
+				window._applicationView = new Readium.Views.ViewerApplicationView({
+					model: window._book
 				});
-
-				// the little overlay
-				_nav = new Readium.Views.NavWidgetView({model: _book});
-				_nav.render();
-
-				addGenericEventListeners(_book);
-
+				window._applicationView.render();
 			});		
 		});
-	}
-	
-	var loadErrorHandler = function(e) {
-		console.log("Error could not load book");
-	}
-	
-	var displaySettingsAtFirstLoad = function() {
-		var timeout = setTimeout(toggleUi, 2000);
+	},
+
+	splat_handler: function(splat) {
+		console.log(splat)
 	}
 
-	// temp fix me
-	var pos = "-44px";
-	var toggleUi = function() {
-		var style = $('#top-bar')[0].style;
-		
-		var settings = $('#settings');
-		var temp = style.top;
-		style.top = pos;
-		pos = temp;
-		settings.toggleClass('hover-fade');
-	};
+});
 
-	var initTopBar = function() {		
-		$('#readium-content-container').click(toggleUi);
-		$('.page-margin').click(toggleUi);
-	};
+$(function() {
+	_router = new Readium.Routers.ViewerRouter();
+	Backbone.history.start({pushState: true});
+});
 
-
-	$(function() {
-		_urlArgs = parseUrlArgs();
-		openBook();
-		displaySettingsAtFirstLoad();
-		initTopBar();
-	});
-})();

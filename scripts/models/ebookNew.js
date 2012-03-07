@@ -316,45 +316,4 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 		this.trigger("first_render_ready")
 	},
 
-
-	/*
-
-
-	var showFixedLayoutBook = function() {
-		addFixedLayoutCssFlag();
-
-		var uris = _book.getAllSectionUris();
-		// need to parse one viewport tag
-		window.webkitResolveLocalFileSystemURL(uris[0], function(fileEntry) {
-			Readium.FileSystemApi(function(fs) {
-				fs.readEntry(fileEntry, function(content) {
-					var parser = new window.DOMParser();
-					var dom = parser.parseFromString(content, 'text/xml');
-					var options = parseViewportTag(dom.getElementsByName("viewport")[0]);
-					options.pageAddCallback = function($newPage) {
-						$newPage.click(toggleUi);
-						var iframe = $('iframe', $newPage)[0];
-						if(iframe) {
-							$('iframe', $newPage)[0].onload = function() {
-								_book.applyBindings(this.contentDocument);
-							}
-						}
-						
-					};
-					_paginator = Readium.FixedPaginator($('#container'), uris, options);
-					_paginator.toggleTwoUp();
-					fixLinks();
-					addPageTurnHandlers(_paginator);
-
-				}, function() {
-					console.log('failed to load fixed layout book');
-				})
-			});
-		});
-			
-		
-			
-	};
-		*/
-
 });

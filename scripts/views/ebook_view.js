@@ -25,11 +25,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}, this);
 		this.model.packageDocument.on("decreased:spine_position", function() {
 			this.renderToLastPage = true;
-		}, this);
-
-		this.$el.zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
-
-		
+		}, this);		
 	},
 
 	render: function() {
@@ -241,6 +237,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.model.on("first_render_ready", this.render, this);
 		this.model.on("change:two_up", this.setUpMode, this);
+		this.$el.zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
 	},
 
 	render: function() {
