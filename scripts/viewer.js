@@ -24,14 +24,20 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.navWidget = new Readium.Views.NavWidgetView({model: _book});
 		this.navWidget.render();
 
+		// the top bar
+		this.toolbar = new Readium.Views.ToolbarView({model: _book});
+		this.toolbar.render();
+
 		this.addGlobalEventHandlers();
 
 	},
 
 	toggleUI: function() {
+		/*
 		this.uiVisible = !this.uiVisible;
 		$('#top-bar').css("top", (this.uiVisible ? "0px" : "-44px") );
 		$('#settings').toggleClass('hover-fade', !this.uiVisible);
+		*/
 	},
 
 	toggleFullscreen: function() {

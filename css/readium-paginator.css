@@ -311,6 +311,10 @@ span.setting-button:hover {
 
 /****************** The Top Bar *****************/
 
+#toolbar-el {
+	height: 40px;
+}
+
 #top-bar {
 	width: 100%;
 	position: fixed;

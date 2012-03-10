@@ -46,6 +46,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
     	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false,
+    	"toolbar_visible": true
   	},
 
 	spinePositionChangedHandler: function() {
@@ -253,6 +254,7 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
     	"num_pages": 0,
     	"two_up": true,
     	"full_screen": false,
+    	"toolbar_visible": true
   	},
 
 	initialize: function() {
