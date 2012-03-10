@@ -25,8 +25,6 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(options && options.file_path) {
 			this.file_path = options.file_path; 	
 		}
-		
-			
     },
 
 	// todo: Cover image? is identifier ok?
@@ -118,12 +116,15 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
  * just want to do our best to display it without failing
  */
 Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.extend({
+
 	validate: function(attrs) {
 
 	},
 
 	toJSON: function() {
-		return this.get("metadata");
+		var metadata = this.get("metadata");
+		metadata.package_doc_path = this.file_path;
+		return metadata;
 	},
 
 	generateCoverImageUrl: function (metaData) {
@@ -139,6 +140,21 @@ Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.ext
 		else {
 			return '/images/library/missing-cover-image.png';
 		}
+	},
+
+	parseIbooksDisplayOptions: function(content) {
+		//fixed_layout: false
+		//open_to_spread: false
+
+		var parseBool = function(string) {
+			return string.toLowerCase().trim() === 'true';	
+		}
+		var parser = new window.DOMParser();
+		var xmlDoc = parser.parseFromString(content, "text/xml");
+		var fixedLayout = xmlDoc.getElementsByName("fixed-layout")[0];
+		var openToSpread = xmlDoc.getElementsByName("open-to-spread")[0];
+		var isFixedLayout = fixedLayout && parseBool(fixedLayout.textContent);
+		var isOpenToSpread = openToSpread && parseBool(openToSpread.textContent);
 	}
 });
 
