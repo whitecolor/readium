@@ -21,7 +21,9 @@
 		<link rel="stylesheet" type="text/css" href="/css/fixed-layout-style.css">
 
 
-		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript"></script>
+		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
+		<script src="/lib/underscore.min.js" type="text/javascript" ></script>
+		<script src="/lib/backbone.min.js" type="text/javascript" ></script>
 		<script src="/lib/lawnchair-0.6.1.min.js" type="text/javascript" ></script>
 		<script src="/lib/bootstrap-custom.min.js" type="text/javascript" ></script>
 
@@ -46,59 +48,70 @@
 		<script src="/scripts/viewer.js" type="text/javascript"></script>
 	</head>
 	<body>
+
  		<div id='menu'></div> 
- 		<div id='top-bar'>
- 			<!--<div id="title">This Is A Title</div>-->
- 			
- 			<span class='top-bar-button' id="back-to-lib-button" >
- 				<a href='/views/library.html'>
-					<img id='readium-icon' src="/images/top_bar/back_to_library.png" alt="lib" />
+
+ 		<div id='toolbar-el'>
+	 		<div id='top-bar'>
+	 			<!--<div id="title">This Is A Title</div>-->
+	 			<span class='top-bar-button' id="back-to-lib-button" >
+	 				<a href='/views/library.html'>
+						<img id='readium-icon' src="/images/top_bar/back_to_library.png" alt="lib" />
+					</a>
+				</span>
+				<button id="hide-toolbar-button" >
+	 				hide
+				</button>
+
+				<a class="pull-right" data-toggle="modal" href="#readium-info" id='bar-logo'>
+					<img src="/images/top_bar/READIUM_TOOLBAR_LOGO.png" height="37px" width="139px"/>
 				</a>
-			</span>
-
-			<a class="pull-right" data-toggle="modal" href="#readium-info" id='bar-logo'>
-				<img src="/images/top_bar/READIUM_TOOLBAR_LOGO.png"/>
-			</a>
-
-			
+ 			</div>
+ 			<button id="show-toolbar-button" >
+	 				show
+			</button>
  		</div>
+
  		<div id="settings" class="clearfix">
 			<span class='setting-button' id="show-toc-button">
-				<img id='readium-icon' src="/images/overlay/table_of_contents.png" alt="+"/>
+				<img id='toc-icon' src="/images/overlay/table_of_contents.png" alt="+"/>
 			</span>
 			<span class="divider"></span>
 						
 			<span class='setting-button' id="increase-font-button">
-				<img id='readium-icon' src="/images/overlay/text_size_larger.png" alt="+"/>
+				<img id='inc-font-icon' src="/images/overlay/text_size_larger.png" alt="+"/>
 			</span>
 			<span class="divider"></span>
 			<span class='setting-button' id="decrease-font-button">
-				<img id='readium-icon' src="/images/overlay/text_size_smaller.png" alt="-"/>
+				<img id='dec-font-icon' src="/images/overlay/text_size_smaller.png" alt="-"/>
 			</span>
 			<span class="divider"></span>
 			<span class='setting-button' id="fullscreen-button">
-				<img id='readium-icon' src="/images/overlay/fs_toggle_zoom.png" alt="-"/>
+				<img id='to-fs-icon' src="/images/overlay/fs_toggle_zoom.png" alt="-"/>
+				<img id='from-fs-icon' src="/images/overlay/fs_toggle_normal.png" alt="-"/>
 			</span>
 			<span class="divider"></span>
 			<span class='setting-button' id="two-up-button">
-				<img id='readium-icon' src="/images/overlay/2page_view_toggle.png" alt="2"/>
+				<img id='two-up-icon' src="/images/overlay/2page_view_toggle.png" alt="2"/>
+				<img id='one-up-icon' src="/images/overlay/1page_view_toggle.png" alt="2"/>
 			</span>
 			<span class="divider"></span>
 			<span class='setting-button' id="page-back-button">
-				<img id='readium-icon' src="/images/overlay/arrow_previous.png"  alt="<"/>
+				<img id='page-back-icon' src="/images/overlay/arrow_previous.png"  alt="<"/>
 			</span>
 			<span class="divider"></span>
 			<span class='setting-button' id="page-fwd-button">
-				<img id='readium-icon' src="/images/overlay/arrow_next.png" alt="<"/>
+				<img id='page-fwd-icon' src="/images/overlay/arrow_next.png" alt="<"/>
 			</span>
 		</div>
- 		<div id='readium-content-container'></div>
- 		<div id='page-wrap' class='clearfix'>
-			<div id="container" class='clearfix'>
 
-				
+		<div id="readium-book-view-el">
+ 			<div id='readium-content-container'></div>
+ 			<div id='page-wrap' class='clearfix'>
+				<div id="container" class='clearfix'></div>
+				<div id='spine-divider'></div>
 			</div>
-		<div id='spine-divider'></div>
+		</div>
 
 		<div class="modal fade" id="readium-info" ><!-- le info modal -->
 			<div>
@@ -115,6 +128,32 @@
 			</div>
 		</div><!-- end le info modal -->
 
-		</div>
+
+		<!-- templates -->
+		<script type="text/template" id='reflowing-page-template'>
+			<div id="page-<%= page_num %>" class="page-wrap <%= (page_num % 2 === 0) ? "even" : "odd" %>">
+				<div class="page-margin">
+					<% if(!empty) { %>
+					<div class="page"></div>
+					<% } %>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/template" id='fixed-page-template'>
+			<div id="page-<%= page_num %>" class="fixed-page-wrap <%= (page_num % 2 === 0) ? "even" : "odd" %>">
+				<div class="fixed-page-margin">
+					<iframe scrolling="no" 
+							frameborder="0" 
+							marginwidth="0" 
+							marginheight="0" 
+							width="<%= width %>px" 
+							height="<%= height %>px" 
+							src="<%= uri %>">
+					</iframe>
+				</div>
+			</div>
+		</script>
+		
 	</body>
 </html>
