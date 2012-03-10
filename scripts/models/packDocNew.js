@@ -55,6 +55,38 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			media_type: "@media-type"
 		} ]
 	},
+
+	getCoverHref: function(dom) {
+		var manifest; var $imageNode;
+		manifest = dom.getElementsByTagName('manifest')[0];
+
+		// epub3 spec for a cover image is like this:
+		/*<item properties="cover-image" id="ci" href="cover.svg" media-type="image/svg+xml" />*/
+		$imageNode = $('item[properties~="cover-image"]', manifest);
+		if($imageNode.length === 1 && $imageNode.attr("href") ) {
+			return $imageNode.attr("href");
+		}
+
+		// some epub2's cover image is like this:
+		/*<meta name="cover" content="cover-image-item-id" />*/
+		var metaNode = $('meta[name="cover"]', dom);
+		var contentAttr = metaNode.attr("content");
+		if(metaNode.length === 1 && contentAttr) {
+			$imageNode = $('item[id="'+contentAttr+'"]', manifest);
+			if($imageNode.length === 1 && $imageNode.attr("href")) {
+				return $imageNode.attr("href");
+			}
+		}
+
+		// that didn't seem to work so, it think epub2 just uses item with id=cover
+		$imageNode = $('#cover', manifest);
+		if($imageNode.length === 1 && $imageNode.attr("href")) {
+			return $imageNode.attr("href");
+		}
+
+		// seems like there isn't one, thats ok...
+		return null;
+	},
 	
 	parse: function(xmlDom) {
 		var json;
@@ -73,6 +105,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		}
 
 		json = Jath.parse( this.jath_template, xmlDom);
+		json.metadata.cover_href = this.getCoverHref(xmlDom);
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
 		return json;
 	}
@@ -91,6 +124,21 @@ Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.ext
 
 	toJSON: function() {
 		return this.get("metadata");
+	},
+
+	generateCoverImageUrl: function (metaData) {
+		var root; var rootUri; var coverUri;
+		if(metaData.cover_href) {
+			// there is a relative url, just need to resolve it
+			root = _fsApi.getFileSystem().root.toURL();
+			root += metaData.package_doc_path;
+			rootUri = new URI(root);
+			coverUri = new URI(metaData.cover_href);
+			return coverUri.resolve(rootUri).toString();
+		}
+		else {
+			return '/images/library/missing-cover-image.png';
+		}
 	}
 });
 
