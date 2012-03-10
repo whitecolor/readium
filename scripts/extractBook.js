@@ -44,8 +44,6 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 		}
 	};
 
-	
-	
 	var isDirectory = function(zipentry) {
 		return zipentry.name.substr(-1) === "/";
 	};
@@ -115,7 +113,6 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 			});
 		});
 	}
-	
 	
 	var parseContainerRoot = function(zip, rootFile, rootMime) {
 		var callback = function(entry, content) {

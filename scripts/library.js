@@ -130,33 +130,6 @@ $(function() {
 		}
 	});
 
-	// Does this need to be here???? I dont think so....
-	var addLibraryBooks =  function(records) {
-		var html;
-		if(records.length === 0) {
-			html = "<p>Your book list is empty</p>";
-		}
-		else {
-			html = ""
-			for(var i = 0; i < records.length; i++) {
-				html += getBookHtml(records[i]);
-			}
-			
-		}
-		$('#library-items-container').html(html);
-		$('.delete-link').click(function(e) {
-			var key;
-			var $this = $(this);
-			var confirmed = confirm( $(this).attr("data-confirm") );
-			e.preventDefault();
-			if( confirmed ) {
-				key = $(this).attr("data-key");
-				deleteBook(key);		
-			} 
-			
-		});
-		$('#loading-message').remove();
-	};
 
 	window.ExtractItem = Backbone.Model.extend({
 		
@@ -301,10 +274,6 @@ $(function() {
 
 	window.Library = new LibraryItems();
 	window.lib_view = new LibraryItemsView({collection: window.Library});
-
-
-
-	
 
 })(jQuery);
 
