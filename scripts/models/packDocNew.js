@@ -24,6 +24,17 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	initialize: function(attributes, options) {
 		if(options && options.file_path) {
 			this.file_path = options.file_path; 	
+			var that = this;
+			if(options.root_url) {
+				that.uri_obj = new URI(options.root_url);
+			}
+			else {
+				Readium.FileSystemApi(function(api) {
+					api.getFsUri(that.file_path, function(uri) {
+						that.uri_obj = new URI(uri);
+					})
+				});
+			}
 		}
     },
 
@@ -89,6 +100,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	parse: function(xmlDom) {
 		var json;
 		var manifest;
+		var cover;
 		if(typeof(xmlDom) === "string" ) {
 			var parser = new window.DOMParser;
       		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
@@ -97,16 +109,31 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		Jath.resolver = function( prefix ) {
     		var mappings = { 
 	    		def: "http://www.idpf.org/2007/opf",
-    			dc: "http://purl.org/dc/elements/1.1/" 
+    			dc: "http://purl.org/dc/elements/1.1/"
     		};
     		return mappings[ prefix ];
 		}
 
 		json = Jath.parse( this.jath_template, xmlDom);
-		json.metadata.cover_href = this.getCoverHref(xmlDom);
+
+		// try to find a cover image
+		cover = this.getCoverHref(xmlDom);
+		if(cover) {
+			json.metadata.cover_href = this.resolveUri(cover);
+		}		
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
 		return json;
-	}
+	},
+
+	reset: function(data) {
+		var attrs = this.parse(data);
+		this.set(attrs);
+	},
+
+	resolveUri: function(rel_uri) {
+		uri = new URI(rel_uri);
+		return uri.resolve(this.uri_obj).toString();
+	},
 
 });
 
@@ -115,37 +142,27 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
  * validated it one time, we don't care if it is valid any more, we
  * just want to do our best to display it without failing
  */
-Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.extend({
+Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.extend({
+
+	initialize: function(attributes, options) {
+		// call the super ctor
+		Readium.Models.PackageDocumentBase.prototype.initialize.call(this, attributes, options);
+		this.set("package_doc_path", this.file_path);
+    },
 
 	validate: function(attrs) {
 
 	},
 
-	toJSON: function() {
-		var metadata = this.get("metadata");
-		metadata.package_doc_path = this.file_path;
-		return metadata;
-	},
-
-	generateCoverImageUrl: function (metaData) {
-		var root; var rootUri; var coverUri;
-		if(metaData.cover_href) {
-			// there is a relative url, just need to resolve it
-			root = _fsApi.getFileSystem().root.toURL();
-			root += metaData.package_doc_path;
-			rootUri = new URI(root);
-			coverUri = new URI(metaData.cover_href);
-			return coverUri.resolve(rootUri).toString();
-		}
-		else {
-			return '/images/library/missing-cover-image.png';
-		}
+	defaults: {
+		fixed_layout: false,
+		open_to_spread: false,
+		cover_href: '/images/library/missing-cover-image.png',
+		created_at: new Date(),
+		updated_at: new Date(),
 	},
 
 	parseIbooksDisplayOptions: function(content) {
-		//fixed_layout: false
-		//open_to_spread: false
-
 		var parseBool = function(string) {
 			return string.toLowerCase().trim() === 'true';	
 		}
@@ -153,8 +170,25 @@ Readium.Models.ValidatedPackageDocument = Readium.Models.PackageDocumentBase.ext
 		var xmlDoc = parser.parseFromString(content, "text/xml");
 		var fixedLayout = xmlDoc.getElementsByName("fixed-layout")[0];
 		var openToSpread = xmlDoc.getElementsByName("open-to-spread")[0];
-		var isFixedLayout = fixedLayout && parseBool(fixedLayout.textContent);
-		var isOpenToSpread = openToSpread && parseBool(openToSpread.textContent);
+		this.set({
+			fixed_layout: ( fixedLayout && parseBool(fixedLayout.textContent) ),
+			open_to_spread: ( openToSpread && parseBool(openToSpread.textContent) )
+		})
+	},
+
+	parse: function(content) {
+		//call super
+		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, content);
+		//  only care about the metadata 
+		return json.metadata;
+	},
+
+	save: function(attrs, options) {
+		var that = this;
+		this.set("updated_at", new Date());
+		Lawnchair(function() {
+			this.save(that.toJSON(), options.success);
+		});
 	}
 });
 
@@ -166,18 +200,10 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 
 	initialize: function(attributes, options) {
-		// TODO make this a call to the super ctor
-		//Readium.Models.PackageDocument.prototype.initialize.call(this, attributes, options);
-		if(options && options.file_path) {
-			this.file_path = options.file_path; 	
-		}
+		// call the super ctor
+		Readium.Models.PackageDocumentBase.prototype.initialize.call(this, attributes, options);
 		this.on('change:spine_position', this.onSpinePosChanged);
-		var that = this;
-		Readium.FileSystemApi(function(api) {
-			api.getFsUri(that.file_path, function(uri) {
-				that.uri_obj = new URI(uri);
-			})
-		});
+		
     },
 
     onSpinePosChanged: function() {
@@ -280,10 +306,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		return res_spine;
 	},
 
-	resolveUri: function(rel_uri) {
-		uri = new URI(rel_uri);
-		return uri.resolve(this.uri_obj).toString();
-	},
+	
 
 	/* TODO getTOC()
 	getTocText: function(successCallback, failureCallback) {

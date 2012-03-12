@@ -63,10 +63,6 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 		}
 	}
 	
-	var parseBool = function(string) {
-		return string.toLowerCase().trim() === 'true';	
-	}
-	
 	var extractEntryByName = function(zip, name, callback) {
 		var found = false;
 		for (var i=0; i < zip.entries.length; i++) {
@@ -80,45 +76,19 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 			throw ("asked to extract non-existent zip-entry: " + name);
 		}
 	};
-
-	var generateCoverImageUrl = function (metaData) {
-		var root; var rootUri; var coverUri;
-		if(metaData.cover_href) {
-			// there is a relative url, just need to resolve it
-			root = _fsApi.getFileSystem().root.toURL();
-			root += metaData.package_doc_path;
-			rootUri = new URI(root);
-			coverUri = new URI(metaData.cover_href);
-			return coverUri.resolve(rootUri).toString();
-		}
-		else {
-			return '/images/library/missing-cover-image.png';
-		}
-	};
 	
-	var saveEntry = function() {
-		var metaData = _packageDoc.getMetaData(); 
-		metaData.created_at = new Date();
-		metaData.updated_at = new Date();
-		metaData.key = _urlHash;
-		metaData.package_doc_path = _packageDocPath;
-		metaData.fixed_layout = _fixedLayout;
-		metaData.open_to_spread = _openToSpread;
-		metaData.cover_href = generateCoverImageUrl( metaData );
-		metaData.src_url = _options.src_filename || url;
-		new Lawnchair(function() {
-			this.save(metaData, function() {
-				_metaData = metaData;
-				unpackBook(_zip, 0);				
-			});
-		});
-	}
 	
 	var parseContainerRoot = function(zip, rootFile, rootMime) {
 		var callback = function(entry, content) {
-			_packageDoc = Readium.PackageDocument(content);
-			_packageDocPath = _urlHash + "/" + rootFile;
-			saveEntry();
+			_packageDoc = new Readium.Models.ValidatedPackageMetaData({
+				key: _urlHash
+			}, {
+				file_path: _urlHash + "/" + rootFile,
+				root_url: _rootUrl + "/" + rootFile
+			});
+			_packageDoc.reset(content);
+			unpackBook(zip, 0)
+
 		}
 		
 		if(rootFile) {
@@ -182,33 +152,10 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 
 	}
 		
-	var parseIbooksDisplayOptions = function(zip) {
-		
-		var callback = function(entry, content) {
-			var parser = new window.DOMParser();
-			var xmlDoc = parser.parseFromString(content, "text/xml");
-			var fixedLayout = xmlDoc.getElementsByName("fixed-layout")[0];
-			var openToSpread = xmlDoc.getElementsByName("open-to-spread")[0];
-			_fixedLayout = fixedLayout && parseBool(fixedLayout.textContent);
-			_openToSpread = openToSpread && parseBool(openToSpread.textContent);
-			
-			parseMetaInfo(zip);
-		}
-		
-		if(zip.entryNames.indexOf(DISPLAY_OPTIONS) >= 0) {
-			extractEntryByName(zip, DISPLAY_OPTIONS, callback);
-		}
-		else {
-			_openToSpread = false;
-			_fixedLayout = false;
-			parseMetaInfo(zip);
-		}
-	}
-	
 	var checkMimetype = function(zip) {
 		var validateCallback = function(entry, content) {
 			if($.trim(content) === EPUB3_MIMETYPE) {
-				parseIbooksDisplayOptions(zip);
+				parseMetaInfo(zip);
 			} else {
 				_log("Invalid mimetype discovered. Progress cancelled.");
 				clean();
@@ -239,6 +186,7 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 	var unpackBook = function(zip, i) {
 		var entry;
 
+		// really hacky way of updating the spinner
 		update(3 + i, zip.entries.length + 5);
 		
 		var unpackFailed = function() {
@@ -247,6 +195,9 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 		}
 
 		var writeToDisk = function(entry, content) {
+			if(entry.name.indexOf(DISPLAY_OPTIONS) >= 0) {
+				_packageDoc.parseIbooksDisplayOptions(content);
+			}
 
 			_fsApi.writeFile(getPath(entry), content, function() {
 				unpackBook(zip, i + 1);
@@ -280,7 +231,14 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 		
 		if( i === zip.entries.length) {
 			_log("Unpacking process completed successfully!");
-			winCb(_metaData);
+			// HUZZAH We did it, now save the meta data
+			_packageDoc.save({}, {
+				success: function() {
+					winCb( _packageDoc.toJSON() );
+				},
+				failure: failCb
+			});
+			
 			
 		} 
 		else {
@@ -299,8 +257,8 @@ Readium.ExtractBook = function(url, winCb, failCb, options) {
 	
 	var beginUnpacking = function() {
 		_fsApi.getFileSystem().root.getDirectory(_urlHash, {create: true}, function(dir) {
-			_zip = new ZipFile(url, validateZip, 0);
 			_rootUrl  = dir.toURL();
+			_zip = new ZipFile(url, validateZip, 0);
 		}, function() {
 			//_zip = new ZipFile(url, validateZip, 0);
 			console.log("In beginUnpacking error handler. Does the root dir already exist?");
