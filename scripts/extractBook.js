@@ -15,7 +15,9 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 
 	defaults: {
 		task_size: 100,
-		progress: 1
+		progress: 1,
+		extracting: false,
+		log_message: "Fetching epub file"
 	},
 
 	 // delete any changes to file system in the event of error, etc.
@@ -257,8 +259,8 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 	update_progress: function() {
 		var zip = this.get("zip_position") || 0;
 		var patch = this.get("patch_position") || 0;
-		var x = Math.floor( (zip + patch + 3) / this.get("task_size") );
-		this.set("progress", x * 100);
+		var x = Math.floor( (zip + patch + 3) * 100 / this.get("task_size") );
+		this.set("progress", x );
 	},
 
 	initializeZip: function() {

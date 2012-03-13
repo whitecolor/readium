@@ -131,49 +131,19 @@ $(function() {
 	});
 
 
-	window.ExtractItem = Backbone.Model.extend({
-		
-		updateProgress: function(index, total) {
-			var prog = index * 100 / total;
-			this.set({
-				progress: prog.toFixed().toString() + "%",
-			});
-		},
-
-		start: function() {
-			this.set({
-				message: "Fetching ePUB",
-				progress: 0,
-				extracting: true
-			});
-		},
-
-		end: function() {
-			this.set({
-				message: "Fetching ePUB",
-				progress: 0,
-				extracting: false
-			});
-		}
-
-
-	});
-
 	window.ExtractItemView = Backbone.View.extend({
 		
 		el: $('#progress-container')[0],
 
 		template: _.template( $('#extracting-item-template').html() ),
 
-		initialize: function() {
-			_.bindAll(this, "render");	
+		initialize: function() {	
 			this.model.bind('change', this.render, this);
 		},
 
 		render: function() {
 			var $el = $(this.el);
 			if( this.model.get('extracting') ) {
-				
 				$el.html(this.template(this.model.toJSON()));
 				$el.show("slow");
 			}
@@ -268,34 +238,17 @@ $(function() {
 		}
 	});
 		
-	window.extraction = new ExtractItem({extracting: false});
-	window.extract_view = new ExtractItemView({model: extraction});
-	extract_view.render();
-
 	window.Library = new LibraryItems();
 	window.lib_view = new LibraryItemsView({collection: window.Library});
 
 })(jQuery);
 
 var beginExtraction = function(url, filename) {
-	 // Create a new window to the info page.
-	 window.extraction.start();
-
-	var extractOptions = {
-		display_message: function(message) {
-			window.extraction.set({
-				message: message
-			});
-		},
-
-		update_progress: function(x, y) {
-			window.extraction.updateProgress(x,y);
-		}
-	};
-	if (filename) {
-		extractOptions.src_filename = filename;
-	}
+	
+	// TODO put this back in
+	//extractOptions.src_filename = filename;
 	var extractor = new Readium.Models.ZipBookExtractor({url: url});
+	window.extract_view = new ExtractItemView({model: extractor});
 	extractor.on("extraction_success", function() {
 		var book = extractor.packageDoc.toJSON();
 		window.Library.add(new window.LibraryItem(book));
@@ -303,8 +256,7 @@ var beginExtraction = function(url, filename) {
 			chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
 		}, 800);
 	})
-	extractor.extract();
-	
+	extractor.extract();	
 };
 
 var resetAndHideForm = function() {
