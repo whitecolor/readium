@@ -295,15 +295,16 @@ var beginExtraction = function(url, filename) {
 	if (filename) {
 		extractOptions.src_filename = filename;
 	}
-	Readium.ExtractBook(url, function(book) {
-			window.extraction.end();
-			window.Library.add(new window.LibraryItem(book));
-			setTimeout(function() {
-				chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
-			}, 800);
-		}, function() {
-			/* wah wah :( */
-		}, extractOptions);
+	var extractor = new Readium.Models.ZipBookExtractor({url: url});
+	extractor.on("extraction_success", function() {
+		var book = extractor.packageDoc.toJSON();
+		window.Library.add(new window.LibraryItem(book));
+		setTimeout(function() {
+			chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
+		}, 800);
+	})
+	extractor.extract();
+	
 };
 
 var resetAndHideForm = function() {
