@@ -230,6 +230,71 @@ $(function() {
 
 	});
 
+	window.FilePickerView = Backbone.View.extend({
+		el:"#add-book-modal",
+
+		events: {
+			"change #files": "handleFileSelect",
+			"change #dir_input": "handleDirSelect",
+			"click #url-button": "handleUrl",
+		},
+
+		show: function() {
+			this.$el.modal('show');
+		},
+
+		hide: function() {
+			this.$el.modal('hide');
+		},
+
+		resetForm: function() {
+
+		},
+
+		handleUrl: function(evt) {
+			var input = document.getElementById('book-url');
+			if(input.value === null || input.value.length < 1) {
+				alert("invalid url, cannot process");
+			}
+			else {
+				var url = input.value;
+				// TODO check src filename
+				var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: url});
+				this.beginExtraction(extractor);
+			}
+		},
+
+		handleFileSelect: function(evt) {
+			var files = evt.target.files; // FileList object
+			var url = window.webkitURL.createObjectURL(files[0]);
+			// TODO check src filename
+			var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: files[0].name});
+			this.beginExtraction(extractor);
+		},
+
+		handleDirSelect: function(evt) {
+			var dirpicker = evt.target; // FileList object		
+			var extractor = new Readium.Models.UnpackedBookExtractor({dir_picker: dirpicker});
+			this.beginExtraction(extractor);
+			
+		},
+
+		beginExtraction: function(extractor) {
+			window.extract_view = new ExtractItemView({model: extractor});
+			extractor.on("extraction_success", function() {
+			var book = extractor.packageDoc.toJSON();
+			window.Library.add(new window.LibraryItem(book));
+			setTimeout(function() {
+				chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
+			}, 800);
+			})
+			extractor.extract();
+			this.resetForm();
+			this.hide();
+		}
+
+	});
+
 	window.options = new ReadiumOptions;
 	window.optionsView = new ReadiumOptionsView({model: window.options});
 	window.options.fetch({
@@ -240,48 +305,16 @@ $(function() {
 		
 	window.Library = new LibraryItems();
 	window.lib_view = new LibraryItemsView({collection: window.Library});
+	window.fp_view = new FilePickerView();
 
 })(jQuery);
 
-var beginExtraction = function(url, filename) {
-	
-	// TODO put this back in
-	//extractOptions.src_filename = filename;
-	var extractor = new Readium.Models.ZipBookExtractor({url: url});
-	window.extract_view = new ExtractItemView({model: extractor});
-	extractor.on("extraction_success", function() {
-		var book = extractor.packageDoc.toJSON();
-		window.Library.add(new window.LibraryItem(book));
-		setTimeout(function() {
-			chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
-		}, 800);
-	})
-	extractor.extract();	
-};
 
-var resetAndHideForm = function() {
-	$('#add-book-modal').modal('hide');
-};
 
-var handleFileSelect = function(evt) {
-	var files = evt.target.files; // FileList object
-	var url = window.webkitURL.createObjectURL(files[0]);
-	beginExtraction(url, files[0].name);
-	resetAndHideForm();
-};
 
-var clickHandler = function(evt) {
-	var input = document.getElementById('book-url');
-	if(input.value === null || input.value.length < 1) {
-		alert("invalid url, cannot process");
-	}
-	else {
-		var url = input.value;
-		beginExtraction(url);
-		resetAndHideForm();
-	}
-};
 
+
+/*
 var flash = function(text, type) {
 	var className = "alert";
 	if(type) {
@@ -293,10 +326,10 @@ var flash = function(text, type) {
 		addClass(className);
 	
 }
+*/
 
 
-	document.getElementById('files').addEventListener('change', handleFileSelect, false);
-	document.getElementById('url-button').addEventListener('click', clickHandler, false);
+	
 	_lawnchair = new Lawnchair(function() {
 		this.all(function(all) {
 			window.Library.reset(all);							

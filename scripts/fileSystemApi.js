@@ -79,17 +79,26 @@ Readium.FileSystemApi = function(initCallback) {
 	};
 	
 	var writeFile = function(path, content, rootDir, successCallback, failureCallback)  {
-			rootDir.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
-				fileEntry.createWriter(function(fileWriter) {
+		rootDir.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
+			fileEntry.createWriter(function(fileWriter) {
 
-					fileWriter.onwriteend = function(e) {
-						successCallback(e);
-					};
+				fileWriter.onwriteend = function(e) {
+					successCallback(e);
+				};
 
-					fileWriter.onerror = function(e) {
-						failureCallback(e);
-					};
-
+				fileWriter.onerror = function(e) {
+					failureCallback(e);
+				};
+				
+				if(content.webkitRelativePath || content.relativePath) {
+					// hacky way to detect if it is a file object
+					 var reader = new FileReader();
+					reader.onload = function(e) {
+						fileWriter.write(e.target.result);
+					}
+  					reader.readAsArrayBuffer(content);
+				}
+				else {
 					// Create a new Blob and write it
 					var bb = new WebKitBlobBuilder(); 
 					if(typeof content === "string") {
@@ -101,10 +110,11 @@ Readium.FileSystemApi = function(initCallback) {
 						bb.append(byteArr.buffer);
 						fileWriter.write(bb.getBlob());
 					}
-
-				}, failureCallback);
+				}
 
 			}, failureCallback);
+
+		}, failureCallback);
 	};
 	
 	var writeFileRecursively = function(folders, content, rootDir, successCallback, failureCallback) {
