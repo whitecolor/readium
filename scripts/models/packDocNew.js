@@ -184,6 +184,7 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 	},
 
 	save: function(attrs, options) {
+		// TODO: this should be done properly with a backbone sync
 		var that = this;
 		this.set("updated_at", new Date());
 		Lawnchair(function() {

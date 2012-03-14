@@ -24,13 +24,106 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 	clean: function() {
 		this.removeHandlers();
 		if(this.fsApi) {
-			this.fsApi.rmdir(this.urlHash);
+			this.fsApi.rmdir(this.base_dir_name);
 		}
 	},
 
+	parseContainerRoot: function(content) {
+		var rootFile = this.get("root_file_path");
+		this.packageDoc = new Readium.Models.ValidatedPackageMetaData({
+				key: this.base_dir_name
+			}, {
+				file_path: this.base_dir_name + "/" + rootFile,
+				root_url: this.get("root_url") + "/" + rootFile
+			});
+		this.packageDoc.reset(content);
+		this.trigger("parsed:root_file")		
+	},
+
+	writeFile: function(rel_path, content, cb) {
+		var that = this;
+		var abs_path = this.base_dir_name + "/" + rel_path;
+
+		if(rel_path.indexOf(this.DISPLAY_OPTIONS) >= 0) {
+			this.packageDoc.parseIbooksDisplayOptions(content);
+		}
+
+		this.fsApi.writeFile(abs_path, content, cb , function() {
+			that.set("error", "ERROR: while writing to filesystem");
+		});
+	},
+
+	parseMetaInfo: function(content) {	
+		var parser = new window.DOMParser();
+		var xmlDoc = parser.parseFromString(content, "text/xml");
+		var rootFiles = xmlDoc.getElementsByTagName("rootfile");
+
+		if(rootFiles.length !== 1) {
+			this.set("error", "Error processing " + CONTAINER);
+		}
+		else {
+			if (rootFiles[0].hasAttribute("full-path")) {
+				this.set("root_file_path", rootFiles[0].attributes["full-path"].value);
+			}
+			else {
+				this.set("error", "Error: could not find package rootfile");
+			}				
+		}
+	},
+
+	validateMimetype: function(content) {
+		if($.trim(content) === this.EPUB3_MIMETYPE) {
+			this.trigger("validated:mime");
+		} else {
+			this.set("error", "Invalid mimetype discovered. Progress cancelled.");
+		}
+	},
+
+	removeHandlers: function() {
+		this.off();
+	},
+
+	extraction_complete: function() {
+		this.set("extracting", false);
+	},
+
+	finish_extraction: function() {
+		var that = this;
+		this.set("log_message", "Unpacking process completed successfully!");
+		// HUZZAH We did it, now save the meta data
+		this.packageDoc.save({}, {
+			success: function() {
+				that.trigger("extraction_success");
+			},
+			failure: function() {
+				that.set("failure", "ERROR: unkown problem durring unpacking process");
+			}
+		});
+	},
+
+	// sadly we need to manually go through and reslove all urls in the
+	// in the epub, because webkit filesystem urls are completely supported
+	// yet, see: http://code.google.com/p/chromium/issues/detail?id=114484
+	correctURIs: function() {
+		var root = this.get("root_url");
+		var i = this.get("patch_position");
+		var manifest = this.get("manifest");
+		var that = this;
+		
+		if( i === manifest.length) {
+			this.finish_extraction();
+		} 
+		else {			
+			this.set("log_message", "monkey patching: " + manifest[i]);
+			monkeyPatchUrls(root + "/" + manifest[i], function() {
+					that.set("patch_position", i + 1);
+				}, function() {
+					that.set("failure", "ERROR: unkown problem durring unpacking process");
+				});
+		}
+	},
 
 });
-
 
 // This method takes a url for an epub, unzips it and then
 // writes its contents out to disk.
@@ -42,14 +135,10 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 			throw "A URL to a zip file must be specified"
 		}
 		else {
-			this.urlHash = Readium.Utils.MD5(url + (new Date()).toString());	
+			this.base_dir_name = Readium.Utils.MD5(url + (new Date()).toString());	
 		}	
 	},
-
-	getPath: function(entry) {
-		return this.urlHash + "/" + entry.name;
-	},
-		
+	
 	extractEntryByName: function(name, callback) {
 		var found = false;
 		for (var i=0; i < this.zip.entries.length; i++) {
@@ -64,70 +153,36 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		}
 	},
 	
-	parseContainerRoot: function() {
+	extractContainerRoot: function() {
 		var that = this;
-		var cb = function(entry, content) {
-			if(typeof content === "string") {
-				var rootFile = that.get("root_file_path");
-				that.packageDoc = new Readium.Models.ValidatedPackageMetaData({
-					key: that.urlHash
-				}, {
-					file_path: that.urlHash + "/" + rootFile,
-					root_url: that.get("root_url") + "/" + rootFile
-				});
-				that.packageDoc.reset(content);
-				that.set("zip_position", 0);
-			}
-		}
-				
+		var path = this.get("root_file_path");
 		try {
-			this.extractEntryByName(this.get("root_file_path"), cb);				
+			this.extractEntryByName(path, function(entry, content) {
+				that.parseContainerRoot(content);
+			});				
 		} catch(e) {
-			this.set("error", e)
-		}
-		
+			this.set("error", e);
+		}	
 	},
 	
-	parseMetaInfo: function(zip) {
+	extractMetaInfo: function() {
 		var that = this;
-		var callback = function(entry, content) {
-				
-			var parser = new window.DOMParser();
-			var xmlDoc = parser.parseFromString(content, "text/xml");
-			var rootFiles = xmlDoc.getElementsByTagName("rootfile");
-
-			if(rootFiles.length !== 1) {
-				that.set("error", "Error processing " + CONTAINER);
-			}
-			else {
-				if (rootFiles[0].hasAttribute("full-path")) {
-					that.set("root_file_path", rootFiles[0].attributes["full-path"].value);
-				}
-				else {
-					that.set("error", "Error: could not find package rootfile");
-				}				
-			}
-		}
-		
 		try {
-			this.extractEntryByName(this.CONTAINER, callback);
+			this.extractEntryByName(this.CONTAINER, function(entry, content) {
+				that.parseMetaInfo(content);
+			});
 		} catch (e) {
 			this.set("error", e);
 		}
-
 	},
 		
-	checkMimetype: function(zip) {
+	extractMimetype: function() {
 		var that = this;
-		var validateCallback = function(entry, content) {
-			if($.trim(content) === that.EPUB3_MIMETYPE) {
-				that.trigger("validated:mime");
-			} else {
-				that.set("error", "Invalid mimetype discovered. Progress cancelled.");
-			}
-		}
+		this.set("log_message", "Verifying mimetype");
 		try {
-			this.extractEntryByName(this.MIMETYPE, validateCallback);			
+			this.extractEntryByName(this.MIMETYPE, function(entry, content) {
+				that.validateMimetype(content);
+			});			
 		} catch (e) {
 			this.set("error", e);
 		}
@@ -138,6 +193,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		// set the task
 		// weak test, just make sure MIMETYPE and CONTAINER files are where expected
 		var entries = this.zip.entryNames;
+		this.set("log_message", "Validating zip file");
 		if(entries.indexOf(this.MIMETYPE) >= 0 && entries.indexOf(this.CONTAINER) >= 0) {
 			this.trigger("validated:zip");
 		}
@@ -147,16 +203,16 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		
 	},
 	
-	unpackBook: function() {
+	extractBook: function() {
+		// genericly extract a file and then write it to disk
 		var entry;
 		var zip = this.zip;
 		var i = this.get("zip_position");
 		var that = this;
 		
 		if( i === zip.entries.length) {
-			this.set("log_message", "Unpacking process completed successfully!");
+			this.set("log_message", "All files unzipped successfully!");
 			this.set("patch_position", 0)
-			
 		} 
 		else {
 			entry = zip.entries[i];
@@ -166,74 +222,37 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 			else {
 				this.set("log_message", "extracting: " + entry.name);
 				entry.extract(function(entry, content) {
-					if(entry.name.indexOf(that.DISPLAY_OPTIONS) >= 0) {
-						that.packageDoc.parseIbooksDisplayOptions(content);
-					}
-
-					that.fsApi.writeFile(that.getPath(entry), content, function() {
+					that.writeFile(entry.name, content, function() {
 						that.set("zip_position", i + 1);
-					} , function() {
-						that.set("error", "ERROR: durring unzipping process failed");
 					});
 				});
 			}
 		}
 	},
 
-	correctURIs: function() {
+	beginUnpacking: function() {		
+		var manifest = [];
 		var entry;
-		var that = this;
-		var i = this.get("patch_position");
-		var zip = this.zip;
-		
-		var monkeypatchingFailed = function() {
-			that.set("failure", "ERROR: unkown problem durring unpacking process");
-		};
-
-		var getUrl = function(entry) {
-			return that.get("root_url") + "/" + entry.name;
-		};
-		
-		if( i === zip.entries.length) {
-			this.set("log_message", "Unpacking process completed successfully!");
-			// HUZZAH We did it, now save the meta data
-			this.packageDoc.save({}, {
-				success: function() {
-					that.trigger("extraction_success");
-				},
-				failure: monkeypatchingFailed
-			});		
-		} 
-		else {
-			entry = zip.entries[i];
-			if( entry.name.substr(-1) === "/" ) {
-				this.set("patch_position", i + 1);
-			}
-			else {
-				this.set("log_message", "monkey patching: " + entry.name);
-				monkeyPatchUrls(getUrl(entry), function() {
-						that.set("patch_position", i + 1);
-					}, monkeypatchingFailed);
+		for(var i = 0; i < this.zip.entries.length; i++) {
+			entry = this.zip.entries[i];
+			if( entry.name.substr(-1) !== "/" ) {
+				manifest.push(entry.name);
 			}
 		}
-	},
-
-	removeHandlers: function() {
-		this.off();
-	},
-
-	extraction_complete: function() {
-		this.set("extracting", false);
+		this.set("manifest", manifest);
+		// just set the first position
+		this.set("zip_position", 0);
 	},
 	
 	extract: function() {
 
 		// set up all the callbacks
 		this.on("initialized:zip", this.validateZip, this);
-		this.on("validated:zip", this.checkMimetype, this);
-		this.on("validated:mime", this.parseMetaInfo, this);
-		this.on("change:root_file_path", this.parseContainerRoot, this);
-		this.on("change:zip_position", this.unpackBook, this);
+		this.on("validated:zip", this.extractMimetype, this);
+		this.on("validated:mime", this.extractMetaInfo, this);
+		this.on("change:root_file_path", this.extractContainerRoot, this);
+		this.on("parsed:root_file", this.beginUnpacking, this);
+		this.on("change:zip_position", this.extractBook, this);
 		this.on("change:patch_position", this.correctURIs, this);
 		this.on("change:failure", this.clean, this);
 		this.on("change:failure", this.removeHandlers, this);
@@ -265,7 +284,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 
 	initializeZip: function() {
 		var that = this;
-		this.fsApi.getFileSystem().root.getDirectory(this.urlHash, {create: true}, function(dir) {
+		this.fsApi.getFileSystem().root.getDirectory(this.base_dir_name, {create: true}, function(dir) {
 			that.set("root_url", dir.toURL());
 			that.zip = new ZipFile(that.get('url'), function() {
 				that.set("task_size", that.zip.entries.length * 2 + 3);
@@ -276,5 +295,20 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		});
 	},
 	
-	
+});
+
+// This method takes a url for an epub, unzips it and then
+// writes its contents out to disk.
+Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
+
+	initialize: function() {
+		var url = this.get("url");
+		if(!url) {
+			throw "A URL to a zip file must be specified"
+		}
+		else {
+			this.base_dir_name = Readium.Utils.MD5(url + (new Date()).toString());	
+		}	
+	},
+
 });
