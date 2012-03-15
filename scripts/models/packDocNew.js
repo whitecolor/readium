@@ -38,13 +38,13 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		}
     },
 
-	// todo: Cover image? is identifier ok?
+	// todo: pubdate? is identifier ok?
 	jath_template: {
 		metadata:  { 
 			id: "//def:metadata/dc:identifier",
-			version: "//def:package/@version",
+			epub_version: "//def:package/@version",
 			title: "//def:metadata/dc:title",
-			creator: "//def:metadata/dc:creator",
+			author: "//def:metadata/dc:creator",
 			publisher: "//def:metadata/dc:publisher",
 			description: "//def:metadata/dc:description",
 			rights: "//def:metadata/dc:rights",

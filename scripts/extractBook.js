@@ -31,11 +31,12 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 	parseContainerRoot: function(content) {
 		var rootFile = this.get("root_file_path");
 		this.packageDoc = new Readium.Models.ValidatedPackageMetaData({
-				key: this.base_dir_name
+				key: this.base_dir_name,
+				src_url: this.get("src")
 			}, {
 				file_path: this.base_dir_name + "/" + rootFile,
-				root_url: this.get("root_url") + "/" + rootFile
-			});
+				root_url: this.get("root_url") + "/" + rootFile,
+			}); 
 		this.packageDoc.reset(content);
 		this.trigger("parsed:root_file")		
 	},
@@ -142,7 +143,8 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 			throw "A URL to a zip file must be specified"
 		}
 		else {
-			this.base_dir_name = Readium.Utils.MD5(url + (new Date()).toString());	
+			this.base_dir_name = Readium.Utils.MD5(url + (new Date()).toString());
+			this.set("src", this.get("src_filename"));
 		}	
 	},
 	
@@ -324,6 +326,7 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 				pathList.push( this.getShortName(path) );
 			}
 		}
+		this.set("src", "Local Directory: " + this.fileList[0].webkitRelativePath.substring(0, this.fNameStartInd));
 		this.set("task_size", pathList.length * 2 + 3);
 		this.set("manifest", pathList);
 	},
