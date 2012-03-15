@@ -45,7 +45,14 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		var abs_path = this.base_dir_name + "/" + rel_path;
 
 		if(rel_path.indexOf(this.DISPLAY_OPTIONS) >= 0) {
-			this.packageDoc.parseIbooksDisplayOptions(content);
+			if(typeof content === "string") {
+				this.packageDoc.parseIbooksDisplayOptions(content);
+			}
+			else {
+				this.readEntryByShortName(this.DISPLAY_OPTIONS, function(data) {
+					that.packageDoc.parseIbooksDisplayOptions(data);
+				})
+			}
 		}
 
 		this.fsApi.writeFile(abs_path, content, cb , function() {
