@@ -352,7 +352,7 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 
 		// set up callbacks for reporting progess
 		this.on("change:task_size", this.update_progress, this);
-		this.on("change:zip_position", this.update_progress, this);
+		this.on("change:write_position", this.update_progress, this);
 		this.on("change:patch_position", this.update_progress, this);
 		this.on("extraction_success", this.extraction_complete, this);
 
@@ -430,6 +430,7 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 
 		var file = this.fileList[i];
 		var relpath = this.getShortName(file.webkitRelativePath);
+		this.set("log_message", "writing: " + relpath);
 		if(relpath.substr(-2) === "/.") {
 			this.set("write_position", i+1);
 			return;

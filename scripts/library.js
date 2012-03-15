@@ -139,6 +139,7 @@ $(function() {
 
 		initialize: function() {	
 			this.model.bind('change', this.render, this);
+			this.model.bind("change:error", this.extractionFailed, this);
 		},
 
 		render: function() {
@@ -151,7 +152,13 @@ $(function() {
 				$el.hide("slow");
 			}
 			return this;
-		}
+		},
+
+		extractionFailed: function(msg) {
+			alert(this.model.get("error"));
+			this.model.set("extracting", false);
+		},
+
 	});
 
 
@@ -282,16 +289,18 @@ $(function() {
 		beginExtraction: function(extractor) {
 			window.extract_view = new ExtractItemView({model: extractor});
 			extractor.on("extraction_success", function() {
-			var book = extractor.packageDoc.toJSON();
-			window.Library.add(new window.LibraryItem(book));
-			setTimeout(function() {
-				chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
-			}, 800);
-			})
+				var book = extractor.packageDoc.toJSON();
+				window.Library.add(new window.LibraryItem(book));
+				setTimeout(function() {
+					chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
+				}, 800);
+			});
 			extractor.extract();
 			this.resetForm();
 			this.hide();
-		}
+		},
+
+		
 
 	});
 
