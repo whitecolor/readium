@@ -318,20 +318,27 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 			}
 		}
 		this.set("task_size", pathList.length * 2 + 3);
-		this.set("short_names", pathList);
+		this.set("manifest", pathList);
 	},
 
 	getShortName: function(longName) {
 		return longName.substr(this.fNameStartInd);
 	},
 
+	update_progress: function() {
+		var write_position = this.get("write_position") || 0;
+		var patch_position = this.get("patch_position") || 0;
+		var x = 3 + write_position + patch_position;
+		this.set("progress", x );
+	},
+
 	extract: function() {
 		// set up all the callbacks
 		this.on("validated:dir", this.readMime, this);
-		//this.on("validated:mime", this.readMetaInfo, this);
-		this.on("change:root_file_path", this.extractContainerRoot, this);
-		this.on("parsed:root_file", this.beginUnpacking, this);
-		this.on("change:zip_position", this.extractBook, this);
+		this.on("validated:mime", this.readMetaInfo, this);
+		this.on("change:root_file_path", this.readContainerRoot, this);
+		this.on("parsed:root_file", this.beginWriting, this);
+		this.on("change:write_position", this.writeEntry, this);
 		this.on("change:patch_position", this.correctURIs, this);
 		this.on("change:failure", this.clean, this);
 		this.on("change:failure", this.removeHandlers, this);
@@ -349,9 +356,21 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 		var that = this;
 		Readium.FileSystemApi(function(fs){
 			that.fsApi = fs;
-			that.validateDir();
+			fs.getFileSystem().root.getDirectory(that.base_dir_name, {create: true}, function(dir) {
+				that.set("root_url", dir.toURL());
+				that.validateDir();
+			});
 		});
 
+	},
+
+	validateDir: function() {
+		var entries = this.get("manifest")
+		if(entries.indexOf(this.MIMETYPE) >= 0 && entries.indexOf(this.CONTAINER) >= 0) {
+			this.trigger("validated:dir");
+		} else {
+			this.set("error", "the directory you selected was not valid");
+		}
 	},
 
 	readMime: function() {
@@ -366,13 +385,51 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 		}
 	},
 
-	validateDir: function() {
-		var entries = this.get("short_names")
-		if(entries.indexOf(this.MIMETYPE) >= 0 && entries.indexOf(this.CONTAINER) >= 0) {
-			this.trigger("validated:dir");
-		} else {
-			this.set("error", "the directory you selected was not valid");
+	readMetaInfo: function() {
+		var that = this;
+		try {
+			this.readEntryByShortName(this.CONTAINER, function(content) {
+				that.parseMetaInfo(content);
+			});
+		} catch (e) {
+			this.set("error", e);
 		}
+	},
+
+	readContainerRoot: function() {
+		var that = this;
+		var path = this.get("root_file_path");
+		try {
+			this.readEntryByShortName(path, function(content) {
+				that.parseContainerRoot(content);
+			});				
+		} catch(e) {
+			this.set("error", e);
+		}	
+	},
+
+	beginWriting: function() {		
+		// just set the first position
+		this.set("write_position", 0);
+	},
+
+	writeEntry: function() {
+		var that = this;
+		var i = this.get("write_position");
+		if(i === this.fileList.length) {
+			this.set("patch_position", 0);
+			return;
+		}
+
+		var file = this.fileList[i];
+		var relpath = this.getShortName(file.webkitRelativePath);
+		if(relpath.substr(-2) === "/.") {
+			this.set("write_position", i+1);
+			return;
+		}
+		this.writeFile(relpath, file, function() {
+			that.set("write_position", i+1);
+		});
 	},
 
 	// should only be used for text files

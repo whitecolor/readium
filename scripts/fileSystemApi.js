@@ -81,6 +81,7 @@ Readium.FileSystemApi = function(initCallback) {
 	var writeFile = function(path, content, rootDir, successCallback, failureCallback)  {
 		rootDir.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
 			fileEntry.createWriter(function(fileWriter) {
+				var bb; // for building blobs of data
 
 				fileWriter.onwriteend = function(e) {
 					successCallback(e);
@@ -92,15 +93,17 @@ Readium.FileSystemApi = function(initCallback) {
 				
 				if(content.webkitRelativePath || content.relativePath) {
 					// hacky way to detect if it is a file object
-					 var reader = new FileReader();
+					var reader = new FileReader();
 					reader.onload = function(e) {
-						fileWriter.write(e.target.result);
+						bb = new WebKitBlobBuilder();
+						bb.append(e.target.result);
+						fileWriter.write(bb.getBlob());
 					}
   					reader.readAsArrayBuffer(content);
 				}
 				else {
 					// Create a new Blob and write it
-					var bb = new WebKitBlobBuilder(); 
+					bb = new WebKitBlobBuilder(); 
 					if(typeof content === "string") {
 						bb.append(content);
 						fileWriter.write(bb.getBlob('text/plain'));
