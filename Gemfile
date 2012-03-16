@@ -4,5 +4,8 @@ source 'http://rubygems.org'
 gem 'thin'
 gem 'rack'
 
+# for le styles
+gem 'sass'
+
 # for running tests
 gem 'jasmine'

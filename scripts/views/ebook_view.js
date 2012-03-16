@@ -234,6 +234,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	initialize: function() {
 		// call the super ctor
 		this.page_template = _.template( $('#fixed-page-template').html() );
+		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.model.on("first_render_ready", this.render, this);
 		this.model.on("change:two_up", this.setUpMode, this);
@@ -243,8 +244,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	render: function() {
 		// add all the pages
 		var sections = this.model.getAllSections();
-		console.log("render");
-
 		$('body').addClass('apple-fixed-layout');
 		this.setUpMode();
 		this.$el.width(this.model.get("meta_width") * 2);
@@ -256,6 +255,20 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		}
 		this.model.changPageNumber(i);
 		return this.renderPages();
+	},
+
+	setUpMode: function() {
+		// call super
+		Readium.Views.PaginationViewBase.prototype.setUpMode.call(this);
+		var two_up = this.model.get("two_up");
+		var height = this.model.get("meta_height");
+		var width = this.model.get("meta_width");
+		if(two_up) {
+			var content = this.empty_template({page_num: 0, height: height, width: width});
+			//this.$('#container').prepend(content);
+		} else {
+			$('#page-0').remove();
+		}
 	},
 
 	renderPages: function() {
