@@ -238,11 +238,11 @@ Readium.TocManager = function(book) {
 		}
 		fixLinks();
 		
-		// need to let the thread go for second so the css
-		// is parsed before appending repaginating
-		setTimeout(function() {	
-			fireRepaginateEvent();
-		}, 8);
+		MathJax.Hub.Queue(
+                  ["Delay",MathJax.Callback,8], // delay to let CSS parse
+                  ["Typeset",MathJax.Hub],      // typeset any mathematics
+                  fireRepaginateEvent           // repaginate after MathJax is done
+		);
 
 	};
 
