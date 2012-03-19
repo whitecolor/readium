@@ -16,11 +16,13 @@ src_files:
   - lib/underscore.min.js
   - lib/backbone.min.js
   - lib/jath.js
+  - lib/URI.js
   - scripts/fileSystemApi.js
   - scripts/utils/bb_file_system_sync.js
   - scripts/utils/cookie_utils.js
   - scripts/models/packDocNew.js
   - scripts/models/ebookNew.js
+  - scripts/models/toc.js
 
 # stylesheets
 #

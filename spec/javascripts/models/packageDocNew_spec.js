@@ -39,7 +39,7 @@ describe('packDocNew', function() {
   var packDoc;
 
   beforeEach(function() {
-    packDoc = new Readium.Models.PackageDocumentBase({}, {url: "blah"});
+    packDoc = new Readium.Models.PackageDocumentBase({}, {file_path: "banano/gram", root_url: "http://blah"});
   });
 
   describe('parsing the package document xml', function() {
@@ -58,7 +58,7 @@ describe('packDocNew', function() {
 
     it('parses the epub version number', function() {
       var res = packDoc.parse(dom);
-      expect(res.metadata.version).toEqual("2.0");
+      expect(res.metadata.epub_version).toEqual("2.0");
     });
 
     it('parses the identifier', function() {
@@ -91,8 +91,8 @@ describe('packDocNew', function() {
   describe('fetching the xml from the fs', function() {
 
     it('accepts a url in the constructor', function() {
-      packDoc = new Readium.Models.PackageDocumentBase({}, {file_path: "url"});
-      expect(packDoc.file_path).toEqual("url");
+      packDoc = new Readium.Models.PackageDocumentBase({}, {file_path: "banano/gram", root_url: "http://blah"});
+      expect(packDoc.file_path).toEqual("banano/gram");
     });
   });
 
@@ -101,7 +101,7 @@ describe('packDocNew', function() {
     var ebook;
 
     beforeEach(function() {
-      packDoc = new Readium.Models.PackageDocumentBase({}, {url: "blah"});
+      packDoc = new Readium.Models.PackageDocumentBase({}, {file_path: "banano/gram", root_url: "http://blah"});
       var parser = new window.DOMParser;
       var dom = parser.parseFromString(xmlString, 'text/xml');
       var res = packDoc.parse(dom);
