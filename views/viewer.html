@@ -155,6 +155,22 @@
 			</div>
 		</script>
 
+		<script type="text/template" id='scrolling-page-template'>
+			<div id="scrolling-content" class="scrolling-page-wrap">
+				<div class="scrolling-page-margin">
+
+					<iframe scrolling="yes" 
+							frameborder="0" 
+							marginwidth="0" 
+							marginheight="0" 
+							width="100%" 
+							height="100%" 
+							src="<%= uri %>">
+					</iframe>
+				</div>
+			</div>
+		</script>
+
 		<script type="text/template" id='empty-fixed-page-template'>
 			<div id="page-0" class="fixed-page-wrap even">
 				<div class="page-margin" style="width: <%=  width %>px; height: <%= height %>px">

@@ -34,10 +34,12 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.fetch({
 			success: function() {
+				// TODO: restore location here
 				that.packageDocument.set({spine_position: 1});
 			}
 		});
-		this.on("change:num_pages", this.adjustCurrentPage, this)
+		this.on("change:num_pages", this.adjustCurrentPage, this);
+
 	},
 
 	defaults: {
@@ -48,20 +50,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
     	"full_screen": false,
     	"toolbar_visible": true
   	},
-
-	spinePositionChangedHandler: function() {
-		var that = this;
-		var sect = this.packageDocument.currentSection();
-		var path = sect.get("href");
-		path = this.resolvePath(path);
-		Readium.FileSystemApi(function(api) {
-			api.readTextFile(path, function(result) {
-				that.set( {current_content: result} );
-			}, function() {
-				console.log("Failed to load file: " + path);
-			})
-		});
-	},
 
 	toggleTwoUp: function() {
 		var twoUp = this.get("two_up");
@@ -201,6 +189,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		});
 	},
 
+	/* NOT USED?
 	getAllSectionUris: function() {
 		var temp = this.packageDocument.get("spine");
 		for(var i = 0; i < temp.length; i++) {
@@ -208,6 +197,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		}
 		return temp;
 	},
+	*/
 
 	goToHref: function(href) {
 		this.packageDocument.goToHref(href);
@@ -224,7 +214,23 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 			np[i] = cp[i] + diff;	
 		}
 		this.set({num_pages: num, current_page: np});
-	}
+	},
+
+	spinePositionChangedHandler: function() {
+		var that = this;
+		var sect = this.packageDocument.currentSection();
+		var path = sect.get("href");
+		var url = this.packageDocument.resolveUri(path);;
+		path = this.resolvePath(path);
+		this.set("current_section_url", url);
+		Readium.FileSystemApi(function(api) {
+			api.readTextFile(path, function(result) {
+				that.set( {current_content: result} );
+			}, function() {
+				console.log("Failed to load file: " + path);
+			})
+		});
+	},
 	
 });
 
@@ -235,12 +241,16 @@ Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
 
 	initialize: function() {
 		// call the super ctor
+		
 		Readium.Models.EbookBase.prototype.initialize.call(this);
+
 	},
 
 	CreatePaginator: function() {
-		return new Readium.Views.ReflowablePaginationView({model: _book});	
-	}
+		return new Readium.Views.ScrollingPaginationView({model: _book});	
+	},
+
+	
 
 });
 
@@ -272,7 +282,6 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 		section.width = this.get("meta_width");
 		section.height = this.get("meta_height");
 		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
-
 
 		return section;
 	},
