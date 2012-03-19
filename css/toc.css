@@ -1,0 +1,29 @@
+/**************** THE TOC PANEL ************************/
+#readium-toc {
+  position: fixed;
+  height: 100%;
+  width: 25%;
+  background-color: #F3F6F7;
+  top: 0;
+  border-left: 1px solid #DDD;
+  font-size: 0.8em;
+  overflow: scroll; }
+
+#readium-toc li {
+  text-align: left;
+  margin: 5px; }
+
+.show-toc #readium-toc {
+  left: 0px; }
+
+.show-toc #page-wrap {
+  width: 75%;
+  left: 25%;
+  position: relative; }
+
+.show-toc .page-margin {
+  width: 95%;
+  margin: 0 auto; }
+
+.show-toc .two-up .page-margin {
+  width: 95%; }

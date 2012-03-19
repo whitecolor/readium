@@ -28,6 +28,8 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.toolbar = new Readium.Views.ToolbarView({model: _book});
 		this.toolbar.render();
 
+		this.model.on("change:has_toc", this.init_toc, this);
+
 		this.addGlobalEventHandlers();
 
 	},
@@ -72,6 +74,15 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		setTimeout(function() {
 			that.toggleUI();
 		}, 2000);
+	},
+
+	init_toc: function() {
+		if( this.model.get("has_toc") ) {
+			var toc_item = this.model.getToc();			
+			this.toc = toc_item.TocView();
+			toc_item.fetch();
+
+		}
 	}
 });
 

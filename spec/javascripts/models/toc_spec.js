@@ -57,11 +57,19 @@ describe("parsing the ncx", function() {
         toc = new Readium.Models.NcxToc({}, {});
     });
 
-    it("parses the text", function() {
+    it("parses the title", function() {
         var parsed = toc.parse(ncx);
+        expect(parsed.title).toEqual("The Waste Land");
     });
 
-    it("parses the source", function() {
+    it("parses all the navPoints", function() {
         var parsed = toc.parse(ncx);
+        expect(parsed.navs.length).toEqual(6);
     });
+
+    it("parses the attrs of the navPoints", function() {
+        var point = toc.parse(ncx).navs[0];
+        expect(point.text).toEqual('I. THE BURIAL OF THE DEAD');
+        expect(point.href).toEqual('wasteland-content.xhtml#ch1');
+    }); 
 });

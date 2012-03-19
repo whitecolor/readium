@@ -49,12 +49,14 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			description: "//def:metadata/dc:description",
 			rights: "//def:metadata/dc:rights",
 			language: "//def:metadata/dc:language",
+			ncx: "//def:spine/@toc",
 		 },
 
 		manifest: [ "//def:item", { 
 			id: "@id",
 			href: "@href",
-			media_type: "@media-type"
+			media_type: "@media-type",
+			properties: "@properties",
 		} ],
 							 
 		spine: [ "//def:itemref", { idref: "@idref" } ],
@@ -235,10 +237,6 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		}
 	},
 
-	// not sure what these were for but here they are...
-	XHTML_MIME: "application/xhtml+xml",	
-	NCX_MIME: "application/x-dtbncx+xml",
-
 	sync: BBFileSystemSync,
 
 	defaults: {
@@ -307,40 +305,25 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		return res_spine;
 	},
 
-	
+	getTocItem: function() {
+		var manifest = this.get("manifest");
+		var spine_id = this.get("metadata").ncx;
+		var item = manifest.find(function(item){ 
+			return item.get("properties") === "nav" 
+		});
 
-	/* TODO getTOC()
-	getTocText: function(successCallback, failureCallback) {
-		var path = this.packageDocument.getTocPath();
-		if(!path) {
-			failureCallback();
-			return;
+		if( item ) {
+			return item;
 		}
 
-		if(this.packageDocument.getTocType() === this.packageDocument.XHTML_MIME) {
-			Readium.FileSystemApi(function(fs) {
-				fs.readTextFile(resolvePath(path), function(result) { 
-					var parser = new window.DOMParser();
-					var dom = parser.parseFromString(result, 'text/xml');
-					successCallback( $('body', dom).html() ); 
-				}, failureCallback);
-			});		
+		if( spine_id && spine_id.length > 0 ) {
+			return manifest.find(function(item) {
+				return item.get("id") === spine_id;
+			});
 		}
 
-		else if(this.packageDocument.getTocType() === this.packageDocument.NCX_MIME) {
-			Readium.FileSystemApi(function(fs) {
-				fs.readTextFile(resolvePath(path), function(result) { 
-					buildTocHtml(result, successCallback) 
-				}, failureCallback);
-			});				
-		}
-
-		else {
-			
-		}
-
+		return null;
 	},
-	*/
 
 
 });

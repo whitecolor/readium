@@ -206,37 +206,6 @@ html, body {
   opacity: 0.6;
   z-index: 10; }
 
-/**************** THE TOC PANEL ************************/
-#menu {
-  position: fixed;
-  height: 100%;
-  width: 25%;
-  background-color: #F3F6F7;
-  top: 0;
-  left: -25%;
-  border-left: 1px solid #DDD;
-  font-size: 0.8em;
-  overflow: scroll; }
-
-#menu li {
-  text-align: left;
-  margin: 5px; }
-
-.show-toc #menu {
-  left: 0px; }
-
-.show-toc #page-wrap {
-  width: 75%;
-  left: 25%;
-  position: relative; }
-
-.show-toc .page-margin {
-  width: 95%;
-  margin: 0 auto; }
-
-.show-toc .two-up .page-margin {
-  width: 95%; }
-
 /****************** The Top Bar *****************/
 #toolbar-el {
   height: 40px; }
@@ -359,3 +328,33 @@ body.apple-fixed-layout {
   height: 100%;
   margin: auto;
   -webkit-box-shadow: 0 0 5px 5px#888; }
+
+/**************** THE TOC PANEL ************************/
+#readium-toc {
+  position: fixed;
+  height: 100%;
+  width: 25%;
+  background-color: #F3F6F7;
+  top: 0;
+  border-left: 1px solid #DDD;
+  font-size: 0.8em;
+  overflow: scroll; }
+
+#readium-toc li {
+  text-align: left;
+  margin: 5px; }
+
+.show-toc #readium-toc {
+  left: 0px; }
+
+.show-toc #page-wrap {
+  width: 75%;
+  left: 25%;
+  position: relative; }
+
+.show-toc .page-margin {
+  width: 95%;
+  margin: 0 auto; }
+
+.show-toc .two-up .page-margin {
+  width: 95%; }

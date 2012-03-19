@@ -10,22 +10,6 @@ if( !window.Readium ) {
 
 Readium.Models.EbookBase = Backbone.Model.extend({
 
-	/* All these attrs are being passed in right now for historical reasons
-			author: "Rudyard Kipling"
-			cover_href: "/images/library/missing-cover-image.png"
-			created_at: "2012-02-24T21:22:27.613Z"
-			epub_version: "2.0"
-			fixed_layout: false
-			id: "urn:uuid:1EECAADE-E17A-11E0-90DD-014376811DC8"
-			key: "069871a83831f401042cccc04d6ab714"
-			lang: "en-us"
-			open_to_spread: false
-			package_doc_path: "069871a83831f401042cccc04d6ab714/OPS/content.opf"
-			publisher: "epubBooks (www.epubbooks.com)"
-			title: "Plain Tales from the Hills"
-			updated_at: "2012-02-24T21:22:27.613Z"
-	*/
-
 	initialize: function() {
 		var that = this;
 		this.packageDocument = new Readium.Models.PackageDocument({}, {
@@ -36,10 +20,10 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 			success: function() {
 				// TODO: restore location here
 				that.packageDocument.set({spine_position: 1});
+				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
 			}
 		});
 		this.on("change:num_pages", this.adjustCurrentPage, this);
-
 	},
 
 	defaults: {
@@ -48,7 +32,8 @@ Readium.Models.EbookBase = Backbone.Model.extend({
     	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false,
-    	"toolbar_visible": true
+    	"toolbar_visible": true,
+    	"toc_visible": false,
   	},
 
 	toggleTwoUp: function() {
@@ -85,8 +70,8 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 
 	toggleToc: function() {
-		// todo this is not the way to do this
-		$('body').toggleClass('show-toc');
+		var vis = this.get("toc_visible");
+		this.set("toc_visible", !vis);
 	},
 	
 	prevPage: function() {
@@ -230,6 +215,20 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 				console.log("Failed to load file: " + path);
 			})
 		});
+	},
+
+	getToc: function() {
+		var item = this.packageDocument.getTocItem();
+		if(!item) {
+			return null;
+		}
+		else {
+			var that = this;
+			return Readium.Models.Toc.getToc(item, {
+				file_path: that.resolvePath(item.get("href")),
+				book: that,
+			});
+		}
 	},
 	
 });
