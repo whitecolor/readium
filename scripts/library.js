@@ -7,7 +7,7 @@ $(function() {
 		idAttribute: "key",
 		
 		getViewBookUrl: function(book) {
-			return "/views/viewer.html?book=" + this.get('key');
+			return "/viewer.html?book=" + this.get('key');
 		},
 
 		openInReader: function() {
@@ -299,7 +299,7 @@ var beginExtraction = function(url, filename) {
 			window.extraction.end();
 			window.Library.add(new window.LibraryItem(book));
 			setTimeout(function() {
-				chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
+				chrome.tabs.create({url: "/viewer.html?book=" + book.key });
 			}, 800);
 		}, function() {
 			/* wah wah :( */
