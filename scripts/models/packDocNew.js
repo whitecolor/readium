@@ -275,17 +275,17 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	},
 
 	goToHref: function(href) {
+		var endsWith = function(str, suffix) {
+    		return str.indexOf(suffix, str.length - suffix.length) !== -1;
+		}
 		var spine = this.get("spine");
 		var manifest = this.get("manifest");
-
-		if(href.indexOf("filesystem:") !== -1) {
-			// need to "un-resolve it"
-			
-		}
-
 		var node = manifest.find(function(x) { 
-					if(x.get("href") === href) return x;
-				});
+				// if is is a relative path chop it down
+				var match = x.get("href").match(/[\.\/]*(.*)/);
+				var suffix = match[match.length - 1];
+				if( endsWith(href, suffix) ) return x;
+			});
 
 		// didn't find the spine node, href invalid
 		if(!node) {
