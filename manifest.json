@@ -1,7 +1,7 @@
 {
    "app": {
       "launch": {
-         "local_path": "views/library.html"
+         "local_path": "index.html"
       }
    },
    "update_url": "http://github.readium.org/releases/update.xml",
@@ -29,6 +29,6 @@
       "js": ["lib/jquery-1.7.1.min.js", "background/hijack-ebooks.js"]
     }
   ],
-   "options_page": "views/library.html#options",
+   "options_page": "index.html#options",
    "version": "0.1.9"
 }
