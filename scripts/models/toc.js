@@ -5,10 +5,19 @@ Readium.Models.Toc = Backbone.Model.extend({
 	initialize: function(options) {
 		this.file_path = options.file_path;
 		this.book = options.book;
+		this.book.on("change:toc_visible", this.setVisibility, this);
 	},
 
 	handleLink: function(href) {
 		this.book.goToHref(href);
+	},
+
+	setVisibility: function() {
+		this.set("visible", this.book.get("toc_visible"));
+	},
+
+	defaults: {
+		visible: false
 	}
 
 }, {

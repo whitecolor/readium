@@ -230,6 +230,20 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 			});
 		}
 	},
+
+	goToPage: function(page) {
+		if(this.get("two_up")) {
+			if(page % 2 === 0) {
+				this.set("current_page", [page, page + 1]);	
+			}
+			else {
+				this.set("current_page", [page - 1, page]);
+			}
+		}
+		else {
+			this.set("current_page", [page])
+		}
+	}
 	
 });
 
@@ -324,6 +338,12 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 		this.packageDocument.off("change:spine_position");
 		this.off("current_content")
 		this.trigger("first_render_ready")
+	},
+
+	spinePositionChangedHandler: function() {
+		Readium.Models.EbookBase.prototype.spinePositionChangedHandler.call(this);
+		this.goToPage(this.packageDocument.get("spine_position"));
+		
 	},
 
 });

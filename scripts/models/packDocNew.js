@@ -277,6 +277,12 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	goToHref: function(href) {
 		var spine = this.get("spine");
 		var manifest = this.get("manifest");
+
+		if(href.indexOf("filesystem:") !== -1) {
+			// need to "un-resolve it"
+			
+		}
+
 		var node = manifest.find(function(x) { 
 					if(x.get("href") === href) return x;
 				});
