@@ -22,11 +22,13 @@ Readium.Models.Toc = Backbone.Model.extend({
 
 }, {
 	// Class Level Attributes!
-	XHTML_MIME: "application/xhtml+xml",	
+	XHTML_MIME: "application/xhtml+xml",
+	XML_MIME: "text/xml",	
 	NCX_MIME: "application/x-dtbncx+xml",
 	getToc: function(manItem, options) {
 		var media_type = manItem.get("media_type");
-		if(media_type === Readium.Models.Toc.XHTML_MIME) {
+		if(media_type === Readium.Models.Toc.XHTML_MIME || 
+				media_type === Readium.Models.Toc.XML_MIME) {
 			return new Readium.Models.XhtmlToc(options);
 		}
 		else if (media_type ===  Readium.Models.Toc.NCX_MIME) {
