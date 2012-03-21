@@ -16,6 +16,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	initialize: function(options) {
 		this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:font_size", this.setFontSize, this);
+		this.bindingTemplate = _.template( $('#binding-template').html() );
 		
 		// TODO: should I break layers here or pass through?
 		this.model.packageDocument.on("increased:spine_position", function() {
@@ -34,6 +35,38 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			chrome.tabs.create({"url": href});
 		} else {
 			this.model.goToHref(href);
+		}
+	},
+
+	getBindings: function() {
+		var packDoc = this.model.packageDocument;
+		var bindings = packDoc.get('bindings');
+		return bindings.map(function(binding) {
+			binding.selector = 'object[type="' + binding.media_type + '"]';
+			binding.url = packDoc.getManifestItemById(binding.handler).get('href');
+			binding.url = packDoc.resolveUri(binding.url);
+			return binding;
+		})
+	},
+
+	applyBindings: function(dom) {
+		var that = this;
+		var bindings = this.getBindings();
+		var i = 0;
+		for(var i = 0; i < bindings.length; i++) {
+			$(bindings[i].selector, dom).each(function() {
+				var params = [];
+				var $el = $(this);
+				var data = $el.attr('data');
+				var url;
+				params.push("src=" + that.model.packageDocument.resolveUri(data));
+				params.push('type=' + bindings[i].media_type);
+				url = bindings[i].url + "?" + params.join('&');
+				var content = $(that.bindingTemplate({}));
+				// must set src attr separately
+				content.attr('src', url);
+				$el.html(content);
+			});
 		}
 	},
 
@@ -127,10 +160,15 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 	},
 
 	render: function() {
+		var that = this;
 		var uri = this.model.get("current_section_url");
 		this.$('#container').html( this.page_template({uri: uri}) );
+		this.$('.content-sandbox').on("load", function(e) {
+			// not sure why, on("load", this.applyBindings, this) was not working
+			that.applyBindings( $(e.srcElement).contents() );
+		});
 		return this;
-	}
+	},
 	
 });
 

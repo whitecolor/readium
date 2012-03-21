@@ -245,10 +245,13 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 	getManifestItem: function(spine_position) {
 		var target = this.get("spine")[spine_position];
-		var node = this.get("manifest").find(function(x) { 
-					if(x.get("id") === target.idref) return x;
+		return this.getManifestItemById(target.idref);
+	},
+
+	getManifestItemById: function(id) {
+		return this.get("manifest").find(function(x) { 
+					if(x.get("id") === id) return x;
 				});
-		return node;
 	},
 
 	currentSection: function() {
