@@ -10,22 +10,6 @@ if( !window.Readium ) {
 
 Readium.Models.EbookBase = Backbone.Model.extend({
 
-	/* All these attrs are being passed in right now for historical reasons
-			author: "Rudyard Kipling"
-			cover_href: "/images/library/missing-cover-image.png"
-			created_at: "2012-02-24T21:22:27.613Z"
-			epub_version: "2.0"
-			fixed_layout: false
-			id: "urn:uuid:1EECAADE-E17A-11E0-90DD-014376811DC8"
-			key: "069871a83831f401042cccc04d6ab714"
-			lang: "en-us"
-			open_to_spread: false
-			package_doc_path: "069871a83831f401042cccc04d6ab714/OPS/content.opf"
-			publisher: "epubBooks (www.epubbooks.com)"
-			title: "Plain Tales from the Hills"
-			updated_at: "2012-02-24T21:22:27.613Z"
-	*/
-
 	initialize: function() {
 		var that = this;
 		this.packageDocument = new Readium.Models.PackageDocument({}, {
@@ -34,49 +18,41 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.fetch({
 			success: function() {
-				that.packageDocument.set({spine_position: 1});
+				// TODO: restore location here
+				that.packageDocument.set({spine_position: 0});
+				that.packageDocument.trigger("change:spine_position");
+				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
 			}
 		});
-		this.on("change:num_pages", this.adjustCurrentPage, this)
+		this.on("change:num_pages", this.adjustCurrentPage, this);
 	},
 
 	defaults: {
 		"font_size": 10,
-    	"current_page":  [1],
+    	"current_page": [1],
     	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false,
+    	"toolbar_visible": true,
+    	"toc_visible": false,
   	},
-
-	spinePositionChangedHandler: function() {
-		var that = this;
-		var sect = this.packageDocument.currentSection();
-		var path = sect.get("href");
-		path = this.resolvePath(path);
-		Readium.FileSystemApi(function(api) {
-			api.readTextFile(path, function(result) {
-				that.set( {current_content: result} );
-			}, function() {
-				console.log("Failed to load file: " + path);
-			})
-		});
-	},
 
 	toggleTwoUp: function() {
 		var twoUp = this.get("two_up");
 		var displayed = this.get("current_page");
+		var newPages = [];
 		if(twoUp) {
-			// delete the second elem
-			displayed.splice(1,1);
+			newPages[0] = displayed[1];
 		}
 		else if(displayed[0] % 2 === 0) {
-			displayed.push(displayed[0] + 1)
+			newPages[0] = displayed[0];
+			newPages[1] = displayed[0] + 1;
 		}
 		else {
-			displayed.push(displayed[0])
-			displayed[0] -= 1;
+			newPages[0] = displayed[0] - 1;
+			newPages[1] = displayed[0];
 		}
-		this.set({two_up: !twoUp, current_page: displayed});
+		this.set({two_up: !twoUp, current_page: newPages});
 	},
 
 	toggleFullScreen: function() {
@@ -95,7 +71,8 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 	},
 
 	toggleToc: function() {
-
+		var vis = this.get("toc_visible");
+		this.set("toc_visible", !vis);
 	},
 	
 	prevPage: function() {
@@ -165,11 +142,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		var ind = pack_doc_path.lastIndexOf("/")
 		return pack_doc_path.substr(0, ind) + "/" + suffix;
 	},
-		
-	resolveUrl: function(path) {
-		// this wont work
-		return _rootUrl + resolvePath(path);
-	},
 
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
@@ -203,30 +175,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		});
 	},
 
-	getAllSectionTexts: function(sectionCallback, failureCallback, completeCallback) {
-		var i = 0;
-		var spine = this.packageDocument.getSpineArray();
-		var thatFs;
-
-		var callback = function(content, fileEntry) {
-			sectionCallback(content);
-			i += 1;
-			if(i < spine.length) {
-				thatFs.readTextFile(resolvePath(spine[i]), callback, failureCallback);
-			}
-			else {
-				completeCallback();
-			}
-		
-		};
-
-		Readium.FileSystemApi(function(fs) {
-			thatFs = fs;
-			thatFs.readTextFile(resolvePath(spine[i]), callback, failureCallback);
-		});
-
-	},
-
+	/* NOT USED?
 	getAllSectionUris: function() {
 		var temp = this.packageDocument.get("spine");
 		for(var i = 0; i < temp.length; i++) {
@@ -234,19 +183,69 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		}
 		return temp;
 	},
+	*/
 
 	goToHref: function(href) {
-		// I dunno if this is the right way to do
-		// this anymore.
 		this.packageDocument.goToHref(href);
 	},
 
-	getProperties: function() {
-		// TODO override TOJSON / SAVE
-		return _properties;
+	changPageNumber: function(num) {
+		var cp = this.get("current_page");
+		var np = [];
+		var diff = num - cp[cp.length - 1];
+		if( diff > 0 ) {
+			diff = 0;
+		}
+		for(var i = 0; i < cp.length; i++) {
+			np[i] = cp[i] + diff;	
+		}
+		this.set({num_pages: num, current_page: np});
 	},
 
+	spinePositionChangedHandler: function() {
+		var that = this;
+		var sect = this.packageDocument.currentSection();
+		var path = sect.get("href");
+		var url = this.packageDocument.resolveUri(path);;
+		path = this.resolvePath(path);
+		this.set("current_section_url", url);
+		Readium.FileSystemApi(function(api) {
+			api.readTextFile(path, function(result) {
+				that.set( {current_content: result} );
+			}, function() {
+				console.log("Failed to load file: " + path);
+			})
+		});
+	},
 
+	getToc: function() {
+		var item = this.packageDocument.getTocItem();
+		if(!item) {
+			return null;
+		}
+		else {
+			var that = this;
+			return Readium.Models.Toc.getToc(item, {
+				file_path: that.resolvePath(item.get("href")),
+				book: that,
+			});
+		}
+	},
+
+	goToPage: function(page) {
+		if(this.get("two_up")) {
+			if(page % 2 === 0) {
+				this.set("current_page", [page, page + 1]);	
+			}
+			else {
+				this.set("current_page", [page - 1, page]);
+			}
+		}
+		else {
+			this.set("current_page", [page])
+		}
+	}
+	
 });
 
 
@@ -254,10 +253,98 @@ Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
 
 	isFixedLayout: false,
 
+	initialize: function() {
+		// call the super ctor
+		
+		Readium.Models.EbookBase.prototype.initialize.call(this);
+
+	},
+
+	CreatePaginator: function() {
+		return new Readium.Views.ScrollingPaginationView({model: _book});	
+	},
+
+	
+
 });
 
 Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 
 	isFixedLayout: true,
+
+	defaults: {
+		"font_size": 10,
+    	"current_page":  [0, 1],
+    	"num_pages": 0,
+    	"two_up": true,
+    	"full_screen": false,
+    	"toolbar_visible": true
+  	},
+
+	initialize: function() {
+		// call the super ctor
+		Readium.Models.EbookBase.prototype.initialize.call(this);
+		this.on("change:current_content", this.parseMetaTags, this);
+	},
+
+	CreatePaginator: function() {
+		return new Readium.Views.FixedPaginationView({model: _book});	
+	},
+
+	buildSectionJSON: function(manifest_item) {
+		var section = {};
+		section.width = this.get("meta_width");
+		section.height = this.get("meta_height");
+		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
+
+		return section;
+	},
+
+	getAllSections: function() {
+		var spine = this.packageDocument.getResolvedSpine();
+		var sections = [];
+		for(var i = 0; i < spine.length; i++) {
+			sections.push(this.buildSectionJSON( spine[i] ));
+		}
+		return sections;
+	},
+
+
+	parseViewportTag: function(viewportTag) {
+		// this is going to be ugly
+		var str = viewportTag.getAttribute('content');
+		str = str.replace(/\s/g, '');
+		var valuePairs = str.split(',');
+		var values = {};
+		var pair;
+		for(var i = 0; i < valuePairs.length; i++) {
+			pair = valuePairs[i].split('=');
+			if(pair.length === 2) {
+				values[ pair[0] ] = pair[1];
+			}
+		}
+		values['width'] = parseFloat(values['width']);
+		values['height'] = parseFloat(values['height']);
+		return values;
+	},
+
+	parseMetaTags: function() {
+		var parser = new window.DOMParser();
+		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
+		var tag = dom.getElementsByName("viewport")[0];
+		if(tag) {
+			var pageSize = this.parseViewportTag(tag);
+			this.set({meta_width: pageSize.width, meta_height: pageSize.height});
+		}
+		this.packageDocument.off("change:spine_position");
+		this.off("current_content")
+		this.trigger("first_render_ready")
+	},
+
+	spinePositionChangedHandler: function() {
+		Readium.Models.EbookBase.prototype.spinePositionChangedHandler.call(this);
+		this.goToPage(this.packageDocument.get("spine_position"));
+		
+	},
 
 });

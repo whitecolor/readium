@@ -1,0 +1,75 @@
+#settings {
+  position: fixed;
+  width: 334px;
+  height: 35px;
+  margin-top: -80px;
+  margin-left: -400px;
+  top: 100%;
+  left: 100%;
+  color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  border: 1px solid #000;
+  z-index: 10; }
+
+#settings span {
+  height: 35px;
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  display: block;
+  float: left; }
+
+#settings span.setting-button {
+  width: 46px;
+  text-align: center; }
+
+span.setting-button:hover {
+  background-color: #353F5E;
+  opacity: 1;
+  cursor: pointer; }
+
+#settings span.setting-button img {
+  position: relative;
+  top: 6px; }
+
+#settings span.divider {
+  width: 0px;
+  border-left: 1px solid black;
+  border-right: 1px solid #353F5E; }
+
+/* stop buttons from highlighting on double click */
+#settings, #settings span, #settings img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -khtml-user-select: none;
+  user-select: none; }
+
+#settings, #top-bar {
+  /* Legacy browsers */
+  background: #000011 url("settings-bg.png") repeat-x top;
+  -o-background-size: 100% 100%;
+  -moz-background-size: 100% 100%;
+  -webkit-background-size: 100% 100%;
+  background-size: 100% 100%;
+  /* Recent browsers */
+  background: -webkit-gradient(linear, left top, left bottom, from(#353f5e), to(#000011));
+  background: -webkit-linear-gradient(top, #353f5e, #000011);
+  background: -moz-linear-gradient(top, #353f5e, #000011);
+  background: -o-linear-gradient(top, #353f5e, #000011);
+  background: linear-gradient(top, #353f5e, #000011); }
+
+#settings {
+  opacity: 0.9;
+  -webkit-transition: opacity 0.3s ease-in;
+  -moz-transition: opacity 0.3s ease-in;
+  -o-transition: opacity 0.3s ease-in;
+  -ms-transition: opacity 0.3s ease-in;
+  transition: opacity 0.3s ease-in; }
+
+#settings.hover-fade {
+  opacity: 0; }
+
+#settings.hover-fade:hover {
+  opacity: 0.9; }

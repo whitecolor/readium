@@ -1,12 +1,17 @@
-// Define a namespace for the library
-if (typeof Readium === "undefined" || Readium === null) {
-	Readium = {};
+if( !window.Readium ) {
+	window.Readium = {
+		Models: {},
+		Collections: {},
+		Views: {},
+		Routers: {},
+		Utils: {}
+	};
 }
 
 Readium.FileSystemApi = function(initCallback) {
 	
 	var _fs;
-	var FILE_SYSTEM_SIZE = 1024 * 1024 * 8; // ~ 80 megaBytes
+	var FILE_SYSTEM_SIZE = 1024 * 1024 * 80; // ~ 80 megaBytes
 	
 	// Initialize the persistent storage file system ONLY after
 	// the user has already granted permission
@@ -74,20 +79,31 @@ Readium.FileSystemApi = function(initCallback) {
 	};
 	
 	var writeFile = function(path, content, rootDir, successCallback, failureCallback)  {
-			rootDir.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
-				fileEntry.createWriter(function(fileWriter) {
+		rootDir.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
+			fileEntry.createWriter(function(fileWriter) {
+				var bb; // for building blobs of data
 
-					fileWriter.onwriteend = function(e) {
-						console.log(e);
-						successCallback(e);
-					};
+				fileWriter.onwriteend = function(e) {
+					successCallback(e);
+				};
 
-					fileWriter.onerror = function(e) {
-						failureCallback(e);
-					};
-
+				fileWriter.onerror = function(e) {
+					failureCallback(e);
+				};
+				
+				if(content.webkitRelativePath || content.relativePath) {
+					// hacky way to detect if it is a file object
+					var reader = new FileReader();
+					reader.onload = function(e) {
+						bb = new WebKitBlobBuilder();
+						bb.append(e.target.result);
+						fileWriter.write(bb.getBlob());
+					}
+  					reader.readAsArrayBuffer(content);
+				}
+				else {
 					// Create a new Blob and write it
-					var bb = new WebKitBlobBuilder(); 
+					bb = new WebKitBlobBuilder(); 
 					if(typeof content === "string") {
 						bb.append(content);
 						fileWriter.write(bb.getBlob('text/plain'));
@@ -97,10 +113,11 @@ Readium.FileSystemApi = function(initCallback) {
 						bb.append(byteArr.buffer);
 						fileWriter.write(bb.getBlob());
 					}
-
-				}, failureCallback);
+				}
 
 			}, failureCallback);
+
+		}, failureCallback);
 	};
 	
 	var writeFileRecursively = function(folders, content, rootDir, successCallback, failureCallback) {
@@ -163,6 +180,12 @@ Readium.FileSystemApi = function(initCallback) {
 			      console.log('Directory removed.');
 			    }, fileSystemErrorHandler);
 			}, fileSystemErrorHandler);
+		},
+
+		getFsUri: function(path, win, fail) {
+			_fs.root.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
+				win(fileEntry.toURL());
+			}, fail || fileSystemErrorHandler);
 		},
 		
 		// recursively create dirs from an array of dir names

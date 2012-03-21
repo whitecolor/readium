@@ -7,7 +7,7 @@ $(function() {
 		idAttribute: "key",
 		
 		getViewBookUrl: function(book) {
-			return "/viewer.html?book=" + this.get('key');
+			return "/views/viewer.html?book=" + this.get('key');
 		},
 
 		openInReader: function() {
@@ -288,23 +288,6 @@ var beginExtraction = function(url, filename) {
 			});
 		},
 
-		update_progress: function(x, y) {
-			window.extraction.updateProgress(x,y);
-		}
-	};
-	if (filename) {
-		extractOptions.src_filename = filename;
-	}
-	Readium.ExtractBook(url, function(book) {
-			window.extraction.end();
-			window.Library.add(new window.LibraryItem(book));
-			setTimeout(function() {
-				chrome.tabs.create({url: "/viewer.html?book=" + book.key });
-			}, 800);
-		}, function() {
-			/* wah wah :( */
-		}, extractOptions);
-};
 
 var resetAndHideForm = function() {
 	$('#add-book-modal').modal('hide');
@@ -317,18 +300,7 @@ var handleFileSelect = function(evt) {
 	resetAndHideForm();
 };
 
-var clickHandler = function(evt) {
-	var input = document.getElementById('book-url');
-	if(input.value === null || input.value.length < 1) {
-		alert("invalid url, cannot process");
-	}
-	else {
-		var url = input.value;
-		beginExtraction(url);
-		resetAndHideForm();
-	}
-};
-
+/*
 var flash = function(text, type) {
 	var className = "alert";
 	if(type) {

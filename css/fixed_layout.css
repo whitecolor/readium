@@ -16,17 +16,15 @@
 
 .two-up .fixed-page-wrap {
   width: 50%; }
-
 .two-up .fixed-page-wrap.odd {
   left: 50%; }
-
 .two-up .fixed-page-wrap.even {
   left: 0%; }
 
 body.apple-fixed-layout {
   height: 100%;
   width: 100%;
-  overflow: scroll; }
+  overflow: hidden; }
 
 .apple-fixed-layout #readium-book-view-el {
   margin: auto; }
