@@ -308,6 +308,11 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 			sections[i].page_num = i + 1;
 			this.$('#container').append(this.page_template(sections[i]));
 		}
+		var that = this;
+		this.$('.content-sandbox').on("load", function(e) {
+			// not sure why, on("load", this.applyBindings, this) was not working
+			that.applyBindings( $(e.srcElement).contents() );
+		});
 		this.model.changPageNumber(i);
 		return this.renderPages();
 	},
