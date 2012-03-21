@@ -19,7 +19,8 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		this.packageDocument.fetch({
 			success: function() {
 				// TODO: restore location here
-				that.packageDocument.set({spine_position: 1});
+				that.packageDocument.set({spine_position: 0});
+				that.packageDocument.trigger("change:spine_position");
 				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
 			}
 		});
