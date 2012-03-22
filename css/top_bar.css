@@ -1,23 +1,23 @@
 /*
 Syntax error: Undefined mixin 'transition'.
-        on line 17 of css/sass/top_bar.scss, in `transition'
-        from line 17 of css/sass/top_bar.scss
+        on line 19 of css/sass/top_bar.scss, in `transition'
+        from line 19 of css/sass/top_bar.scss
 
-12: 	top: 0px;
-13: 	z-index: 1000;
-14: 	opacity: 0.9;
-15: 	-moz-opacity: 0.9;
-16: 	filter:alpha(opacity=9);
-17: 	@include transition (all 0.3s linear);
-18: 	@include linear-gradient(top, #353F5E, #000011);
-19: 	text-align: center;
-20: 	color: #DDD;
-21: 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
-22: 	border-bottom: 3px solid #6FA64D;
+14: 	top: 0px;
+15: 	z-index: 1000;
+16: 	opacity: 0.9;
+17: 	-moz-opacity: 0.9;
+18: 	filter:alpha(opacity=9);
+19: 	@include transition (all 0.3s linear);
+20: 	@include linear-gradient(top, #353F5E, #000011);
+21: 	color: #DDD;
+22: 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+23: 	border-bottom: 3px solid #6FA64D;
+24: 	padding: 0; margin: 0;
 
 Backtrace:
-css/sass/top_bar.scss:17:in `transition'
-css/sass/top_bar.scss:17
+css/sass/top_bar.scss:19:in `transition'
+css/sass/top_bar.scss:19
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:170:in `visit_mixin'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `visit'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:18:in `visit'
@@ -78,4 +78,4 @@ css/sass/top_bar.scss:17
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Syntax error: Undefined mixin 'transition'.\A         on line 17 of css/sass/top_bar.scss, in `transition'\A         from line 17 of css/sass/top_bar.scss\A \A 12: 	top: 0px;\A 13: 	z-index: 1000;\A 14: 	opacity: 0.9;\A 15: 	-moz-opacity: 0.9;\A 16: 	filter:alpha(opacity=9);\A 17: 	@include transition (all 0.3s linear);\A 18: 	@include linear-gradient(top, #353F5E, #000011);\A 19: 	text-align: center;\A 20: 	color: #DDD;\A 21: 	font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; \A 22: 	border-bottom: 3px solid #6FA64D;"; }
+  content: "Syntax error: Undefined mixin 'transition'.\A         on line 19 of css/sass/top_bar.scss, in `transition'\A         from line 19 of css/sass/top_bar.scss\A \A 14: 	top: 0px;\A 15: 	z-index: 1000;\A 16: 	opacity: 0.9;\A 17: 	-moz-opacity: 0.9;\A 18: 	filter:alpha(opacity=9);\A 19: 	@include transition (all 0.3s linear);\A 20: 	@include linear-gradient(top, #353F5E, #000011);\A 21: 	color: #DDD;\A 22: 	font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; \A 23: 	border-bottom: 3px solid #6FA64D;\A 24: 	padding: 0; margin: 0;"; }

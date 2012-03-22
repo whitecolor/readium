@@ -1,23 +1,23 @@
 /*
 Syntax error: Undefined mixin 'box-shadow'.
-        on line 145 of css/sass/readium_paginator.scss, in `box-shadow'
-        from line 145 of css/sass/readium_paginator.scss
+        on line 136 of css/sass/readium_paginator.scss, in `box-shadow'
+        from line 136 of css/sass/readium_paginator.scss
 
-140:     position: absolute;
-141:     top: 2%;
-142:     left: 50%;
-143:     height:96%;
-144:     width: 1px;
-145:     @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));
-146: 	display: none;
-147: 	background-color: #444;
-148: 	opacity: 0.6;
-149: 	z-index: 10;
-150: }
+131:     position: absolute;
+132:     top: 2%;
+133:     left: 50%;
+134:     height:96%;
+135:     width: 1px;
+136:     @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));
+137: 	display: none;
+138: 	background-color: #444;
+139: 	opacity: 0.6;
+140: 	z-index: 10;
+141: }
 
 Backtrace:
-css/sass/readium_paginator.scss:145:in `box-shadow'
-css/sass/readium_paginator.scss:145
+css/sass/readium_paginator.scss:136:in `box-shadow'
+css/sass/readium_paginator.scss:136
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:170:in `visit_mixin'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `visit'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:18:in `visit'
@@ -78,4 +78,4 @@ css/sass/readium_paginator.scss:145
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 145 of css/sass/readium_paginator.scss, in `box-shadow'\A         from line 145 of css/sass/readium_paginator.scss\A \A 140:     position: absolute;\A 141:     top: 2%;\A 142:     left: 50%;\A 143:     height:96%;\A 144:     width: 1px;\A 145:     @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));\A 146: 	display: none;\A 147: 	background-color: #444;\A 148: 	opacity: 0.6;\A 149: 	z-index: 10;\A 150: }"; }
+  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 136 of css/sass/readium_paginator.scss, in `box-shadow'\A         from line 136 of css/sass/readium_paginator.scss\A \A 131:     position: absolute;\A 132:     top: 2%;\A 133:     left: 50%;\A 134:     height:96%;\A 135:     width: 1px;\A 136:     @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));\A 137: 	display: none;\A 138: 	background-color: #444;\A 139: 	opacity: 0.6;\A 140: 	z-index: 10;\A 141: }"; }

@@ -64,17 +64,21 @@
 						<img id='readium-icon' src="/images/top_bar/back_to_library.png" alt="lib" />
 					</a>
 				</span>
-				<button id="hide-toolbar-button" >
-	 				hide
-				</button>
+				
 
-				<a class="pull-right" data-toggle="modal" href="#readium-info" id='bar-logo'>
-					<img src="/images/top_bar/READIUM_TOOLBAR_LOGO.png" height="37px" width="139px"/>
-				</a>
+				<div id='right-wrapper'>
+					<a data-toggle="modal" href="#readium-info" id='bar-logo'>
+						<img src="/images/top_bar/READIUM_TOOLBAR_LOGO.png" height="37px" width="139px"/>
+					</a>
+					<div class='bar-divider'></div>
+					<a id="hide-toolbar-button" class="toggle-bar-btn">
+		 				<img src="/images/top_bar/Up.png" alt="X" width="12px" height="12px" />
+					</a>
+				</div>
  			</div>
- 			<button id="show-toolbar-button" >
-	 				show
-			</button>
+ 			<span id="show-toolbar-button" class="pull-right toggle-bar-btn" >
+ 				<img src="/images/top_bar/Down.png" alt="V" width="12px" height="12px" />
+			</span>
  		</div>
 
  		<div id="settings" class="clearfix">

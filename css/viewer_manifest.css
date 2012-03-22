@@ -88,8 +88,7 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow: hidden;
-  background-color: #BBB; }
+  overflow: hidden; }
 
 #container {
   margin: 0;
@@ -102,7 +101,6 @@ html, body {
   padding: 0; }
 
 #content {
-  color: #444;
   font: normal 16px/1.25 "Helvetica Neue", sans-serif; }
 
 #readium-content-container {
@@ -138,8 +136,6 @@ html, body {
   width: 60%;
   margin: 0 auto;
   padding: 0;
-  -webkit-box-shadow: 0 0 5px 5px #888;
-  background-color: white;
   overflow: visible; }
 
 .page-margin:before, .page-margin:after {
@@ -149,7 +145,6 @@ html, body {
   clear: both; }
 
 .page {
-  background-color: white;
   border: none;
   content: -webkit-from-flow("foo");
   -webkit-flow-from: foo;
@@ -163,9 +158,6 @@ html, body {
   height: 5%;
   margin: 0px;
   width: 0px; }
-
-#container {
-  background-color: #BBB; }
 
 .clearfix:after {
   content: " ";
@@ -296,13 +288,15 @@ body.apple-fixed-layout {
   margin: 5px; }
 
 #toolbar-el {
-  height: 40px; }
+  height: 40px;
+  width: 100%;
+  padding: 0;
+  margin: 0; }
 
 #top-bar {
   width: 100%;
   position: fixed;
-  height: 30px;
-  padding-top: 10px;
+  height: 40px;
   top: 0px;
   z-index: 1000;
   opacity: 0.9;
@@ -335,31 +329,83 @@ body.apple-fixed-layout {
   background-image: -ms-linear-gradient(top, #353f5e, #000011);
   background-image: -o-linear-gradient(top, #353f5e, #000011);
   background-image: linear-gradient(top, #353f5e, #000011);
-  text-align: center;
   color: #DDD;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  border-bottom: 3px solid #6FA64D; }
+  border-bottom: 3px solid #6FA64D;
+  padding: 0;
+  margin: 0;
+  text-align: center; }
 
 #back-to-lib-button {
   float: left;
   margin-left: 20px; }
 
-img#readium-icon {
-  height: 25px;
-  width: 45px;
-  margin: auto 0px;
-  padding: 0px;
-  position: relative;
-  display: inline; }
+.top-bar-button {
+  margin-top: 8px; }
 
-.top-bar-button img#readium-icon {
-  top: 0px; }
+#right-wrapper {
+  float: right; }
 
 #bar-logo {
-  position: relative;
-  top: -10px;
-  right: 20px; }
+  text-decoration: none; }
   #bar-logo img {
     max-height: 37px;
-    max-width: 139px;
-    clear: both; }
+    max-width: 139px; }
+
+#show-toolbar-button {
+  width: 25px;
+  height: 18px;
+  background-color: #838383;
+  border: 1px solid #555;
+  position: relative;
+  top: 10px;
+  right: 10px;
+  text-align: center;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px; }
+  #show-toolbar-button img {
+    margin-top: 2px; }
+
+#hide-toolbar-button {
+  height: 40px;
+  display: inline-block;
+  position: relative;
+  top: -30px; }
+  #hide-toolbar-button img {
+    position: relative;
+    top: 15px;
+    right: 1px; }
+
+.bar-divider {
+  width: 0;
+  height: 40px;
+  display: inline-block;
+  border-left: 1px solid black;
+  border-right: 1px solid #353F5E; }
+
+html, body, #container {
+  background-color: #BBB; }
+
+.page-margin {
+  -webkit-box-shadow: 0 0 5px 5px #777777;
+  -moz-box-shadow: 0 0 5px 5px #777777;
+  box-shadow: 0 0 5px 5px #777777; }
+
+.page-margin, .page {
+  background-color: #FFF; }
+
+#content {
+  color: #EEE; }
+
+.dark-theme #readium-content-container {
+  color: #030303; }
+.dark-theme .page-margin {
+  border-left: 1px solid #000;
+  border-right: 1px solid #000; }
+.dark-theme .page-margin, .dark-theme .page {
+  background-color: #444; }
+.dark-theme #content {
+  color: #EEE; }

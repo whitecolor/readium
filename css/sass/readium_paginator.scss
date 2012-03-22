@@ -4,7 +4,6 @@ html, body {
 	height: 100%;  
 	width: 100%;
 	overflow: hidden;
-	background-color: #BBB;
 }
 
 #container {
@@ -20,7 +19,6 @@ html, body {
 }
 
 #content {
-    color: #444;
     font: normal 16px/1.25 'Helvetica Neue', sans-serif;
 }
 
@@ -62,8 +60,6 @@ html, body {
 	width: 60%;
 	margin: 0 auto;
 	padding: 0;
-	-webkit-box-shadow: 0 0 5px 5px #888;
-	background-color: white;
 	overflow: visible;
 }
 
@@ -75,7 +71,6 @@ html, body {
 }
 
 .page {
-    background-color: white;
     border: none;
     content: -webkit-from-flow('foo');
     -webkit-flow-from: foo;
@@ -90,10 +85,6 @@ html, body {
 	height: 5%;
 	margin: 0px;
 	width: 0px;
-}
-
-#container {
-	background-color: #BBB;
 }
 
 .clearfix:after {
