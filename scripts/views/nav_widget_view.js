@@ -5,6 +5,10 @@ Readium.Views.NavWidgetView = Backbone.View.extend({
 	initialize: function() {
 		this.model.on("change:two_up", this.render, this);
 		this.model.on("change:full_screen", this.render, this);
+		setTimeout(function() {
+			$('#settings').addClass('hover-fade')
+		}, 1000);
+		
 	},
 
 	render: function() {

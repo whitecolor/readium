@@ -42,31 +42,40 @@ span.setting-button:hover {
 #settings, #settings span, #settings img {
   -webkit-user-select: none;
   -moz-user-select: none;
-  -o-user-select: none;
-  -khtml-user-select: none;
+  -ms-user-select: none;
   user-select: none; }
 
-#settings, #top-bar {
-  /* Legacy browsers */
-  background: #000011 url("settings-bg.png") repeat-x top;
-  -o-background-size: 100% 100%;
-  -moz-background-size: 100% 100%;
-  -webkit-background-size: 100% 100%;
-  background-size: 100% 100%;
-  /* Recent browsers */
-  background: -webkit-gradient(linear, left top, left bottom, from(#353f5e), to(#000011));
-  background: -webkit-linear-gradient(top, #353f5e, #000011);
-  background: -moz-linear-gradient(top, #353f5e, #000011);
-  background: -o-linear-gradient(top, #353f5e, #000011);
-  background: linear-gradient(top, #353f5e, #000011); }
+#settings {
+  background-color: #353f5e;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #353f5e), color-stop(100%, #000011));
+  background-image: -webkit-linear-gradient(top, #353f5e, #000011);
+  background-image: -moz-linear-gradient(top, #353f5e, #000011);
+  background-image: -ms-linear-gradient(top, #353f5e, #000011);
+  background-image: -o-linear-gradient(top, #353f5e, #000011);
+  background-image: linear-gradient(top, #353f5e, #000011); }
 
 #settings {
   opacity: 0.9;
-  -webkit-transition: opacity 0.3s ease-in;
-  -moz-transition: opacity 0.3s ease-in;
-  -o-transition: opacity 0.3s ease-in;
-  -ms-transition: opacity 0.3s ease-in;
-  transition: opacity 0.3s ease-in; }
+  -webkit-transition-property: opacity, 1s, ease-in;
+  -moz-transition-property: opacity, 1s, ease-in;
+  -ms-transition-property: opacity, 1s, ease-in;
+  -o-transition-property: opacity, 1s, ease-in;
+  transition-property: opacity, 1s, ease-in;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
 
 #settings.hover-fade {
   opacity: 0; }
@@ -85,9 +94,7 @@ html, body {
 #container {
   margin: 0;
   padding: 0;
-  width: 100%;
-  /*height: 100%;
-  overflow: hidden;*/ }
+  width: 100%; }
 
 #content-end {
   margin: 0;
@@ -101,9 +108,6 @@ html, body {
 #readium-content-container {
   -webkit-flow: 'foo';
   -webkit-flow-into: foo; }
-
-::-webkit-scrollbar {
-  visibility: hidden; }
 
 #page-wrap #container {
   position: relative;
@@ -134,7 +138,7 @@ html, body {
   width: 60%;
   margin: 0 auto;
   padding: 0;
-  -webkit-box-shadow: 0 0 5px 5px#888;
+  -webkit-box-shadow: 0 0 5px 5px #888;
   background-color: white;
   overflow: visible; }
 
@@ -172,23 +176,17 @@ html, body {
 /* Style declarations for two up mode */
 .two-up .page-wrap {
   width: 50%; }
-
 .two-up .page-wrap.odd {
   left: 50%; }
-
 .two-up .page-wrap.even {
   left: 0; }
-
 .two-up .odd, .two-up .even .page-margin {
   float: right; }
-
 .two-up .even, .two-up .odd .page-margin {
   float: left; }
-
 .two-up .page-margin {
   width: 90%;
   margin: 0; }
-
 .two-up .page {
   width: 85%; }
 
@@ -198,9 +196,9 @@ html, body {
   left: 50%;
   height: 96%;
   width: 1px;
-  -webkit-box-shadow: 0px 0px 15px 3px rgba(5, 5, 5, 0.7);
-  -moz-box-shadow: 0px 0px 15px 3px rgba(5, 5, 5, 0.7);
-  box-shadow: 0px 0px 15px 3px rgba(5, 5, 5, 0.7);
+  -webkit-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
+  -moz-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
+  box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
   display: none;
   background-color: #444;
   opacity: 0.6;
@@ -216,6 +214,8 @@ html, body {
   left: 25%;
   overflow: hidden;
   -webkit-box-shadow: 0 0 5px 5px rgba(80, 80, 80, 0.5);
+  -moz-box-shadow: 0 0 5px 5px rgba(80, 80, 80, 0.5);
+  box-shadow: 0 0 5px 5px rgba(80, 80, 80, 0.5);
   background-color: #FFF; }
 
 .apple-fixed-layout #spine-divider {
@@ -237,26 +237,16 @@ body.apple-fixed-layout {
 .apple-fixed-layout #readium-book-view-el {
   margin: auto; }
 
-/*************** BEGIN: INFO MODAL ***************/
 #readium-info {
   text-align: center;
   padding: 30px;
-  background: #cccccc;
-  /* Old browsers */
-  background: -moz-linear-gradient(top, #cccccc 0%, white 100%);
-  /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cccccc), color-stop(100%, white));
-  /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, #cccccc 0%, white 100%);
-  /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, #cccccc 0%, white 100%);
-  /* Opera 11.10+ */
-  background: -ms-linear-gradient(top, #cccccc 0%, white 100%);
-  /* IE10+ */
-  background: linear-gradient(top, #cccccc 0%, white 100%);
-  /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#ffffff',GradientType=0 );
-  /* IE6-9 */ }
+  background-color: #cccccc;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cccccc), color-stop(100%, white));
+  background-image: -webkit-linear-gradient(top, #cccccc, white);
+  background-image: -moz-linear-gradient(top, #cccccc, white);
+  background-image: -ms-linear-gradient(top, #cccccc, white);
+  background-image: -o-linear-gradient(top, #cccccc, white);
+  background-image: linear-gradient(top, #cccccc, white); }
   #readium-info #version-info, #readium-info .green, #readium-info .modal-detail.green {
     color: #6FA64D; }
   #readium-info p {
@@ -278,13 +268,14 @@ body.apple-fixed-layout {
     text-rendering: optimizelegibility;
     display: block; }
 
-/*************** END: INFO MODAL ***************/
 .scrolling-page-margin {
   background-color: #FFF;
   width: 50%;
   height: 100%;
   margin: auto;
-  -webkit-box-shadow: 0 0 5px 5px#888; }
+  -webkit-box-shadow: 0 0 5px 5px #888888;
+  -moz-box-shadow: 0 0 5px 5px #888888;
+  box-shadow: 0 0 5px 5px #888888; }
 
 /**************** THE TOC PANEL ************************/
 #readium-toc {
@@ -304,7 +295,6 @@ body.apple-fixed-layout {
   text-align: left;
   margin: 5px; }
 
-/****************** The Top Bar *****************/
 #toolbar-el {
   height: 40px; }
 
@@ -318,10 +308,33 @@ body.apple-fixed-layout {
   opacity: 0.9;
   -moz-opacity: 0.9;
   filter: alpha(opacity=9);
-  -webkit-transition: all 0.3s linear;
-  -moz-transition: all 0.3s linear;
-  -o-transition: all 0.3s linear;
-  -ms-transition: all 0.3s linear;
+  -webkit-transition-property: all, 0.3s, linear;
+  -moz-transition-property: all, 0.3s, linear;
+  -ms-transition-property: all, 0.3s, linear;
+  -o-transition-property: all, 0.3s, linear;
+  transition-property: all, 0.3s, linear;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  background-color: #353f5e;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #353f5e), color-stop(100%, #000011));
+  background-image: -webkit-linear-gradient(top, #353f5e, #000011);
+  background-image: -moz-linear-gradient(top, #353f5e, #000011);
+  background-image: -ms-linear-gradient(top, #353f5e, #000011);
+  background-image: -o-linear-gradient(top, #353f5e, #000011);
+  background-image: linear-gradient(top, #353f5e, #000011);
   text-align: center;
   color: #DDD;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -346,3 +359,7 @@ img#readium-icon {
   position: relative;
   top: -10px;
   right: 20px; }
+  #bar-logo img {
+    max-height: 37px;
+    max-width: 139px;
+    clear: both; }

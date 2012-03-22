@@ -1,4 +1,4 @@
-/****************** The Top Bar *****************/
+//Right now these styles are applied to the top bar of the viewer only
 
 #toolbar-el {
 	height: 40px;
@@ -14,10 +14,8 @@
 	opacity: 0.9;
 	-moz-opacity: 0.9;
 	filter:alpha(opacity=9);
-	-webkit-transition: all 0.3s linear;
-	-moz-transition: all 0.3s linear;
-	-o-transition: all 0.3s linear;
-	-ms-transition: all 0.3s linear;
+	@include transition (all 0.3s linear);
+	@include linear-gradient(top, #353F5E, #000011);
 	text-align: center;
 	color: #DDD;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
@@ -47,4 +45,9 @@ img#readium-icon {
 	position: relative;
 	top: -10px;
 	right: 20px;
+	img {
+		max-height: 37px;
+		max-width: 139px;
+		clear: both;
+	}
 }

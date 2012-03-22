@@ -11,8 +11,6 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    /*height: 100%;
-    overflow: hidden;*/ 
 }
 
 #content-end {
@@ -29,10 +27,6 @@ html, body {
 #readium-content-container {
 	-webkit-flow: 'foo';
     -webkit-flow-into: foo;
-}
-
-::-webkit-scrollbar {
-    visibility: hidden;
 }
 
 #page-wrap #container {
@@ -68,7 +62,7 @@ html, body {
 	width: 60%;
 	margin: 0 auto;
 	padding: 0;
-	-webkit-box-shadow: 0 0 5px 5px#888;
+	-webkit-box-shadow: 0 0 5px 5px #888;
 	background-color: white;
 	overflow: visible;
 }
@@ -102,8 +96,6 @@ html, body {
 	background-color: #BBB;
 }
 
-
-
 .clearfix:after {
     content: " ";
     display: block;
@@ -113,33 +105,35 @@ html, body {
 
 /* Style declarations for two up mode */
 
-.two-up .page-wrap {
-	width: 50%;
-}
+.two-up { 
+	.page-wrap {
+		width: 50%;
+	}
 
-.two-up .page-wrap.odd {
-	left: 50%;
-}
+	.page-wrap.odd {
+		left: 50%;
+	}
 
-.two-up .page-wrap.even {
-	left: 0;
-}
+	.page-wrap.even {
+		left: 0;
+	}
 
-.two-up .odd, .two-up .even .page-margin {
-	float: right;
-}
+	.odd, .even .page-margin {
+		float: right;
+	}
 
-.two-up .even, .two-up .odd .page-margin {
-	float: left;
-}
+	.even, .odd .page-margin {
+		float: left;
+	}
 
-.two-up .page-margin {
-	width: 90%;
-	margin: 0;
-}
+	.page-margin {
+		width: 90%;
+		margin: 0;
+	}
 
-.two-up .page {
-	width: 85%;
+	.page {
+		width: 85%;
+	}
 }
 
 #spine-divider {
@@ -148,9 +142,7 @@ html, body {
     left: 50%;
     height:96%;
     width: 1px;
-    -webkit-box-shadow: 0px 0px 15px 3px rgba(5, 5, 5, 0.7);
-	-moz-box-shadow: 0px 0px 15px 3px rgba(5, 5, 5, 0.7);
-	box-shadow: 0px 0px 15px 3px rgba(5, 5, 5, 0.7);
+    @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));
 	display: none;
 	background-color: #444;
 	opacity: 0.6;

@@ -6,6 +6,7 @@ gem 'rack'
 
 # for le styles
 gem 'sass'
+gem 'bourbon'
 
 # for running tests
 gem 'jasmine'

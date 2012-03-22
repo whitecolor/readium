@@ -3,5 +3,5 @@
 	width: 50%;
 	height: 100%;
 	margin: auto;
-	-webkit-box-shadow: 0 0 5px 5px#888;
+	@include box-shadow(0 0 5px 5px #888);
 }
