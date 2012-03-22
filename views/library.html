@@ -41,8 +41,10 @@
 		<script src="/lib/URI.js" type="text/javascript" ></script>
 		<script src="/lib/jath.js" type="text/javascript"></script>
 		<script src="/scripts/utils/bb_file_system_sync.js" type="text/javascript"></script>
+		<script src="/scripts/utils/local_storage_sync.js" type="text/javascript"></script>
 		<script src="/scripts/models/packDocNew.js" type="text/javascript" ></script>
 		<script src="/scripts/models/path_resolver.js" type="text/javascript" ></script>
+		<script src="/scripts/models/readium_options.js" type="text/javascript" ></script>
 		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
 		<script src="/scripts/extractBook.js" type="text/javascript" ></script>
 
@@ -204,7 +206,15 @@
         <fieldset>
           
 			
-          
+          <div class="control-group">
+            <label class="control-label" for="optionsCheckbox"></label>
+            <div class="controls">
+              <label class="checkbox">
+                <input type="checkbox" id="paginate_everything" value="paginate_everything">
+                Paginate all reflowable ePUB content
+              </label>
+            </div>
+          </div>
            
           <div class="control-group">
             <label class="control-label" for="optionsCheckbox"></label>

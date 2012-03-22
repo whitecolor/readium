@@ -161,58 +161,17 @@ $(function() {
 
 	});
 
-
-	// the options
-	window.ReadiumOptions = Backbone.Model.extend({
-
-		defaults: {
-			hijack_epub_urls: true,
-			verbose_unpacking: true
-		},
-
-		sync: function(method, model, options) {
-			// "create" create the model on the server
-			// "read" : read this model from the server and return it
-			// "update" : update the model on the server with the argument
-			// "delete" : delete the model from the server.
-			var json;
-			var key = "READIUM_OPTIONS"
-
-			if(method === "read") {
-				json = window.localStorage.getItem(key);
-				if(json) {
-					// DON'T CHANGE IF NOTHING IN STORAGE
-					model.attributes = (json && JSON.parse(json)) || {};	
-				}
-				else {
-					options.error('Failed to load settings from local storage')
-					return;
-				}
-			}
-
-			if(method === "create" || method === "update") {
-				window.localStorage.setItem(key, JSON.stringify(model.attributes) );
-				
-			}
-			
-			if(method === "delete") {
-				// TODO: this is not deleting stuff...
-				window.localStorage.removeItem(key);
-			}
-			options.success(model);
-			
-		}
-	});
-
 	window.ReadiumOptionsView = Backbone.View.extend({
 		el: "#readium-options-modal",
 
 		initialize: function() {
 			this.model.on("change", this.render, this);
+			this.render();
 		},
 
 		render: function() {
 			var m = this.model;
+			this.$('#paginate_everything').prop('checked', m.get("paginate_everything"));
 			this.$('#verbose_unpacking').prop('checked', m.get("verbose_unpacking"));
 			this.$('#hijack_epub_urls').prop('checked', m.get("hijack_epub_urls"));
 		},
@@ -233,6 +192,7 @@ $(function() {
 
   		save: function() {
   			this.model.save();
+  			this.$el.modal("hide");
   		}
 
 	});
@@ -304,39 +264,14 @@ $(function() {
 
 	});
 
-	window.options = new ReadiumOptions;
+	window.options = Readium.Models.ReadiumOptions.getInstance();
 	window.optionsView = new ReadiumOptionsView({model: window.options});
-	window.options.fetch({
-		success: function() {
-			//optionsView.render();
-		}
-	});
 		
 	window.Library = new LibraryItems();
 	window.lib_view = new LibraryItemsView({collection: window.Library});
 	window.fp_view = new FilePickerView();
 
 })(jQuery);
-
-
-
-
-
-
-/*
-var flash = function(text, type) {
-	var className = "alert";
-	if(type) {
-		className += " alert-" + type;
-	}
-	$('#flash-container').
-		html('<div>'+text+'</div>').
-		removeClass().
-		addClass(className);
-	
-}
-*/
-
 
 	
 	_lawnchair = new Lawnchair(function() {
