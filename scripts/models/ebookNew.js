@@ -261,7 +261,16 @@ Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
 	},
 
 	CreatePaginator: function() {
-		return new Readium.Views.ScrollingPaginationView({model: _book});	
+		// TODO do this properly later:
+
+		var optionString = localStorage["READIUM_OPTIONS"];
+    	var options = (optionString && JSON.parse(optionString) ) || {"singleton": {}};
+    	if( options["singleton"]["paginate_everything"] ) {
+    		return new Readium.Views.ReflowablePaginationView({model: this});	
+    	} else {
+    		return new Readium.Views.ScrollingPaginationView({model: this});		
+    	}
+		
 	},
 
 	
@@ -288,7 +297,7 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 	},
 
 	CreatePaginator: function() {
-		return new Readium.Views.FixedPaginationView({model: _book});	
+		return new Readium.Views.FixedPaginationView({model: this});	
 	},
 
 	buildSectionJSON: function(manifest_item) {

@@ -179,15 +179,18 @@ $(function() {
 		events: {
     		"change #verbose_unpacking": "updateSettings",
     		"change #hijack_epub_urls": "updateSettings",
+    		"change #paginate_everything": "updateSettings",
     		"click #save-settings-btn": "save"
   		},
 
   		updateSettings: function() {
   			var hijack = this.$('#hijack_epub_urls').prop('checked')
   			var unpack = this.$('#verbose_unpacking').prop('checked')
+  			var paginate = this.$('#paginate_everything').prop('checked')
   			
-			this.model.set({"verbose_unpacking": unpack});
-			this.model.set({"hijack_epub_urls": hijack});
+			this.model.set({"verbose_unpacking": unpack,
+							"hijack_epub_urls": hijack,
+							"paginate_everything": paginate});
   		},
 
   		save: function() {
