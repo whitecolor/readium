@@ -169,9 +169,10 @@ html, body {
   width: 85%; }
 .two-up #spine-divider {
   position: absolute;
-  top: 2%;
+  top: 40px;
   left: 50%;
-  height: 96%;
+  height: 87%;
+  margin: 2% 0;
   width: 1px;
   -webkit-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
   -moz-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
