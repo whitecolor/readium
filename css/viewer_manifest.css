@@ -90,10 +90,11 @@ html, body {
   width: 100%;
   overflow: hidden; }
 
-#container {
+#readium-book-view-el, #container, #page-wrap {
   margin: 0;
   padding: 0;
-  width: 100%; }
+  width: 100%;
+  height: 100%; }
 
 #content-end {
   margin: 0;
@@ -107,29 +108,19 @@ html, body {
   -webkit-flow: 'foo';
   -webkit-flow-into: foo; }
 
-#page-wrap #container {
-  position: relative;
-  width: 100%;
-  height: 100%; }
-
 .page-wrap {
-  height: 100%;
+  height: 90%;
   width: 100%;
   position: fixed;
   padding: 0;
   margin: 0;
   overflow: visible;
-  z-index: 1; }
+  z-index: 1;
+  margin: 2% 0; }
 
 .page-wrap.hidden-page {
   visibility: hidden;
   z-index: -10000; }
-
-.page-wrap:before, .page-wrap:after {
-  content: "";
-  display: block;
-  height: 2%;
-  clear: both; }
 
 .page-margin {
   height: 96%;
@@ -154,11 +145,6 @@ html, body {
   width: 90%;
   margin: 0 auto; }
 
-.space {
-  height: 5%;
-  margin: 0px;
-  width: 0px; }
-
 .clearfix:after {
   content: " ";
   display: block;
@@ -181,8 +167,7 @@ html, body {
   margin: 0; }
 .two-up .page {
   width: 85%; }
-
-#spine-divider {
+.two-up #spine-divider {
   position: absolute;
   top: 2%;
   left: 50%;
@@ -264,7 +249,9 @@ body.apple-fixed-layout {
   background-color: #FFF;
   width: 50%;
   height: 100%;
-  margin: auto;
+  margin: 0 auto;
+  margin-top: 1%;
+  height: 90%;
   -webkit-box-shadow: 0 0 5px 5px #888888;
   -moz-box-shadow: 0 0 5px 5px #888888;
   box-shadow: 0 0 5px 5px #888888; }
@@ -400,6 +387,8 @@ html, body, #container {
 #content {
   color: #EEE; }
 
+.dark-theme html, .dark-theme body, .dark-theme #container {
+  background-color: #000; }
 .dark-theme #readium-content-container {
   color: #030303; }
 .dark-theme .page-margin {

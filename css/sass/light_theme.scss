@@ -21,6 +21,10 @@ html, body, #container {
 	}
 
 .dark-theme {
+	html, body, #container { 
+		background-color: #000;
+	}
+
 	#readium-content-container {
 		color: #030303;
 	}
