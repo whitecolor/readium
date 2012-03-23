@@ -201,16 +201,21 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		
 		// we need to let the stylesheets be parsed (TODO use an event?)
 		var that = this;
-		setTimeout(function() {
-			that.renderPages();
-			that.toggleTwoUp();
-			if(that.renderToLastPage) {
-				that.model.goToLastPage();
-			}
-			else {
-				that.model.goToFirstPage();
-			}
-		}, 3);
+		MathJax.Hub.Queue(
+            ["Delay",MathJax.Callback,8], // delay to let CSS parse
+            ["Typeset",MathJax.Hub],      // typeset any mathematics
+        	function() {
+				that.renderPages();
+				that.toggleTwoUp();
+				if(that.renderToLastPage) {
+					that.model.goToLastPage();
+				}
+				else {
+					that.model.goToFirstPage();
+				}
+        	}
+		);
+		
 		return this;
 	},
 
