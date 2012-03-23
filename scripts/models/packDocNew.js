@@ -210,7 +210,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
     },
 
     onSpinePosChanged: function() {
-    	if( this.get("spine_position") > this.previous("spine_position") ) {
+    	if( this.get("spine_position") >= this.previous("spine_position") ) {
     		this.trigger("increased:spine_position");
     	}
     	else {

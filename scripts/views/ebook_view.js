@@ -191,6 +191,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var parser = new window.DOMParser();
 		var dom = parser.parseFromString( htmlText, 'text/xml' );
 		this.addStyleSheets( dom );
+		this.applyBindings( dom );
 		this.replaceContent( dom.body.innerHTML );
 		// need to add one page for calculation to work (TODO: this can be fixed)
 		this.$('#container').html( this.page_template({page_num: 1, empty: false}) );
@@ -293,7 +294,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.model.on("first_render_ready", this.render, this);
 		this.model.on("change:two_up", this.setUpMode, this);
-		this.$el.zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
 	},
 
 	render: function() {
@@ -314,6 +314,9 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 			that.applyBindings( $(e.srcElement).contents() );
 		});
 		this.model.changPageNumber(i);
+		setTimeout(function() {
+			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
+		}, 10)
 		return this.renderPages();
 	},
 
