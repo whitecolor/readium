@@ -131,7 +131,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 	
 	replaceContent: function(content) {
-		this.$('#readium-content-container').html(content + "<div id='content-end'></div>");
+		// TODO: put this where it belongs
+		this.$('#readium-content-container').
+			css('visibility', 'hidden').
+			html(content + "<div id='content-end'></div>");
 		_contentEnd = $('#content-end');
 	},
 
@@ -267,6 +270,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		
 		this.model.changPageNumber(num);
+		this.$('#readium-content-container').
+			css('visibility', 'visible');
 		
 		// dunno that I should be calling this explicitly
 		this.changePage();
