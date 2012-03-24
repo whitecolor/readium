@@ -42,7 +42,11 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		var displayed = this.get("current_page");
 		var newPages = [];
 		if(twoUp) {
-			newPages[0] = displayed[1];
+			if (displayed[0] === 0) {
+				newPages[0] = 1;
+			} else {
+				newPages[0] = displayed[0];
+			}
 		}
 		else if(displayed[0] % 2 === 0) {
 			newPages[0] = displayed[0];
