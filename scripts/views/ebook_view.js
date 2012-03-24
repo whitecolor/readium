@@ -77,16 +77,14 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		$('.readium-dynamic-sh').remove();
 
 		// TODO USE jQUERY for this (bug reported and fixed in master)
-		links = bookDom.getElementsByTagName("link");
-		
-		for (var j = 0; j < links.length; j++) {
-			link = links[j];
+		$($("link", bookDom).get().reverse()).each(function(){
+			link = this;
 			if(typeof link.rel === "string" && link.rel.toUpperCase() === "STYLESHEET") {
 				$link = $(link);
 				$link.addClass('readium-dynamic-sh');
 				$('head').prepend($link);
 			}
-		}
+		});
 	},
 
 	setUpMode: function() {
