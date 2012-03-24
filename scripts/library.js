@@ -267,12 +267,36 @@ $(function() {
 
 	});
 
+	window.LibraryRouter = Backbone.Router.extend({
+
+		initialize: function(options) {
+			this.picker = options.picker;
+		},
+
+		routes: {
+			"options": 		"showOptions", 
+			"/unpack/*url": 	"beginExtraction"
+		},
+
+		showOptions: function() {
+			$('#readium-options-modal').modal('show');
+		},
+
+		beginExtraction: function(url) {
+			var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: url});
+			this.picker.beginExtraction(extractor);
+		}
+
+	});
+
 	window.options = Readium.Models.ReadiumOptions.getInstance();
 	window.optionsView = new ReadiumOptionsView({model: window.options});
 		
 	window.Library = new LibraryItems();
 	window.lib_view = new LibraryItemsView({collection: window.Library});
 	window.fp_view = new FilePickerView();
+	window.router = new LibraryRouter({picker: window.fp_view});
+	Backbone.history.start({pushState: false, root: "views/library.html"})
 
 })(jQuery);
 
@@ -288,15 +312,5 @@ $(function() {
 	$("#row-view-btn").click(function(e) {
 		$('#library-items-container').addClass("row-view").removeClass("block-view")
 	});
-
-	// TODO: use a Backbone router for this
-	if(window.location.hash === "#options") {
-		$('#readium-options-modal').modal('show')
-	}
-	/*
-	$("#options-btn").click(function(e) {
-		window.location = "/views/options.html";
-	});
-*/
 	
 });
