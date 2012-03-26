@@ -49,6 +49,8 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			description: "//def:metadata/dc:description",
 			rights: "//def:metadata/dc:rights",
 			language: "//def:metadata/dc:language",
+			pubdate: "//def:metadata/dc:date",
+			modified_date: "//def:metadata/def:meta[@property='dcterms:modified']",
 			ncx: "//def:spine/@toc",
 		 },
 
