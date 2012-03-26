@@ -77,7 +77,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		$('.readium-dynamic-sh').remove();
 
 		// TODO USE jQUERY for this (bug reported and fixed in master)
-		$("link", bookDom).each(function(){
+		$($("link", bookDom).get().reverse()).each(function(){
 			link = this;
 			if(typeof link.rel === "string" && link.rel.toUpperCase() === "STYLESHEET") {
 				$link = $(link);
