@@ -2,6 +2,8 @@
 
 _an open source library for handling EPUB documents_
 
+
+
 Readium is in early beta stages. The goal of the project is to create an open source set of libraries for viewing and developing EPUB 2.0.1 and EPUB 3 content. Currently the project is available as a google chrome extension that enables viewing of EPUB content in the browser. For high-level information see the [Readium Project](http://readium.org/)  website.
 
 ## Contributing
