@@ -128,6 +128,9 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(cover) {
 			json.metadata.cover_href = this.resolveUri(cover);
 		}		
+		if(json.metadata.layout === "pre-paginated") {
+			json.metadata.fixed_layout = true;
+		}
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
 		return json;
 	},
