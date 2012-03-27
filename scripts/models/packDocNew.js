@@ -51,6 +51,9 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			language: "//def:metadata/dc:language",
 			pubdate: "//def:metadata/dc:date",
 			modified_date: "//def:metadata/def:meta[@property='dcterms:modified']",
+			layout: "//def:metadata/def:meta[@property='rendition:layout']",
+			spread: "//def:metadata/def:meta[@property='rendition:spread']",
+			orientation: "//def:metadata/def:meta[@property='rendition:orientation']",
 			ncx: "//def:spine/@toc",
 		 },
 
@@ -61,7 +64,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			properties: "@properties",
 		} ],
 							 
-		spine: [ "//def:itemref", { idref: "@idref" } ],
+		spine: [ "//def:itemref", { idref: "@idref", properties: "@properties" } ],
 
 		bindings: ["//def:bindings/def:mediaType", { 
 			handler: "@handler",

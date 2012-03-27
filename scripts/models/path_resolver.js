@@ -1,3 +1,5 @@
+// seems like this is now fixed in chromium so soon it will no longer be necessary, YAY!
+
 // get rid of webkit prefix
 window.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
 window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder; 
