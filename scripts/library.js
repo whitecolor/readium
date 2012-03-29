@@ -7,7 +7,7 @@ $(function() {
 		idAttribute: "key",
 		
 		getViewBookUrl: function(book) {
-			return "/views/viewer.html?book=" + this.get('key');
+			return "/viewer.html?book=" + this.get('key');
 		},
 
 		openInReader: function() {
@@ -33,6 +33,8 @@ $(function() {
 	window.LibraryItems = Backbone.Collection.extend({
 
 		model: LibraryItem,
+
+		url: "/epub_content/metadata.json"
 		
 	});
 
@@ -296,16 +298,13 @@ $(function() {
 	window.lib_view = new LibraryItemsView({collection: window.Library});
 	window.fp_view = new FilePickerView();
 	window.router = new LibraryRouter({picker: window.fp_view});
-	Backbone.history.start({pushState: false, root: "views/library.html"})
+	Backbone.history.start({pushState: false, root: "views/library.html"});
+	window.Library.fetch();
 
 })(jQuery);
 
 	
-	_lawnchair = new Lawnchair(function() {
-		this.all(function(all) {
-			window.Library.reset(all);							
-		});
-	});
+	
 	$("#block-view-btn").click(function(e) {
 		$('#library-items-container').addClass("block-view").removeClass("row-view")
 	});

@@ -203,6 +203,8 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 	}
 });
 
+
+
 /**
  * The working package doc, used to to navigate a package document
  * vai page turns, cfis, etc etc
@@ -244,8 +246,6 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 			return "ERROR: invalid spine position";
 		}
 	},
-
-	sync: BBFileSystemSync,
 
 	defaults: {
 		spine_position: 0
@@ -342,5 +342,60 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		return null;
 	},
 
+
+/*
+  sync: function(method, model, options) {
+
+  	var methodMap = {
+    'create': 'POST',
+    'update': 'PUT',
+    'delete': 'DELETE',
+    'read':   'GET'
+  };
+
+    var type = methodMap[method];
+
+
+    options || (options = {});
+
+
+    var params = {type: type, dataType: 'xml'};
+
+
+    if (!options.url) {
+      params.url = this.url;
+    }
+
+
+    if (!options.data && model && (method == 'create' || method == 'update')) {
+      params.contentType = 'application/xml';
+      params.data = JSON.stringify(model.toJSON());
+    }
+
+
+    if (Backbone.emulateJSON) {
+      params.contentType = 'application/x-www-form-urlencoded';
+      params.data = params.data ? {model: params.data} : {};
+    }
+
+
+    if (Backbone.emulateHTTP) {
+      if (type === 'PUT' || type === 'DELETE') {
+        if (Backbone.emulateJSON) params.data._method = type;
+        params.type = 'POST';
+        params.beforeSend = function(xhr) {
+          xhr.setRequestHeader('X-HTTP-Method-Override', type);
+        };
+      }
+    }
+
+
+    if (params.type !== 'GET' && !Backbone.emulateJSON) {
+      params.processData = false;
+    }
+
+    return $.ajax(_.extend(params, options));
+  }
+*/
 
 });
