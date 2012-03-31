@@ -213,6 +213,19 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		var url = this.packageDocument.resolveUri(path);;
 		path = this.resolvePath(path);
 		this.set("current_section_url", url);
+		$.ajax({
+			url: path,
+			accept: "xml",
+			cache: true,
+			success: function(res) {
+				console.log("ajax was successful")
+				debugger;
+			},
+			error: function(err) {
+				console.log("ajax fail")
+				debugger;
+			}
+		});
 		
 	},
 
