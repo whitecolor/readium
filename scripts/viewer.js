@@ -9,7 +9,7 @@ if( !window.Readium ) {
 };
 
 Readium.Views.ViewerApplicationView = Backbone.View.extend({
-	el: 'body',
+	el: '#readium-viewer-activity',
 
 	uiVisible: false,
 
@@ -84,51 +84,4 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 		}
 	}
-});
-
-Readium.Routers.ViewerRouter = Backbone.Router.extend({
-
-	routes: {
-		"?book=:key": "openBook",
-		"*splat": "splat_handler"
-	},
-
-	openBook: function(key) {
-
-		var packDoc = new Readium.Models.PackageDocument();
-		packDoc.url = "/epub_content/1/EPUB/package.opf";
-		packDoc.fetch({
-			success:function(result) {
-				if(result.fixed_layout) {
-					console.log('initializing fixed layout book');
-					window._book = new Readium.Models.AppleFixedEbook(result);
-				}
-				else {
-					console.log('initializing reflowable book');
-					window._book = new Readium.Models.ReflowableEbook(result);
-				}
-				
-				window._applicationView = new Readium.Views.ViewerApplicationView({
-					model: window._book
-				});
-				window._applicationView.render();
-			},
-			error: function(res) {
-				alert("oops");
-			},
-			dataType: 'xml'
-		});
-
-		
-	},
-
-	splat_handler: function(splat) {
-		console.log(splat)
-	}
-
-});
-
-$(function() {
-	_router = new Readium.Routers.ViewerRouter();
-	Backbone.history.start({pushState: true, root: "/viewer.html"});
 });

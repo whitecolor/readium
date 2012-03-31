@@ -21,21 +21,12 @@ Readium.Collections.ManifestItems = Backbone.Collection.extend({
  */
 Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	
-	initialize: function(attributes, options) {
-		if(options && options.file_path) {
-			this.file_path = options.file_path; 	
-			var that = this;
-			if(options.root_url) {
-				that.uri_obj = new URI(options.root_url);
-			}
-			else {
-				Readium.FileSystemApi(function(api) {
-					api.getFsUri(that.file_path, function(uri) {
-						that.uri_obj = new URI(uri);
-					})
-				});
-			}
-		}
+	initialize: function() {
+		
+		this.url = this.get("url"); 	
+		this.file_path = this.get("url"); 	
+		this.uri_obj = new URI(this.url);
+			
     },
 
 	// todo: pubdate? is identifier ok?
@@ -212,9 +203,9 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 
-	initialize: function(attributes, options) {
+	initialize: function() {
 		// call the super ctor
-		Readium.Models.PackageDocumentBase.prototype.initialize.call(this, attributes, options);
+		Readium.Models.PackageDocumentBase.prototype.initialize.call(this);
 		this.on('change:spine_position', this.onSpinePosChanged);
 		
     },
@@ -245,6 +236,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		if(attrs.spine_position < 0 || attrs.spine_position >= spine.length)	{
 			return "ERROR: invalid spine position";
 		}
+		
 	},
 
 	defaults: {
@@ -341,61 +333,5 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 		return null;
 	},
-
-
-/*
-  sync: function(method, model, options) {
-
-  	var methodMap = {
-    'create': 'POST',
-    'update': 'PUT',
-    'delete': 'DELETE',
-    'read':   'GET'
-  };
-
-    var type = methodMap[method];
-
-
-    options || (options = {});
-
-
-    var params = {type: type, dataType: 'xml'};
-
-
-    if (!options.url) {
-      params.url = this.url;
-    }
-
-
-    if (!options.data && model && (method == 'create' || method == 'update')) {
-      params.contentType = 'application/xml';
-      params.data = JSON.stringify(model.toJSON());
-    }
-
-
-    if (Backbone.emulateJSON) {
-      params.contentType = 'application/x-www-form-urlencoded';
-      params.data = params.data ? {model: params.data} : {};
-    }
-
-
-    if (Backbone.emulateHTTP) {
-      if (type === 'PUT' || type === 'DELETE') {
-        if (Backbone.emulateJSON) params.data._method = type;
-        params.type = 'POST';
-        params.beforeSend = function(xhr) {
-          xhr.setRequestHeader('X-HTTP-Method-Override', type);
-        };
-      }
-    }
-
-
-    if (params.type !== 'GET' && !Backbone.emulateJSON) {
-      params.processData = false;
-    }
-
-    return $.ajax(_.extend(params, options));
-  }
-*/
 
 });

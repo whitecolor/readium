@@ -12,18 +12,18 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 
 	initialize: function() {
 		var that = this;
-		this.packageDocument = new Readium.Models.PackageDocument({}, {
-			file_path: this.get("package_doc_path")
+		var url = this.get("package_doc_path");
+		this.packageDocument = new Readium.Models.PackageDocument({
+			url: url
 		});
 		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
-		this.packageDocument.fetch({
-			success: function() {
-				// TODO: restore location here
-				that.packageDocument.set({spine_position: 0});
-				that.packageDocument.trigger("change:spine_position");
-				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
-			}
+		this.packageDocument.on("change:spine", function() {
+			// TODO: restore location here
+			that.packageDocument.set({spine_position: 0});
+			that.packageDocument.trigger("change:spine_position");
+			that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
 		});
+		this.packageDocument.fetch({dataType: "xml"})
 		this.on("change:num_pages", this.adjustCurrentPage, this);
 	},
 
@@ -213,13 +213,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		var url = this.packageDocument.resolveUri(path);;
 		path = this.resolvePath(path);
 		this.set("current_section_url", url);
-		Readium.FileSystemApi(function(api) {
-			api.readTextFile(path, function(result) {
-				that.set( {current_content: result} );
-			}, function() {
-				console.log("Failed to load file: " + path);
-			})
-		});
+		
 	},
 
 	getToc: function() {
