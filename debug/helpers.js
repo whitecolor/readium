@@ -47,7 +47,7 @@ function rmdir(path) {
 	}
 	pwd.getDirectory(path, {}, function(dirEntry) {
 	    dirEntry.removeRecursively(function() {
-	      console.log('Directory removed..');
+	      console.log('Directory removed.');
 	    }, null);
 	}, null);
 }
