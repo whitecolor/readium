@@ -267,7 +267,7 @@ Readium.Routers.ApplicationRouter = Backbone.Router.extend({
 
 	routes: {
 		"view_book/:id": "openBook",
-		"libary": "showLibrary",
+		"": "showLibrary",
 	},
 
 	openBook: function(key) {

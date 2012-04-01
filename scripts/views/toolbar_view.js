@@ -16,6 +16,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 	events: {
 		"click #hide-toolbar-button": "hide_toolbar",
 		"click #show-toolbar-button": "show_toolbar",
+		"click #back-to-lib-button": "show_library"
 	},
 
 	show_toolbar: function() {
@@ -24,5 +25,9 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 
 	hide_toolbar: function() {
 		this.model.set("toolbar_visible", false);
-	}
+	},
+
+	show_library: function() {
+		window.router.navigate('/', {trigger: true});
+	},
 });

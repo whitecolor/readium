@@ -19,8 +19,8 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.on("change:spine", function() {
 			// TODO: restore location here
-			that.packageDocument.set({spine_position: 0});
-			that.packageDocument.trigger("change:spine_position");
+			that.packageDocument.set({spine_position: 0}, {silent: true});
+			//that.packageDocument.trigger("change:spine_position");
 			that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
 		});
 		this.packageDocument.fetch({dataType: "xml"})
@@ -218,12 +218,11 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 			accept: "xml",
 			cache: true,
 			success: function(res) {
-				console.log("ajax was successful")
-				debugger;
+				that.set("current_content", res);
 			},
 			error: function(err) {
-				console.log("ajax fail")
-				debugger;
+				alert("Error: unable to fetch spine item");
+				window.router.navigate("/", {silent: true});
 			}
 		});
 		
@@ -349,8 +348,12 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 	},
 
 	parseMetaTags: function() {
-		var parser = new window.DOMParser();
-		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
+		var dom = this.get("current_content");
+		if(typeof dom === "string") {
+			var parser = new window.DOMParser();
+			var dom = parser.parseFromString(dom, 'text/xml');	
+		}
+		
 		var tag = dom.getElementsByName("viewport")[0];
 		if(tag) {
 			var pageSize = this.parseViewportTag(tag);

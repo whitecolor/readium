@@ -189,8 +189,15 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	render: function() {
 		var htmlText = this.model.get("current_content");
-		var parser = new window.DOMParser();
-		var dom = parser.parseFromString( htmlText, 'text/xml' );
+		var dom;
+		if(typeof htmlText === "string") {
+			var parser = new window.DOMParser();
+			dom = parser.parseFromString( htmlText, 'text/xml' );
+		}
+		else {
+			dom = htmlText;
+		}
+		
 		this.addStyleSheets( dom );
 		this.applyBindings( dom );
 		this.replaceContent( dom.body.innerHTML );
