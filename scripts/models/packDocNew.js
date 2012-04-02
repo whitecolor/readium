@@ -289,8 +289,9 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		var spine = this.get("spine");
 		var manifest = this.get("manifest");
 		var that = this
+		href = href.replace(/#.*$/, "");
 		var node = manifest.find(function(x) {
-			var path = that.resolveUri(x.get("href"));
+			var path = that.resolveUri(x.get("href")).replace(/#.*$/, "");
 			if (href == path) return x;
 		});
 								 
