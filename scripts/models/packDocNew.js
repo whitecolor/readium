@@ -23,7 +23,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	
 	initialize: function(attributes, options) {
 		if(options && options.file_path) {
-			this.file_path = options.file_path; 	
+			this.file_path = options.file_path;
 			var that = this;
 			if(options.root_url) {
 				that.uri_obj = new URI(options.root_url);
@@ -286,18 +286,14 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	},
 
 	goToHref: function(href) {
-		var endsWith = function(str, suffix) {
-    		return str.indexOf(suffix, str.length - suffix.length) !== -1;
-		}
 		var spine = this.get("spine");
 		var manifest = this.get("manifest");
-		var node = manifest.find(function(x) { 
-				// if is is a relative path chop it down
-				var match = x.get("href").match(/[\.\/]*(.*)/);
-				var suffix = match[match.length - 1];
-				if( endsWith(href, suffix) ) return x;
-			});
-
+		var that = this
+		var node = manifest.find(function(x) {
+			var path = that.resolveUri(x.get("href"));
+			if (href == path) return x;
+		});
+								 
 		// didn't find the spine node, href invalid
 		if(!node) {
 			return null;
