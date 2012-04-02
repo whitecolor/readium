@@ -105,7 +105,7 @@ describe('packDocNew', function() {
       var parser = new window.DOMParser;
       var dom = parser.parseFromString(xmlString, 'text/xml');
       var res = packDoc.parse(dom);
-      ebook = new Readium.Models.PackageDocument(res) 
+   	  ebook = new Readium.Models.PackageDocument(res, {file_path: "banano/gram", root_url: "http://blah"}) 
     });
 
     it('sets the default spine position', function() {
@@ -144,13 +144,13 @@ describe('packDocNew', function() {
 
     describe("goToHref", function() {
       it("sets the spine position correctly", function() {
-        ebook.goToHref("Page_3.html");
+        ebook.goToHref("http://blah/Page_3.html");
         expect(ebook.get("spine_position") ).toEqual(2);
       })
 
       it("does not change the spine position on invalid href", function() {
         ebook.set({spine_position: 2})
-        ebook.goToHref("Pafdsafasge_3.html");
+        ebook.goToHref("http://blah/Pafdsafasge_3.html");
         expect(ebook.get("spine_position") ).toEqual(2);
       })
     });
