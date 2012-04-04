@@ -354,7 +354,7 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 			var dom = parser.parseFromString(dom, 'text/xml');	
 		}
 		
-		var tag = dom.getElementsByName("viewport")[0];
+		var tag = $("meta[name]='viewport'", dom)[0];
 		if(tag) {
 			var pageSize = this.parseViewportTag(tag);
 			this.set({meta_width: pageSize.width, meta_height: pageSize.height});

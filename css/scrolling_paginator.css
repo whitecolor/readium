@@ -10,6 +10,10 @@ Syntax error: Undefined mixin 'box-shadow'.
 7: 	height: 90%;
 8: 	@include box-shadow(0 0 5px 5px #888); 
 9: }
+10: 
+11: #scrolling-content {
+12: 	height: 100%;
+13: }
 
 Backtrace:
 css/sass/scrolling_paginator.scss:8:in `box-shadow'
@@ -68,10 +72,10 @@ css/sass/scrolling_paginator.scss:8
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:41:in `parse'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:21:in `parse!'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/bin/sass:8:in `<top (required)>'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/bin/sass:19:in `load'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/bin/sass:19:in `<main>'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290/bin/sass:19:in `load'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290/bin/sass:19:in `<main>'
 */
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 8 of css/sass/scrolling_paginator.scss, in `box-shadow'\A         from line 8 of css/sass/scrolling_paginator.scss\A \A 3: 	width: 50%;\A 4: 	height: 100%;\A 5: 	margin: 0 auto;\A 6: 	margin-top: 1%;\A 7: 	height: 90%;\A 8: 	@include box-shadow(0 0 5px 5px #888); \A 9: }"; }
+  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 8 of css/sass/scrolling_paginator.scss, in `box-shadow'\A         from line 8 of css/sass/scrolling_paginator.scss\A \A 3: 	width: 50%;\A 4: 	height: 100%;\A 5: 	margin: 0 auto;\A 6: 	margin-top: 1%;\A 7: 	height: 90%;\A 8: 	@include box-shadow(0 0 5px 5px #888); \A 9: }\A 10: \A 11: #scrolling-content {\A 12: 	height: 100%;\A 13: }"; }
