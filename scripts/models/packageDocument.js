@@ -304,6 +304,8 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		
 		for(var i = 0; i < spine.length; ++i ) {
 			if(spine[i].idref === id) {
+				// always aproach link spine items in fwd dir
+				this._previousAttributes.spine_position = 0
 				this.set({spine_position: i});
 				break;
 			}
