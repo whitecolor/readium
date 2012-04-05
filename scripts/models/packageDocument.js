@@ -289,7 +289,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		var spine = this.get("spine");
 		var manifest = this.get("manifest");
 		var that = this
-		href = href.replace(/#.*$/, "");
+		href = that.resolveUri(href).replace(/#.*$/, "");
 		var node = manifest.find(function(x) {
 			var path = that.resolveUri(x.get("href")).replace(/#.*$/, "");
 			if (href == path) return x;
@@ -305,8 +305,9 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		for(var i = 0; i < spine.length; ++i ) {
 			if(spine[i].idref === id) {
 				// always aproach link spine items in fwd dir
+				this.set({spine_position: i}, {silent: true});
 				this._previousAttributes.spine_position = 0
-				this.set({spine_position: i});
+				this.trigger("change:spine_position")
 				break;
 			}
 		}

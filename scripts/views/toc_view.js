@@ -35,7 +35,7 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 		this.setVisibility();
 		var ol = $("<ol></ol>");
 		var navs = this.model.get("navs");
-		for(var i = 0; i < navs.length; navs++) {
+		for(var i = 0; i < navs.length; i++) {
 			ol.append( this.nav_template(navs[i]) );
 		}
 		this.$el.html("<h2>" + (this.model.get("title") || "Contents") + "</h2>")
