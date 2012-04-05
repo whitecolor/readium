@@ -179,16 +179,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		});
 	},
 
-	/* NOT USED?
-	getAllSectionUris: function() {
-		var temp = this.packageDocument.get("spine");
-		for(var i = 0; i < temp.length; i++) {
-			temp[i] = resolveUrl(temp[i]);
-		}
-		return temp;
-	},
-	*/
-
 	goToHref: function(href) {
 		this.packageDocument.goToHref(href);
 	},
