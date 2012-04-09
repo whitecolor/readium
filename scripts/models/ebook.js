@@ -12,6 +12,7 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 
 	initialize: function() {
 		var that = this;
+		this.isFixedLayout = this.get("fixed_layout");
 		this.packageDocument = new Readium.Models.PackageDocument({}, {
 			file_path: this.get("package_doc_path")
 		});
@@ -25,6 +26,10 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 			}
 		});
 		this.on("change:num_pages", this.adjustCurrentPage, this);
+		if(this.isFixedLayout) {
+			this.toggleTwoUp();
+			this.on("change:current_content", this.parseMetaTags, this);
+		}
 	},
 
 	defaults: {
@@ -196,22 +201,6 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		this.set({num_pages: num, current_page: np});
 	},
 
-	spinePositionChangedHandler: function() {
-		var that = this;
-		var sect = this.packageDocument.currentSection();
-		var path = sect.get("href");
-		var url = this.packageDocument.resolveUri(path);;
-		path = this.resolvePath(path);
-		this.set("current_section_url", url);
-		Readium.FileSystemApi(function(api) {
-			api.readTextFile(path, function(result) {
-				that.set( {current_content: result} );
-			}, function() {
-				console.log("Failed to load file: " + path);
-			})
-		});
-	},
-
 	getToc: function() {
 		var item = this.packageDocument.getTocItem();
 		if(!item) {
@@ -238,66 +227,31 @@ Readium.Models.EbookBase = Backbone.Model.extend({
 		else {
 			this.set("current_page", [page])
 		}
-	}
-	
-});
-
-
-Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
-
-	isFixedLayout: false,
-
-	initialize: function() {
-		// call the super ctor
-		
-		Readium.Models.EbookBase.prototype.initialize.call(this);
-
 	},
 
-	CreatePaginator: function() {
-		// TODO do this properly later:
-
-		var optionString = localStorage["READIUM_OPTIONS"];
-    	var options = (optionString && JSON.parse(optionString) ) || {"singleton": {}};
-    	if( options["singleton"]["paginate_everything"] ) {
-    		return new Readium.Views.ReflowablePaginationView({model: this});	
-    	} else {
-    		return new Readium.Views.ScrollingPaginationView({model: this});		
-    	}
-		
-	},
-
-	
-
-});
-
-Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
-
-	isFixedLayout: true,
-
-	defaults: {
-		"font_size": 10,
-    	"current_page":  [0, 1],
-    	"num_pages": 0,
-    	"two_up": true,
-    	"full_screen": false,
-    	"toolbar_visible": true
-  	},
-
-	initialize: function() {
-		// call the super ctor
-		Readium.Models.EbookBase.prototype.initialize.call(this);
-		this.on("change:current_content", this.parseMetaTags, this);
-	},
-
-	CreatePaginator: function() {
-		return new Readium.Views.FixedPaginationView({model: this});	
+	spinePositionChangedHandler: function() {
+		var that = this;
+		var sect = this.packageDocument.currentSection();
+		var path = sect.get("href");
+		var url = this.packageDocument.resolveUri(path);;
+		path = this.resolvePath(path);
+		this.set("current_section_url", url);
+		Readium.FileSystemApi(function(api) {
+			api.readTextFile(path, function(result) {
+				that.set( {current_content: result} );
+			}, function() {
+				console.log("Failed to load file: " + path);
+			})
+		});
+		if(this.isFixedLayout) {
+			this.goToPage(this.packageDocument.get("spine_position"));
+		}
 	},
 
 	buildSectionJSON: function(manifest_item) {
 		var section = {};
-		section.width = this.get("meta_width");
-		section.height = this.get("meta_height");
+		section.width = this.get("meta_width") || 0;
+		section.height = this.get("meta_height") || 0;
 		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
 
 		return section;
@@ -344,10 +298,28 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 		this.trigger("first_render_ready")
 	},
 
-	spinePositionChangedHandler: function() {
-		Readium.Models.EbookBase.prototype.spinePositionChangedHandler.call(this);
-		this.goToPage(this.packageDocument.get("spine_position"));
-		
-	},
+	CreatePaginator: function() {
+		// TODO do this properly later:
 
+		if(this.isFixedLayout) {
+			return new Readium.Views.FixedPaginationView({model: this});
+		}
+		var optionString = localStorage["READIUM_OPTIONS"];
+    	var options = (optionString && JSON.parse(optionString) ) || {"singleton": {}};
+    	if( options["singleton"]["paginate_everything"] ) {
+    		return new Readium.Views.ReflowablePaginationView({model: this});	
+    	} else {
+    		return new Readium.Views.ScrollingPaginationView({model: this});		
+    	}
+	},
+	
+});
+
+
+Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
+
+});
+
+Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
+	
 });
