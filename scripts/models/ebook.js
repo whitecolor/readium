@@ -8,7 +8,7 @@ if( !window.Readium ) {
 	};
 };
 
-Readium.Models.EbookBase = Backbone.Model.extend({
+Readium.Models.Ebook = Backbone.Model.extend({
 
 	initialize: function() {
 		var that = this;
@@ -312,14 +312,5 @@ Readium.Models.EbookBase = Backbone.Model.extend({
     		return new Readium.Views.ScrollingPaginationView({model: this});		
     	}
 	},
-	
-});
-
-
-Readium.Models.ReflowableEbook = Readium.Models.EbookBase.extend({
-
-});
-
-Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 	
 });

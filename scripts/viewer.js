@@ -97,20 +97,14 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 		// the "right" way to do this is probably to call fetch()
 		// on the book, but I needed to know what kind of book to 
 		// initialize at early on. This is a pragmatic solution
+		// NOT TRUE ANY MORE TODO: fixme
 		Lawnchair(function() {
 			this.get(key, function(result) {
 				if(result === null) {
 					alert('Could not load book, try refeshing your browser.')
 					return;
 				}
-				if(result.fixed_layout) {
-					console.log('initializing fixed layout book');
-					window._book = new Readium.Models.AppleFixedEbook(result);
-				}
-				else {
-					console.log('initializing reflowable book');
-					window._book = new Readium.Models.ReflowableEbook(result);
-				}
+				window._book = new Readium.Models.Ebook(result);
 				
 				window._applicationView = new Readium.Views.ViewerApplicationView({
 					model: window._book
