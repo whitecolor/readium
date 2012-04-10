@@ -66,7 +66,6 @@ describe('packDocNew', function() {
       expect(res.metadata.id).toEqual("9782035862464");
     });
 
-
     it('parses the title', function() {
       var res = packDoc.parse(dom);
       expect(res.metadata.title).toEqual("L'espagnol dans votre poche");
@@ -82,6 +81,17 @@ describe('packDocNew', function() {
       expect(res.bindings.length).toEqual(1);
       expect(res.bindings[0].media_type).toEqual("application/x-epub-figure-gallery");
     })
+
+    it("parses spine item properties", function() {
+      var res = packDoc.parse(dom);
+      expect(res.spine[0].properties.page_spread).toEqual('right');
+      expect(res.spine[0].properties.fixed_flow).toEqual(true);
+    });
+
+    it("it sets properties as empty object if there are none", function() {
+      var res = packDoc.parse(dom);
+      expect(res.spine[1].properties).toEqual({});
+    });
   });
 
   describe('default values', function() {

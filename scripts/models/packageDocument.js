@@ -104,6 +104,35 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		// seems like there isn't one, thats ok...
 		return null;
 	},
+
+	parseSpineProperties: function(spine) {
+		
+		var parseProperiesString = function(str) {
+			var properties = {};
+			var allPropStrs = str.split(" "); // split it on white space
+			for(var i = 0; i < allPropStrs.length; i++) {
+				// brute force!!!
+				//rendition:orientation landscape | portrait | auto
+				//rendition:spread none | landscape | portrait | both | auto
+
+				//rendition:page-spread-center 
+				//page-spread | left | right
+				//rendition:layout reflowable | pre-paginated
+				if(allPropStrs[i] === "rendition:page-spread-center") properties.page_spread = "center";
+				if(allPropStrs[i] === "page-spread-left") properties.page_spread = "left";
+				if(allPropStrs[i] === "page-spread-right") properties.page_spread = "right";
+				if(allPropStrs[i] === "page-spread-right") properties.page_spread = "right";
+				if(allPropStrs[i] === "rendition:layout-reflowable") properties.fixed_flow = false;
+				if(allPropStrs[i] === "rendition:layout-pre-paginated") properties.fixed_flow = true;
+			}
+			return properties;
+			
+		}
+		for(var i = 0; i < spine.length; i++) {
+			spine[i].properties = parseProperiesString(spine[i].properties);
+		}
+		return spine;
+	},
 	
 	parse: function(xmlDom) {
 		var json;
@@ -133,6 +162,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			json.metadata.fixed_layout = true;
 		}
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
+		json.spine = this.parseSpineProperties(json.spine);
 		return json;
 	},
 
