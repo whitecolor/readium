@@ -29,7 +29,7 @@ describe('packDocNew', function() {
   xmlString += '<item id="font3" href="Fonts/HighlanderStd-BookItalic.otf" media-type="application/x-font-otf"/>'
   xmlString += "</manifest>"
   xmlString += '<spine toc="ncx">'
-  xmlString += '<itemref idref="Page_1"/><itemref idref="Page_2"/><itemref idref="Page_3"/>'
+  xmlString += '<itemref idref="Page_1" properties="page-spread-right rendition:layout-pre-paginated"/><itemref idref="Page_2"/><itemref idref="Page_3"/>'
   xmlString += '</spine>'
   xmlString += "<bindings>"
   xmlString += '<mediaType handler="figure-gallery-impl" media-type="application/x-epub-figure-gallery"/>'
