@@ -54,8 +54,8 @@ describe("construction an item", function() {
 describe("parsing the ncx", function() {
     var toc;
     beforeEach(function() {
-        var ebook = new Readium.Models.Ebook;
-        toc = new Readium.Models.NcxToc({model: ebook}, {file_path: "nowhere"});
+        var ebook = new Readium.Models.Ebook({"package_doc_path": "banana"});
+        toc = new Readium.Models.NcxToc({book: ebook, file_path: "nowhere"});
     });
 
     it("parses the title", function() {
