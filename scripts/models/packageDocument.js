@@ -55,6 +55,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			spread: "//def:metadata/def:meta[@property='rendition:spread']",
 			orientation: "//def:metadata/def:meta[@property='rendition:orientation']",
 			ncx: "//def:spine/@toc",
+			page_prog_dir: "//def:spine/@page-progression-direction",
 		 },
 
 		manifest: [ "//def:item", { 
