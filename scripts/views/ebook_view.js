@@ -211,6 +211,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var spineItem = this.model.packageDocument.currentSpineItem();
 		if(this.shouldRenderAsFixed(spineItem)) {
 			console.log("encountered a fixed layout spine item");
+			return this.renderFixedPage();
 		}
 
 		var htmlText = this.model.get("current_content");
@@ -243,6 +244,21 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	renderFixedPage: function() {
+
+		this.model.parseMetaTags();
+		$('body').addClass('apple-fixed-layout');
+		this.$el.width(this.model.get("meta_width") * 2);
+		this.$el.height(this.model.get("meta_height"));
+
+
+		var section = this.model.getAllSections()[this.model.packageDocument.get("spine_position")];
+		section.page_num = 1;
+		this.$('#container').html(this.fixed_page_template(section));
+		var that = this;
+		setTimeout(function() {
+			$('#page-wrap').zoomAndScale();
+		}, 10);
+
 
 		return this;
 	},
