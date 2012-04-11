@@ -20,7 +20,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.packageDocument.fetch({
 			success: function() {
 				// TODO: restore location here
-				that.packageDocument.set({spine_position: 0});
+				that.packageDocument.set({spine_position: that.restorePostition()});
 				that.packageDocument.trigger("change:spine_position");
 				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
 			}
@@ -134,8 +134,13 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
+	restorePostition: function() {
+		var pos = Readium.Utils.getCookie(this.get("key"));
+		return parseInt(pos, 10) || 0;
+	},
+
 	savePosition: function() {
-		Readium.Utils.setCookie(_properties.key, _packageDocument.getPosition(), 365);
+		Readium.Utils.setCookie(this.get("key"), this.packageDocument.get("spine_position"), 365);
 	},
 
 	// TODO: do move this into package doc class (no sense it being here)
@@ -246,6 +251,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		if(this.isFixedLayout) {
 			this.goToPage(this.packageDocument.get("spine_position"));
 		}
+
+		// save the position
+		this.savePosition();
 	},
 
 	buildSectionJSON: function(manifest_item) {

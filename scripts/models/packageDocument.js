@@ -298,6 +298,11 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		return this.getManifestItem(spine_pos);
 	},
 
+	currentSpineItem: function() {
+		var spine_pos = this.get("spine_position");
+		return this.get("spine")[spine_position];
+	},
+
 	hasNextSection: function() {
 		return this.get("spine_position") < (this.get("spine").length - 1);
 	},
