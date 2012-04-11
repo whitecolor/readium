@@ -14,6 +14,12 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	renderToLastPage: false,
 
 	initialize: function(options) {
+
+		// grab all the templates for all types of content
+		this.fixed_page_template = _.template( $('#fixed-page-template').html() );
+		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
+		this.scrolling_template = _.template( $('#scrolling-page-template').html() );
+
 		this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.bindingTemplate = _.template( $('#binding-template').html() );
@@ -70,13 +76,16 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
+	shouldRenderAsFixed: function(spineItem) {
+		return spineItem.properties.fixed_flow;
+	},
+
 	addStyleSheets: function(bookDom) {
 		var link; var href; var $link; var links;
 		
 		// first remove anything we already put up there
 		$('.readium-dynamic-sh').remove();
 
-		// TODO USE jQUERY for this (bug reported and fixed in master)
 		$($("link", bookDom).get().reverse()).each(function(){
 			link = this;
 			if(typeof link.rel === "string" && link.rel.toUpperCase() === "STYLESHEET") {
@@ -147,13 +156,13 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.renderPages();
 	},
 
-        injectMathJax: function (iframe) {
-          var doc = iframe.contentDocument;
-          var script = doc.createElement("script");
-          script.type = "text/javascript";
-          script.src = MathJax.Hub.config.root+"/MathJax.js?config=readium-iframe";
-          doc.getElementsByTagName("head")[0].appendChild(script);
-        }
+    injectMathJax: function (iframe) {
+      var doc = iframe.contentDocument;
+      var script = doc.createElement("script");
+      script.type = "text/javascript";
+      script.src = MathJax.Hub.config.root+"/MathJax.js?config=readium-iframe";
+      doc.getElementsByTagName("head")[0].appendChild(script);
+    }
 	
 });
 
@@ -163,14 +172,13 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 	initialize: function() {
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
-		this.page_template = _.template( $('#scrolling-page-template').html() );
 		this.model.on("change:current_section_url", this.render, this);
 	},
 
 	render: function() {
 		var that = this;
 		var uri = this.model.get("current_section_url");
-		this.$('#container').html( this.page_template({uri: uri}) );
+		this.$('#container').html( this.scrolling_template({uri: uri}) );
 		this.$('.content-sandbox').on("load", function(e) {
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
@@ -192,16 +200,19 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	initialize: function() {
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
-
 		this.page_template = _.template( $('#reflowing-page-template').html() );
-		
 		this.model.on("repagination_event", this.renderPages, this);
 		this.model.on("change:current_content", this.render, this);
 		this.model.on("change:two_up", this.renderPages, this);
-
 	},
 
 	render: function() {
+		// change strategies if we need fixed layout page
+		var spineItem = this.model.packageDocument.currentSpineItem();
+		if(this.shouldRenderAsFixed(spineItem)) {
+			console.log("encountered a fixed layout spine item");
+		}
+
 		var htmlText = this.model.get("current_content");
 		var parser = new window.DOMParser();
 		var dom = parser.parseFromString( htmlText, 'text/xml' );
@@ -228,6 +239,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         	}
 		);
 		
+		return this;
+	},
+
+	renderFixedPage: function() {
+
 		return this;
 	},
 
@@ -311,8 +327,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 	initialize: function() {
 		// call the super ctor
-		this.page_template = _.template( $('#fixed-page-template').html() );
-		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.model.on("first_render_ready", this.render, this);
 		this.model.on("change:two_up", this.setUpMode, this);
@@ -328,7 +342,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		
 		for(var i = 0; i < sections.length; i++) {
 			sections[i].page_num = i + 1;
-			this.$('#container').append(this.page_template(sections[i]));
+			this.$('#container').append(this.fixed_page_template(sections[i]));
 		}
 		var that = this;
 		this.$('.content-sandbox').on("load", function(e) {
@@ -337,7 +351,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		});
 		this.model.changPageNumber(i);
 		setTimeout(function() {
-			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
+			$('#page-wrap').zoomAndScale();
 		}, 10)
 		return this.renderPages();
 	},

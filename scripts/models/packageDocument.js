@@ -300,7 +300,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 	currentSpineItem: function() {
 		var spine_pos = this.get("spine_position");
-		return this.get("spine")[spine_position];
+		return this.get("spine")[spine_pos];
 	},
 
 	hasNextSection: function() {
