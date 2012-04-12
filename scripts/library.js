@@ -336,14 +336,9 @@ $(function() {
 	window.lib_view = new Readium.Views.LibraryItemsView({collection: window.Library});
 	window.fp_view = new Readium.Views.FilePickerView();
 	window.router = new Readium.Routers.ApplicationRouter({collection: window.Library});
-	Backbone.history.start({pushState: false, root: "index.html"});
+	Backbone.history.start({pushState: false});
 	// window.Library.fetch();
 	window.Library.trigger('reset')
-
-
-
-
-	
 	
 	$("#block-view-btn").click(function(e) {
 		$('#library-items-container').addClass("block-view").removeClass("row-view")

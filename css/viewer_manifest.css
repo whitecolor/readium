@@ -109,23 +109,24 @@ html, body {
   -webkit-flow-into: foo; }
 
 .page-wrap {
-  height: 90%;
+  height: 100%;
   width: 100%;
   position: fixed;
   padding: 0;
   margin: 0;
   overflow: visible;
   z-index: 1;
-  margin: 2% 0; }
+  margin: 0; }
 
 .page-wrap.hidden-page {
   visibility: hidden;
   z-index: -10000; }
 
 .page-margin {
-  height: 96%;
-  width: 60%;
-  margin: 0 auto;
+  height: 100%;
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
   padding: 0;
   overflow: visible; }
 
@@ -390,11 +391,6 @@ body.apple-fixed-layout {
 
 html, body, #container {
   background-color: #BBB; }
-
-.page-margin {
-  -webkit-box-shadow: 0 0 5px 5px #777777;
-  -moz-box-shadow: 0 0 5px 5px #777777;
-  box-shadow: 0 0 5px 5px #777777; }
 
 .page-margin, .page {
   background-color: #FFF; }
