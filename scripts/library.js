@@ -332,12 +332,14 @@ $(function() {
 	window.options = Readium.Models.ReadiumOptions.getInstance();
 	window.optionsView = new Readium.Views.ReadiumOptionsView({model: window.options});
 		
-	window.Library = new Readium.Collections.LibraryItems();
+	window.Library = new Readium.Collections.LibraryItems(window.ReadiumLibraryData);
 	window.lib_view = new Readium.Views.LibraryItemsView({collection: window.Library});
 	window.fp_view = new Readium.Views.FilePickerView();
 	window.router = new Readium.Routers.ApplicationRouter({collection: window.Library});
 	Backbone.history.start({pushState: false, root: "index.html"});
-	window.Library.fetch();
+	// window.Library.fetch();
+	window.Library.trigger('reset')
+
 
 
 
