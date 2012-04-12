@@ -66,6 +66,14 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 				book.prevPage();
 			}
 		});
+
+		$(document).on('swipeleft', function() {
+			book.nextPage();
+		});
+
+		$(document).on('swiperight', function() {
+			book.prevPage();
+		});
 	},
 
 	render: function() {
