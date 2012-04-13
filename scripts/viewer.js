@@ -52,7 +52,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	},
 
 	addGlobalEventHandlers: function() {
-		var book = this.model;
+		var book = this.model; var el;
 		window.onresize = function(event) {
 			book.trigger("repagination_event");
 		}
@@ -66,6 +66,13 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 				book.prevPage();
 			}
 		});
+		$('#touch-panel').toggle(book.isFixedLayout);
+		if(book.isFixedLayout) {
+			el = $('#touch-panel');
+		}
+		else {
+			el = $(document)
+		}
 
 		$(document).on('swipeleft', function() {
 			book.nextPage();
@@ -74,6 +81,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		$(document).on('swiperight', function() {
 			book.prevPage();
 		});
+		
 	},
 
 	render: function() {

@@ -295,7 +295,7 @@ Readium.Models.AppleFixedEbook = Readium.Models.EbookBase.extend({
 		"font_size": 10,
     	"current_page":  [0, 1],
     	"num_pages": 0,
-    	"two_up": true,
+    	"two_up": false,
     	"full_screen": false,
     	"toolbar_visible": true
   	},
