@@ -66,7 +66,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 				book.prevPage();
 			}
 		});
-		$('#touch-panel').toggle(book.isFixedLayout);
+		//$('#touch-panel').toggle(book.isFixedLayout);
 		if(book.isFixedLayout) {
 			el = $('#touch-panel');
 		}
