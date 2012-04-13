@@ -328,7 +328,7 @@ Readium.Routers.LibraryRouter = Backbone.Router.extend({
 });
 */
 
-$(function() {
+$(document).on("pageinit",function() {
 	window.options = Readium.Models.ReadiumOptions.getInstance();
 	window.optionsView = new Readium.Views.ReadiumOptionsView({model: window.options});
 		
@@ -336,7 +336,8 @@ $(function() {
 	window.lib_view = new Readium.Views.LibraryItemsView({collection: window.Library});
 	window.fp_view = new Readium.Views.FilePickerView();
 	window.router = new Readium.Routers.ApplicationRouter({collection: window.Library});
-	Backbone.history.start({pushState: false});
+
+	Backbone.history.start({pushState: false})
 	// window.Library.fetch();
 	window.Library.trigger('reset')
 	
