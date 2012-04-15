@@ -6,328 +6,311 @@ if( !window.Readium ) {
 		Routers: {},
 		Utils: {}
 	};
-}
+};
 
-if(typeof Readium.FileSystemApi === "undefined") {
-	throw "Ebook holds Readium::FileSystemApi as a dependency";
-}
+Readium.Models.Ebook = Backbone.Model.extend({
 
-if(typeof Readium.PackageDocument === "undefined") {
-	throw "Ebook holds Readium::packageDocument as a dependency";
-}
-
-if(!Readium.Utils) {
-	Readium.Utils = {};
-}
-	
-Readium.Utils.setCookie = function(c_name,value,exdays) {
-	var exdate=new Date();
-	exdate.setDate(exdate.getDate() + exdays);
-	var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
-	document.cookie=c_name + "=" + c_value;
-}
-
-
-Readium.Utils.getCookie = function(c_name) {
-	var i, x, y, ARRcookies=document.cookie.split(";");
-	for (i = 0; i < ARRcookies.length; i++) {
-		x = ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
-		y = ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
-		x = x.replace(/^\s+|\s+$/g,"");
-		if ( x == c_name ) {
-			return unescape(y);
+	initialize: function() {
+		var that = this;
+		this.isFixedLayout = this.get("fixed_layout");
+		this.packageDocument = new Readium.Models.PackageDocument({}, {
+			file_path: this.get("package_doc_path")
+		});
+		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
+		this.packageDocument.fetch({
+			success: function() {
+				// TODO: restore location here
+				that.packageDocument.set({spine_position: 0});
+				that.packageDocument.trigger("change:spine_position");
+				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
+			}
+		});
+		this.on("change:num_pages", this.adjustCurrentPage, this);
+		if(this.isFixedLayout) {
+			this.toggleTwoUp();
+			this.on("change:current_content", this.parseMetaTags, this);
 		}
-	}
-}
+	},
 
-// Asynchronous constructor
-Readium.Ebook = function(properties, successCallback, errorCallback) {
-	
-	// private members
-	var _properties;
-	var _fsApi;
-	var _packageDocUrl; // not used
-	var _rootUrl;
-	
-	var loadBookMark = function() {
-		var str = Readium.Utils.getCookie(_properties.key);
-		return parseInt(str) || 0;
-	}
-	
-	var validateProperties = function(obj) {
-		var key;
-		var keys = "id key lang package_doc_path updated_at created_at".split(" ")
+	defaults: {
+		"font_size": 10,
+    	"current_page": [1],
+    	"num_pages": 0,
+    	"two_up": false,
+    	"full_screen": false,
+    	"toolbar_visible": true,
+    	"toc_visible": false,
+  	},
 
-		for(var i = 0; i < keys.length; i++) {
-			key = keys[i];
-			if(!obj[key]) {
-				return false;
+	toggleTwoUp: function() {
+		var twoUp = this.get("two_up");
+		var displayed = this.get("current_page");
+		var newPages = [];
+		if(twoUp) {
+			if (displayed[0] === 0) {
+				newPages[0] = 1;
+			} else {
+				newPages[0] = displayed[0];
 			}
 		}
-		_properties = obj;
-		return true;
-	}
-	
-	var save = function(callback) {
-		_properties.updated_at = new Date();
-		if(!_properties.key) {
-			// should never get here
-			throw "FATAL ERROR: cannot save record with no key";
+		else if(displayed[0] % 2 === 0) {
+			newPages[0] = displayed[0];
+			newPages[1] = displayed[0] + 1;
 		}
-		Lawnchair(function() {
-			this.save(properties, function(obj) {
-				callback(obj);
-			});
-		});
-	};
-	
-	// initialization code
-	var init = function() {
-		var initPackageDocument = function(domString, fileEntry) {
-			_packageDocument = Readium.PackageDocument(domString);
-			_packageDocument.setPosition( loadBookMark() );
-			_packageDocUrl = fileEntry.toURL();
-			
-			// execute callback and pass back api for "this"
-			successCallback(api);
-		};
-		
-		if(validateProperties(properties)) {
+		else {
+			newPages[0] = displayed[0] - 1;
+			newPages[1] = displayed[0];
+		}
+		this.set({two_up: !twoUp, current_page: newPages});
+	},
 
-			Readium.FileSystemApi(function(fs) {
-				_fsApi = fs;
-				_rootUrl = _fsApi.getFileSystem().root.toURL();
-				_fsApi.readTextFile(_properties.package_doc_path, initPackageDocument, errorCallback);
-			});
-		}
-		else if (errorCallback){
-			errorCallback("invalid properties");
-		}		
-	};
+	toggleFullScreen: function() {
+		var fullScreen = this.get("full_screen");
+		this.set({full_screen: !fullScreen});
+	},
+
+	increaseFont: function() {
+		var size = this.get("font_size");
+		this.set({font_size: size + 1})
+	},
+
+	decreaseFont: function() {
+		var size = this.get("font_size");
+		this.set({font_size: size - 1})
+	},
+
+	toggleToc: function() {
+		var vis = this.get("toc_visible");
+		this.set("toc_visible", !vis);
+	},
 	
-	var resolvePath = function(path) {
+	prevPage: function() {
+
+		var curr_pg = this.get("current_page");
+		var lastPage = curr_pg[0] - 1;
+
+		if(curr_pg[0] <= 1) {
+			this.packageDocument.goToPrevSection();
+		}
+		else if(!this.get("two_up")){
+			this.set("current_page", [lastPage]);
+		}
+		else {
+			this.set("current_page", [lastPage - 1, lastPage]);
+		}
+	},
+	
+	nextPage: function() {
+		var curr_pg = this.get("current_page");
+		var firstPage =curr_pg[curr_pg.length-1] + 1;
+		if (curr_pg[curr_pg.length-1] >= this.get("num_pages") ) {
+			this.packageDocument.goToNextSection();
+		}
+		else if(!this.get("two_up")){
+			return this.set("current_page", [firstPage]);
+		}
+		else {
+			return this.set("current_page", [firstPage, firstPage+1]);
+		}
+	},
+	
+	goToFirstPage: function() {
+		if( this.get("two_up") ) {
+			this.set("current_page", [0,1])
+		}
+		else {
+			this.set("current_page", [1]);
+		} 
+	},
+
+	goToLastPage: function() {
+		var page = this.get("num_pages");
+
+		if( this.get("two_up") ) {
+			this.set("current_page", [page-1, page])
+		}
+		else {
+			this.set("current_page", [page])
+		}
+	},
+
+	savePosition: function() {
+		Readium.Utils.setCookie(_properties.key, _packageDocument.getPosition(), 365);
+	},
+
+	// TODO: do move this into package doc class (no sense it being here)
+	resolvePath: function(path) {
 		var suffix;
+		var pack_doc_path = this.packageDocument.file_path;
 		if(path.indexOf("../") === 0) {
 			suffix = path.substr(3);
 		}
 		else {
 			suffix = path;
 		}
-		var ind = _properties.package_doc_path.lastIndexOf("/")
-		return _properties.package_doc_path.substr(0, ind) + "/" + suffix;
-	}
-	
-	var resolveUrl = function(path) {
-		return _rootUrl + resolvePath(path);
-	}
-	
-	var savePosition = function() {
-		Readium.Utils.setCookie(_properties.key, _packageDocument.getPosition(), 365);
-	}
+		var ind = pack_doc_path.lastIndexOf("/")
+		return pack_doc_path.substr(0, ind) + "/" + suffix;
+	},
 
-	var buildTocHtml = function(text, callback) {
-		var parser = new window.DOMParser();
-		var dom = parser.parseFromString(text, 'text/xml');
-		var ul = '<ol>';
-		var navPoints = dom.getElementsByTagName('navPoint');
-		var label; var href;
-
-	
-
-		for(var i = 0; i < navPoints.length; i++) {
-			label = navPoints[i].getElementsByTagName('text')[0].textContent;
-			href = navPoints[i].getElementsByTagName('content')[0].attributes["src"].value;
-			ul += "<li><a href='" + href + "'>" + label + "</a></li>";
+	adjustCurrentPage: function() {
+		var cp = this.get("current_page");
+		var num = this.get("num_pages");
+		var two_up = this.get("two_up")
+		if(cp[cp.length - 1] > num) {
+			this.goToLastPage();
 		}
-		ul += '</ol>'
-
-		callback(ul);
-
-	};
-
-	/************************* bindings handling code, move it? **********************/
-
-	var applyBindings = function(domSpot) {
-		var key;
-		var bindings = jQuery.extend({}, _packageDocument.getBindingHandlers());
-
-		// break out early if there are none <= any point to this?
-		if(!bindings || Object.keys(bindings).length === 0) {
-			return;
+	},	
+	
+	goToNextSection: function() {
+		// Is this check even necessary?
+		// I think package doc validations takes care of it
+		if(this.packageDocument.hasNextSection() ) {
+			this.packageDocument.goToNextSection();	
 		}
-
-		// resolve all the bindings paths to absolute urls
-		for( key in bindings ) {
-			bindings[key] = resolveUrl(bindings[key]);
+	},
+	
+	goToPrevSection: function() {
+		// Is this check even necessary?
+		// I think package doc validations takes care of it
+		if(this.packageDocument.hasPrevSection() ) {
+			this.packageDocument.goToPrevSection();		
 		}
-
-		$('object[type]', domSpot).each(function() {
-			var params; var src; var frame;
-			var $this = $(this);
-			var type = $this.attr('type');
-			if( bindings.hasOwnProperty(type) ) {
-				params = parseBindingsParams($this);
-				src = bindings[type] + '?' + params;
-				frame = $('<iframe></iframe>');
-				frame.load(function() {
-					// this project was supposed to be done yesterday
-					// don't judge me :(
-					var that = this;
-					var $dom = $(this.contentDocument.body);
-					var calcZoom = function() {
-						return  $dom.height() / $(that).height();
-					}
-
-
-					$(window).resize(function() {
-						$dom.css('zoom', calcZoom());
-					});
-					$dom.css('zoom', calcZoom());
-				});
-				frame.attr('src', src);
-				frame.attr('height', '100%');
-				frame.attr('width', '100%');
-				frame.attr('noresize', "noresize");
-				frame.attr('frameborder', '0');
-				frame.attr('marginwidth', '0');
-				frame.attr('marginheight', '0');
-				$this.html(frame);
-			}
+	},
+	
+	getSectionText: function(successCallback, failureCallback) {
+		var path = this.packageDocument.currentSection();
+		Readium.FileSystemApi(function(fs) {
+			fs.readTextFile(resolvePath(path), successCallback, failureCallback);
 		});
+	},
 
-	};
+	goToHref: function(href) {
+		this.packageDocument.goToHref(href);
+	},
 
-	var parseBindingsParams = function($obj) {
-		var params = [];
-		params.push("src=" + resolveUrl( $obj.attr('data') ) );
-		params.push("type=" + $obj.attr('type') );
-		$('param', $obj).each(function() {
-			var $this = $(this);
-			params.push($this.attr('name') + '=' + $this.attr('value') )
-		});
-		params = params.join('&');
+	changPageNumber: function(num) {
+		var cp = this.get("current_page");
+		var np = [];
+		var diff = num - cp[cp.length - 1];
+		if( diff > 0 ) {
+			diff = 0;
+		}
+		for(var i = 0; i < cp.length; i++) {
+			np[i] = cp[i] + diff;	
+		}
+		this.set({num_pages: num, current_page: np});
+	},
 
-		/* need to escape special chars as per RFC3987 */
-		return encodeURI(params); 
-	};
-
-	/************************* END bindings handling code, move it? **********************/
-	
-	// declare api
-	var api = {
-		resolvePath: resolvePath,
-		
-		resolveUrl: resolveUrl,
-		
-		goToNextSection: function() {
-			if(_packageDocument.hasNextSection() ) {
-				_packageDocument.goToNextSection();			
-				savePosition();	
-				return true;
-			}
-			return false;
-		},
-		
-		goToPrevSection: function() {
-			if(_packageDocument.hasPrevSection() ) {
-				_packageDocument.goToPrevSection();		
-				savePosition();		
-				return true;	
-			}
-			return false;
-		},
-		
-		getSectionText: function(successCallback, failureCallback) {
-			var path = _packageDocument.currentSection();
-			Readium.FileSystemApi(function(fs) {
-				fs.readTextFile(resolvePath(path), successCallback, failureCallback);
+	getToc: function() {
+		var item = this.packageDocument.getTocItem();
+		if(!item) {
+			return null;
+		}
+		else {
+			var that = this;
+			return Readium.Models.Toc.getToc(item, {
+				file_path: that.resolvePath(item.get("href")),
+				book: that,
 			});
-		},
+		}
+	},
 
-		getAllSectionTexts: function(sectionCallback, failureCallback, completeCallback) {
-			var i = 0;
-			var spine = _packageDocument.getSpineArray();
-			var thatFs;
-
-			var callback = function(content, fileEntry) {
-				sectionCallback(content);
-				i += 1;
-				if(i < spine.length) {
-					thatFs.readTextFile(resolvePath(spine[i]), callback, failureCallback);
-				}
-				else {
-					completeCallback();
-				}
-			
-			};
-
-			Readium.FileSystemApi(function(fs) {
-				thatFs = fs;
-				thatFs.readTextFile(resolvePath(spine[i]), callback, failureCallback);
-			});
-
-		},
-
-		getAllSectionUris: function() {
-			var temp = _packageDocument.getSpineArray();	
-			for(var i = 0; i < temp.length; i++) {
-				temp[i] = resolveUrl(temp[i]);
+	goToPage: function(page) {
+		if(this.get("two_up")) {
+			if(page % 2 === 0) {
+				this.set("current_page", [page, page + 1]);	
 			}
-			return temp;
-		},
-
-		getTocText: function(successCallback, failureCallback) {
-			var path = _packageDocument.getTocPath();
-			if(!path) {
-				failureCallback();
-				return;
-			}
-
-			if(_packageDocument.getTocType() === _packageDocument.XHTML_MIME) {
-				Readium.FileSystemApi(function(fs) {
-					fs.readTextFile(resolvePath(path), function(result) { 
-						var parser = new window.DOMParser();
-						var dom = parser.parseFromString(result, 'text/xml');
-						successCallback( $('body', dom).html() ); 
-					}, failureCallback);
-				});		
-			}
-
-			else if(_packageDocument.getTocType() === _packageDocument.NCX_MIME) {
-				Readium.FileSystemApi(function(fs) {
-					fs.readTextFile(resolvePath(path), function(result) { 
-						buildTocHtml(result, successCallback) 
-					}, failureCallback);
-				});				
-			}
-
 			else {
-				
+				this.set("current_page", [page - 1, page]);
 			}
+		}
+		else {
+			this.set("current_page", [page])
+		}
+	},
+
+	spinePositionChangedHandler: function() {
+		var that = this;
+		var sect = this.packageDocument.currentSection();
+		var path = sect.get("href");
+		var url = this.packageDocument.resolveUri(path);;
+		path = this.resolvePath(path);
+		this.set("current_section_url", url);
+		Readium.FileSystemApi(function(api) {
+			api.readTextFile(path, function(result) {
+				that.set( {current_content: result} );
+			}, function() {
+				console.log("Failed to load file: " + path);
+			})
+		});
+		if(this.isFixedLayout) {
+			this.goToPage(this.packageDocument.get("spine_position"));
+		}
+	},
+
+	buildSectionJSON: function(manifest_item) {
+		var section = {};
+		section.width = this.get("meta_width") || 0;
+		section.height = this.get("meta_height") || 0;
+		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
+
+		return section;
+	},
+
+	getAllSections: function() {
+		var spine = this.packageDocument.getResolvedSpine();
+		var sections = [];
+		for(var i = 0; i < spine.length; i++) {
+			sections.push(this.buildSectionJSON( spine[i] ));
+		}
+		return sections;
+	},
 
 
-
-		},
-
-		goToHref: function(href) {
-			if(_packageDocument.goToHref(href,this)) {
-				savePosition();
-				return true;
+	parseViewportTag: function(viewportTag) {
+		// this is going to be ugly
+		var str = viewportTag.getAttribute('content');
+		str = str.replace(/\s/g, '');
+		var valuePairs = str.split(',');
+		var values = {};
+		var pair;
+		for(var i = 0; i < valuePairs.length; i++) {
+			pair = valuePairs[i].split('=');
+			if(pair.length === 2) {
+				values[ pair[0] ] = pair[1];
 			}
-			return false;
-		},
+		}
+		values['width'] = parseFloat(values['width']);
+		values['height'] = parseFloat(values['height']);
+		return values;
+	},
 
-		getProperties: function() {
-			return _properties;
-		},
+	parseMetaTags: function() {
+		var parser = new window.DOMParser();
+		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
+		var tag = dom.getElementsByName("viewport")[0];
+		if(tag) {
+			var pageSize = this.parseViewportTag(tag);
+			this.set({meta_width: pageSize.width, meta_height: pageSize.height});
+		}
+		this.packageDocument.off("change:spine_position");
+		this.off("current_content")
+		this.trigger("first_render_ready")
+	},
 
-		isFixedLayout: function() {
-			return _properties.fixed_layout;
-		},
+	CreatePaginator: function() {
+		// TODO do this properly later:
 
-		applyBindings: applyBindings
-	};
+		if(this.isFixedLayout) {
+			return new Readium.Views.FixedPaginationView({model: this});
+		}
+		var optionString = localStorage["READIUM_OPTIONS"];
+    	var options = (optionString && JSON.parse(optionString) ) || {"singleton": {}};
+    	if( options["singleton"]["paginate_everything"] ) {
+    		return new Readium.Views.ReflowablePaginationView({model: this});	
+    	} else {
+    		return new Readium.Views.ScrollingPaginationView({model: this});		
+    	}
+	},
 	
-
-	init();
-}
+});

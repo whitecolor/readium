@@ -1,30 +1,81 @@
-// Define a namespace for the library
-if (typeof Readium === "undefined" || Readium === null) {
-	Readium = {};
+if( !window.Readium ) {
+	window.Readium = {
+		Models: {},
+		Collections: {},
+		Views: {},
+		Routers: {},
+		Utils: {}
+	};
 }
 
-Readium.PackageDocument = function(domString) {
-	
-	// contstants
-	var CFI_PREFIX = "epubcfi("
-	
-	// private members
-	var _dom;
-	var _spinePosition = -1;
-	var _currentFileUrl = null;
-	var _bindingHandlers = null;
-	var _fs = null;
-	var _resolver = null;
-	
-	// initialization code
-	var init = function() {
-		var parser = new window.DOMParser();
-		_dom = parser.parseFromString(domString, "text/xml");
-	};
+Readium.Models.ManifestItem = Backbone.Model.extend({});
 
-	var getCoverHref = function() {
+Readium.Collections.ManifestItems = Backbone.Collection.extend({
+	model: Readium.Models.ManifestItem,
+});
+
+/**
+ * This is root of all PackageDocument subclasses and the EBook class
+ * it, contains only the logic for parsing a packagedoc.xml and 
+ * convert the data to JSON.
+ */
+Readium.Models.PackageDocumentBase = Backbone.Model.extend({
+	
+	initialize: function(attributes, options) {
+		if(options && options.file_path) {
+			this.file_path = options.file_path;
+			var that = this;
+			if(options.root_url) {
+				that.uri_obj = new URI(options.root_url);
+			}
+			else {
+				Readium.FileSystemApi(function(api) {
+					api.getFsUri(that.file_path, function(uri) {
+						that.uri_obj = new URI(uri);
+					})
+				});
+			}
+		}
+    },
+
+	// todo: pubdate? is identifier ok?
+	jath_template: {
+		metadata:  { 
+			id: "//def:metadata/dc:identifier",
+			epub_version: "//def:package/@version",
+			title: "//def:metadata/dc:title",
+			author: "//def:metadata/dc:creator",
+			publisher: "//def:metadata/dc:publisher",
+			description: "//def:metadata/dc:description",
+			rights: "//def:metadata/dc:rights",
+			language: "//def:metadata/dc:language",
+			pubdate: "//def:metadata/dc:date",
+			modified_date: "//def:metadata/def:meta[@property='dcterms:modified']",
+			layout: "//def:metadata/def:meta[@property='rendition:layout']",
+			spread: "//def:metadata/def:meta[@property='rendition:spread']",
+			orientation: "//def:metadata/def:meta[@property='rendition:orientation']",
+			ncx: "//def:spine/@toc",
+			page_prog_dir: "//def:spine/@page-progression-direction",
+		 },
+
+		manifest: [ "//def:item", { 
+			id: "@id",
+			href: "@href",
+			media_type: "@media-type",
+			properties: "@properties",
+		} ],
+							 
+		spine: [ "//def:itemref", { idref: "@idref", properties: "@properties" } ],
+
+		bindings: ["//def:bindings/def:mediaType", { 
+			handler: "@handler",
+			media_type: "@media-type"
+		} ]
+	},
+
+	getCoverHref: function(dom) {
 		var manifest; var $imageNode;
-		manifest = _dom.getElementsByTagName('manifest')[0];
+		manifest = dom.getElementsByTagName('manifest')[0];
 
 		// epub3 spec for a cover image is like this:
 		/*<item properties="cover-image" id="ci" href="cover.svg" media-type="image/svg+xml" />*/
@@ -35,7 +86,7 @@ Readium.PackageDocument = function(domString) {
 
 		// some epub2's cover image is like this:
 		/*<meta name="cover" content="cover-image-item-id" />*/
-		var metaNode = $('meta[name="cover"]', _dom);
+		var metaNode = $('meta[name="cover"]', dom);
 		var contentAttr = metaNode.attr("content");
 		if(metaNode.length === 1 && contentAttr) {
 			$imageNode = $('item[id="'+contentAttr+'"]', manifest);
@@ -52,300 +103,245 @@ Readium.PackageDocument = function(domString) {
 
 		// seems like there isn't one, thats ok...
 		return null;
-	};
+	},
+	
+	parse: function(xmlDom) {
+		var json;
+		var manifest;
+		var cover;
+		if(typeof(xmlDom) === "string" ) {
+			var parser = new window.DOMParser;
+      		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
+		}
+		
+		Jath.resolver = function( prefix ) {
+    		var mappings = { 
+	    		def: "http://www.idpf.org/2007/opf",
+    			dc: "http://purl.org/dc/elements/1.1/"
+    		};
+    		return mappings[ prefix ];
+		}
 
-	var getVersionNumber = function() {
-		var version = $('package', _dom).attr('version');
-		if(version) {
-			return version;
-		}
-		else {
-			return "UNKNOWN";
-		}
-	}
-	
-	var parseMetaData = function() {
-		var metaDom; var ns; var metaData;
-		
-		metaDom = _dom.getElementsByTagName('metadata')[0];
-		// namespaces are more trouble than they are worth right now
-		// ns = metaDom.namespaceURI;
-		metaData = {};
-		
-		var getTagHelper = function(tagName) {
-			// var elems = _dom.getElementsByTagNameNS(ns, 'title');
-			var elems = metaDom.getElementsByTagName(tagName);
-			if(elems.length > 0) {
-				return elems[0].textContent;
-			}
-			else {
-				return "UNKNOWN";
-			}
-		}
-            var parseDateTime = function(datetime) {
-                var re = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z/;
-                var matched = datetime.match(re);
-                if (matched) {
-                    return matched[1]+"/"+matched[2]+"/"+matched[3]+" "+matched[4]+":"+matched[5]+":"+matched[6];
-                } else {
-                    // unknown format; return itself
-                    return datetime;
-                }
-            }
-            var getPubDateHelper = function() {
-                var date = null;
-                var elems = null;
-                var mDom = _dom.getElementsByTagName('metadata')[0];
-                elems = $('date', mDom);
-                if(elems.length >= 1) {
-                    date = elems[0].textContent;
-                } else {
-                    elems = $('meta[property="dcterms:modified"]', mDom);
-                    if(elems.length >= 1) {
-                        date = elems[0].textContent;
-                    }
-                }
-                if (date) {
-                    return parseDateTime(date);
-                } else {
-                    return "UNKNOWN";
-                }
-            }
-		
-		metaData.title = getTagHelper('title');
-		metaData.id = getTagHelper('identifier');
-		metaData.lang = getTagHelper('language');
-		metaData.publisher = getTagHelper('publisher');
-		metaData.author = getTagHelper('creator');
-		metaData.cover_href = getCoverHref();
-		metaData.epub_version = getVersionNumber();
-		metaData.pubdate = getPubDateHelper();
+		json = Jath.parse( this.jath_template, xmlDom);
 
-		
-		return metaData;
-		
-	};
-	
-	// private methods
-	var getCfiMeat = function(str) {
-		var end = str.lastIndexOf(")");
-		var pref = str.indexOf(CFI_PREFIX);
-		var start = pref + CFI_PREFIX.length;
-		if( pref > -1 && end > -1 && start < end) {
-			return str.substr(start, end - start);
-		} else {
-			return null;
+		// try to find a cover image
+		cover = this.getCoverHref(xmlDom);
+		if(cover) {
+			json.metadata.cover_href = this.resolveUri(cover);
+		}		
+		if(json.metadata.layout === "pre-paginated") {
+			json.metadata.fixed_layout = true;
 		}
-		
-	};
-	
-	var spineNodes = function() {
-		var spine = _dom.getElementsByTagName('spine')[0];
-		return spine.getElementsByTagName("*");
-	};
-	
-	var nextSpineNode = function() {
-		var spine = spineNodes();
-		if(_spinePosition < spine.length - 1) {
-			_spinePosition += 1;
-			return spine[_spinePosition];
-		} else {
-			return null;
-		}
-	};
-	
-	var followSpineNode = function(node) {
-		var id;
-		if(node.attributes['idref']) {
-			id = node.attributes['idref'].value;
-			node = _dom.getElementById(id);
-			return followSpineNode(node);
-		}
-		return node;
-	};
-	
-	var getSectionHrefFromNode = function(node) {
-		var sectionNode = followSpineNode(node);
-		if(sectionNode) {
-			return sectionNode.attributes["href"].value;
-		}
-		else {
-			return null;
-		}
-	};
+		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
+		return json;
+	},
 
-	var getSpineNodePositionFromHref = function(href, book) {
-		var findItemByHref = function(href, book) {
-			var elems = $('item', _dom);
-			var hrefFilePath = href.replace(/#.*$/, "");
-			for(var i = 0; i< elems.length; i++) {
-				var itemHref = elems[i].attributes["href"].value;
-				itemHref = itemHref.replace(/#.*$/, "");
-				if(itemHref === hrefFilePath ||
-					_resolver.resolve(book.resolvePath(itemHref)).toString() === hrefFilePath) {
-					return $(elems[i]);
-				}
-			}
-			return null;
-		};
+	reset: function(data) {
+		var attrs = this.parse(data);
+		this.set(attrs);
+	},
 
-		var elem = findItemByHref(href, book);
-		if (elem === null) {
-			return -1;
-		}
-		var id = elem.attr('id');
-		var sns = spineNodes();
-		for(var i = 0; i < sns.length; i++) {
-			if(sns[i].attributes["idref"].value === id) {
-				return i;
-			}
-		}
-		return -1;
-	};
+	resolveUri: function(rel_uri) {
+		uri = new URI(rel_uri);
+		return uri.resolve(this.uri_obj).toString();
+	},
 
-	parseBindingHandlers = function() {
-		var handers = {};
-		$('bindings mediaType', _dom).each(function() {
-			var $this = $(this);
-			var type = $this.attr('media-type'); 
-			var id = $this.attr('handler');
-			handers[type] = getSectionHrefFromNode(_dom.getElementById(id));
+});
+
+/**
+ * Used to validate a freshly unzipped package doc. Once we have 
+ * validated it one time, we don't care if it is valid any more, we
+ * just want to do our best to display it without failing
+ */
+Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.extend({
+
+	initialize: function(attributes, options) {
+		// call the super ctor
+		Readium.Models.PackageDocumentBase.prototype.initialize.call(this, attributes, options);
+		this.set("package_doc_path", this.file_path);
+    },
+
+	validate: function(attrs) {
+
+	},
+
+	defaults: {
+		fixed_layout: false,
+		open_to_spread: false,
+		cover_href: '/images/library/missing-cover-image.png',
+		created_at: new Date(),
+		updated_at: new Date(),
+	},
+
+	parseIbooksDisplayOptions: function(content) {
+		var parseBool = function(string) {
+			return string.toLowerCase().trim() === 'true';	
+		}
+		var parser = new window.DOMParser();
+		var xmlDoc = parser.parseFromString(content, "text/xml");
+		var fixedLayout = xmlDoc.getElementsByName("fixed-layout")[0];
+		var openToSpread = xmlDoc.getElementsByName("open-to-spread")[0];
+		this.set({
+			fixed_layout: ( fixedLayout && parseBool(fixedLayout.textContent) ),
+			open_to_spread: ( openToSpread && parseBool(openToSpread.textContent) )
+		})
+	},
+
+	parse: function(content) {
+		//call super
+		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, content);
+		//  only care about the metadata 
+		return json.metadata;
+	},
+
+	save: function(attrs, options) {
+		// TODO: this should be done properly with a backbone sync
+		var that = this;
+		this.set("updated_at", new Date());
+		Lawnchair(function() {
+			this.save(that.toJSON(), options.success);
 		});
-		return handers;
-	};
-	
-	init();
-	Readium.FileSystemApi(function(fs) {
-		_fsApi = fs;
-		var rootUrl = _fsApi.getFileSystem().root.toURL();
-		_resolver = new PathResolver(rootUrl);
-	});
-	// return pubic interface
-	return {
+	}
+});
 
-		XHTML_MIME: "application/xhtml+xml",
-		
-		NCX_MIME: "application/x-dtbncx+xml",
+/**
+ * The working package doc, used to to navigate a package document
+ * vai page turns, cfis, etc etc
+ */
+Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
-		getFileFromCfi: function() {},
-		
-		setPosition: function(x) {
-			_spinePosition = x;
-		},
-		
-		getPosition: function() {
-			return _spinePosition;
-		},
-		
-		currentSection: function() {
-			var spineNode = spineNodes()[_spinePosition];
-			return getSectionHrefFromNode(spineNode);
-		},
-		
-		nextSection: function() {
-			var nSNode = nextSpineNode();
-			if(nSNode) {
-				return getSectionHrefFromNode(nSNode);
-			} else {
-				return null;
-			}
-		},
-		
-		hasNextSection: function() {
-			return _spinePosition < spineNodes().length - 1;
-		},
-		
-		goToNextSection: function() {
-			if (_spinePosition >= spineNodes().length - 1) {
-				throw "attempting to set invalid spine position";
-			}
-			_spinePosition += 1;
-		},
-		
-		hasPrevSection: function() {
-			return _spinePosition > 0;
-		},
-		
-		goToPrevSection: function() {
-			if (_spinePosition <= 0) {
-				throw "attempting to set invalid spine position";
-			}
-			_spinePosition -= 1;
-		},
-		
-		getDom: function() {
-			return _dom;
-		},
 
-		getTocPath: function() {
-			var id; var node; var spine; var navElems;
-
-			navElems = $('item[properties="nav"]', _dom);
-			if(navElems.length === 1) {
-				return getSectionHrefFromNode( navElems[0] );
-			}
-
-			spine = _dom.getElementsByTagName('spine')[0];
-			if(spine && spine.attributes['toc'] && spine.attributes['toc'].value) {
-				id = spine.attributes['toc'].value;
-				node = _dom.getElementById(id);
-				return getSectionHrefFromNode(node);
-			}
-			return null;
-		},
+	initialize: function(attributes, options) {
+		// call the super ctor
+		Readium.Models.PackageDocumentBase.prototype.initialize.call(this, attributes, options);
+		this.on('change:spine_position', this.onSpinePosChanged);
 		
-		getMetaData: function() {
-			return parseMetaData();
-		},
+    },
+
+    onSpinePosChanged: function() {
+    	if( this.get("spine_position") >= this.previous("spine_position") ) {
+    		this.trigger("increased:spine_position");
+    	}
+    	else {
+    		this.trigger("decreased:spine_position");
+    	}
+    },
+
+
+	// just want to make sure that we do not slip into an
+	// invalid state
+	validate: function(attrs) {
 		
-		hasSpine: function() {
-			return !!( _dom.getElementsByTagName('spine')[0] );
-		},
-
-		goToHref: function(href, book) {
-			var pos = getSpineNodePositionFromHref(href, book);
-			if(pos === -1) {
-				// failed to find the spine node
-				return false;
-			}
-			_spinePosition = pos;
-			return true;
-		},
-
-		getTocType: function() {
-			var id; var node; var navElems; var spine;
-			navElems = $('item[properties="nav"]', _dom);
-
-			if(navElems.length === 1) {
-				// return media-type attr or take a good guess
-				return navElems[0].attributes["media-type"].value || this.XHTML_MIME;
-			}
-
-			spine = _dom.getElementsByTagName('spine')[0];
-			if(spine && spine.attributes['toc'] && spine.attributes['toc'].value) {
-				id = spine.attributes['toc'].value;
-				node = _dom.getElementById(id);
-				return node.attributes["media-type"].value || this.NCX_MIME;
-			}
-
-			return null;
-		},
-
-		getSpineArray: function() {
-			var results = [];
-			var snodes = spineNodes();
-			for(i = 0; i < snodes.length; i++) {
-				results.push( getSectionHrefFromNode(snodes[i]) );
-			}
-			return results;
-		},
-
-		getBindingHandlers: function() {
-			if(!_bindingHandlers) {
-				_bindingHandlers = parseBindingHandlers();	
-			}
-			return _bindingHandlers;
+		if( !( attrs.manifest || this.get("manifest") ) ) {
+			return "ERROR: All ePUBs must have a manifest";
 		}
+
+		//validate the spine exists and the position is valids
+		var spine = attrs.spine || this.get("spine") ;
+		if( !spine ) {
+			return "ERROR: All ePUBs must have a spine";
+		}
+		if(attrs.spine_position < 0 || attrs.spine_position >= spine.length)	{
+			return "ERROR: invalid spine position";
+		}
+	},
+
+	sync: BBFileSystemSync,
+
+	defaults: {
+		spine_position: 0
+	},
+
+	getManifestItem: function(spine_position) {
+		var target = this.get("spine")[spine_position];
+		return this.getManifestItemById(target.idref);
+	},
+
+	getManifestItemById: function(id) {
+		return this.get("manifest").find(function(x) { 
+					if(x.get("id") === id) return x;
+				});
+	},
+
+	currentSection: function() {
+		var spine_pos = this.get("spine_position");
+		return this.getManifestItem(spine_pos);
+	},
+
+	hasNextSection: function() {
+		return this.get("spine_position") < (this.get("spine").length - 1);
+	},
+
+	hasPrevSection: function() {
+		return this.get("spine_position") > 0;
+	},
+
+	goToNextSection: function() {
+		var cp = this.get("spine_position");
+		this.set({spine_position: (cp + 1) });
+	},
+
+	goToPrevSection: function() {
+		var cp = this.get("spine_position");
+		this.set({spine_position: (cp - 1) });	
+	},
+
+	goToHref: function(href) {
+		var spine = this.get("spine");
+		var manifest = this.get("manifest");
+		var that = this
+		href = that.resolveUri(href).replace(/#.*$/, "");
+		var node = manifest.find(function(x) {
+			var path = that.resolveUri(x.get("href")).replace(/#.*$/, "");
+			if (href == path) return x;
+		});
+								 
+		// didn't find the spine node, href invalid
+		if(!node) {
+			return null;
+		}
+
+		var id = node.get("id");
 		
-	};
-}
+		for(var i = 0; i < spine.length; ++i ) {
+			if(spine[i].idref === id) {
+				// always aproach link spine items in fwd dir
+				this.set({spine_position: i}, {silent: true});
+				this._previousAttributes.spine_position = 0
+				this.trigger("change:spine_position")
+				break;
+			}
+		}
+	},
+
+	getResolvedSpine: function() {
+		var spine_length = this.get("spine").length;
+		var res_spine = [];
+		for(var i = 0; i < spine_length; i++) {
+			res_spine.push( this.getManifestItem(i) );
+		}
+		return res_spine;
+	},
+
+	getTocItem: function() {
+		var manifest = this.get("manifest");
+		var spine_id = this.get("metadata").ncx;
+		var item = manifest.find(function(item){ 
+			return item.get("properties") === "nav" 
+		});
+
+		if( item ) {
+			return item;
+		}
+
+		if( spine_id && spine_id.length > 0 ) {
+			return manifest.find(function(item) {
+				return item.get("id") === spine_id;
+			});
+		}
+
+		return null;
+	},
+
+
+});

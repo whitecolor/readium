@@ -16,20 +16,22 @@ PathResolver.prototype.resolve = function(relativePath) {
 var domToString = function(dom) {
 	var x = new XMLSerializer();
 	return x.serializeToString(dom);
-}
+};
 
 var fixCssLinks = function(content, resolver) {
 
-	var beginning = /url\s*\(\s*['"]\s*/
-	var end = /['"]\s*\)/
-	return content.replace(/url\s*\(\s*(['"]).+?\1\s*\)/g, function(frag) {
+	// fix import statements to  (unconditionally) have url(...) wrapper
+    content = content.replace(/@import\s+(?:url\()*(.+?)(?:\))*\s*;/g, "@import url\($1\);");
+
+	var beginning = /url\s*\(\s*['"]*\s*/
+	var end = /['"]*\s*\)/
+	return content.replace(/url\s*\(\s*.+?\s*\)/g, function(frag) { 
 		frag = frag.replace(beginning, '');
 		frag = frag.replace(end, '');
 		return "url('" + resolver.resolve(frag) + "')";
 	});
 
 };
-
 
 var fixXhtmlLinks = function(content, resolver) {
 	var $obj; var path; 

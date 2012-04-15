@@ -147,6 +147,13 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.renderPages();
 	},
 
+        injectMathJax: function (iframe) {
+          var doc = iframe.contentDocument;
+          var script = doc.createElement("script");
+          script.type = "text/javascript";
+          script.src = MathJax.Hub.config.root+"/MathJax.js?config=readium-iframe";
+          doc.getElementsByTagName("head")[0].appendChild(script);
+        }
 	
 });
 
@@ -167,10 +174,17 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 		this.$('.content-sandbox').on("load", function(e) {
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
+            that.injectMathJax(e.srcElement);
+            that.injectLinkHandler(e.srcElement);
 		});
 		return this;
 	},
-	
+
+	injectLinkHandler: function (iframe) {
+        var doc = iframe.contentDocument;
+		$("a", doc).click(this.linkClickHandler);
+	}
+
 });
 
 Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend({
