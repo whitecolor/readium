@@ -1,12 +1,4 @@
-// We have a dependency on jQuery for now
-if(typeof jQuery === "undefined") {
-	throw "Readium pagination holds jQuery as a dependency";
-}
-
-// Define a namespace for the library
-if (typeof Readium === "undefined" || Readium === null) {
-	Readium = {};
-}
+// TODO: This is dead code now
 
 
 // container is the place in which to put pages. best to use body.

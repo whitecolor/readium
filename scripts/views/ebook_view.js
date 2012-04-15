@@ -1,12 +1,4 @@
-if( !window.Readium ) {
-	window.Readium = {
-		Models: {},
-		Collections: {},
-		Views: {},
-		Routers: {},
-		Utils: {}
-	};
-}
+
 
 Readium.Views.PaginationViewBase = Backbone.View.extend({
 
