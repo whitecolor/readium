@@ -1,5 +1,3 @@
-
-
 Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	el: "#readium-book-view-el",
@@ -62,13 +60,58 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
+	// parse the epub "switch" tags and hide
+	// cases that are not supported
+	applySwitches: function(dom) {
+
+		// helper method, returns true if a given case node
+		// is supported, false otherwise
+		var isSupported = function(caseNode) {
+
+			var ns = caseNode.attributes["required-namespace"];
+			if(!ns) {
+				// the namespace was not specified, that should
+				// never happen, we don't support it then
+				console.log("Encountered a case statement with no required-namespace");
+				return false;
+			}
+			// all the xmlns's that readium is known to support
+			// TODO this is going to require maintanence
+			var supportedNamespaces = ["http://www.w3.org/1998/Math/MathML"];
+			return _.include(supportedNamespaces, ns);
+		};
+
+
+		$('switch', dom).each(function(ind) {
+			var supportedCase;
+			var $cases = $('case', this);
+			// start by hiding all the cases, this each statement
+			// IS needed, jquery doesn't like the xml nodes we are
+			// fiddling with
+			$cases.each(function() { 
+				var $el = $(this);
+				$el.data("style", ($el.attr("style") || "") );
+				$el.attr("style", "display: none");
+			})
+
+			// find the first case that is supported
+			supportedCase = _.find($cases, isSupported);
+
+			if(supportedCase) {
+				// show one if we found one
+				$(supportedCase).attr("style", $(supportedCase).data("style") );
+				// and hide the default
+				$('default', this).attr("style", "display: none");
+			}
+		})
+	},
+
 	addStyleSheets: function(bookDom) {
 		var link; var href; var $link; var links;
 		
 		// first remove anything we already put up there
 		$('.readium-dynamic-sh').remove();
 
-		// TODO USE jQUERY for this (bug reported and fixed in master)
 		$($("link", bookDom).get().reverse()).each(function(){
 			link = this;
 			if(typeof link.rel === "string" && link.rel.toUpperCase() === "STYLESHEET") {
@@ -77,6 +120,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 				$('head').prepend($link);
 			}
 		});
+	},
+
+	applyHidden: function(dom) {
+		$('[hidden]', dom).toggle(false);
 	},
 
 	setUpMode: function() {
@@ -166,6 +213,7 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 		this.$('.content-sandbox').on("load", function(e) {
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
+			that.applySwitches( e.srcElement );
             that.injectMathJax(e.srcElement);
             that.injectLinkHandler(e.srcElement);
 		});
@@ -174,7 +222,7 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 
 	injectLinkHandler: function (iframe) {
         var doc = iframe.contentDocument;
-		$("a", doc).click(this.linkClickHandler);
+		$("a", doc).click(this.linkClickHandler, this);
 	}
 
 });
@@ -199,6 +247,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var dom = parser.parseFromString( htmlText, 'text/xml' );
 		this.addStyleSheets( dom );
 		this.applyBindings( dom );
+		this.applySwitches( dom );
 		this.replaceContent( dom.body.innerHTML );
 		// need to add one page for calculation to work (TODO: this can be fixed)
 		this.$('#container').html( this.page_template({page_num: 1, empty: false}) );
