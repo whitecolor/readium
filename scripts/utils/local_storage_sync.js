@@ -1,12 +1,3 @@
-if( !window.Readium ) {
-	window.Readium = {
-		Models: {},
-		Collections: {},
-		Views: {},
-		Routers: {},
-		Utils: {}
-	};
-};
 
 // based on http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 Readium.Utils.Guid = function() {

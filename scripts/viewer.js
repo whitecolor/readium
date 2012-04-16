@@ -1,13 +1,3 @@
-if( !window.Readium ) {
-	window.Readium = {
-		Models: {},
-		Collections: {},
-		Views: {},
-		Routers: {},
-		Utils: {}
-	};
-};
-
 Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	el: 'body',
 
@@ -84,43 +74,4 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 		}
 	}
-});
-
-Readium.Routers.ViewerRouter = Backbone.Router.extend({
-
-	routes: {
-		"views/viewer.html?book=:key": "openBook",
-		"*splat": "splat_handler"
-	},
-
-	openBook: function(key) {
-		// the "right" way to do this is probably to call fetch()
-		// on the book, but I needed to know what kind of book to 
-		// initialize at early on. This is a pragmatic solution
-		// NOT TRUE ANY MORE TODO: fixme
-		Lawnchair(function() {
-			this.get(key, function(result) {
-				if(result === null) {
-					alert('Could not load book, try refeshing your browser.')
-					return;
-				}
-				window._book = new Readium.Models.Ebook(result);
-				
-				window._applicationView = new Readium.Views.ViewerApplicationView({
-					model: window._book
-				});
-				window._applicationView.render();
-			});		
-		});
-	},
-
-	splat_handler: function(splat) {
-		console.log(splat)
-	}
-
-});
-
-$(function() {
-	_router = new Readium.Routers.ViewerRouter();
-	Backbone.history.start({pushState: true});
 });
