@@ -274,21 +274,11 @@ $(function() {
 	window.lib_view = new LibraryItemsView({collection: window.Library});
 	window.fp_view = new FilePickerView();
 	window.router = new Readium.Routers.LibraryRouter({picker: window.fp_view});
-	Backbone.history.start({pushState: false, root: "views/library.html"})
+	Backbone.history.start({pushState: false, root: "views/library.html"});
 
 })(jQuery);
 
 	
-	_lawnchair = new Lawnchair(function() {
-		this.all(function(all) {
-			window.Library.reset(all);							
-		});
-	});
-	$("#block-view-btn").click(function(e) {
-		$('#library-items-container').addClass("block-view").removeClass("row-view")
-	});
-	$("#row-view-btn").click(function(e) {
-		$('#library-items-container').addClass("row-view").removeClass("block-view")
-	});
+	
 	
 });

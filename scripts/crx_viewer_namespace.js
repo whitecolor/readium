@@ -1,3 +1,6 @@
+// This is the namespace and initialization code that is used by
+// by the epub viewer of the chrome extension
+
 window.Readium = {
 	Models: {},
 	Collections: {},
