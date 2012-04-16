@@ -1,5 +1,3 @@
-
-
 Readium.FileSystemApi = function(initCallback) {
 	
 	var _fs;
