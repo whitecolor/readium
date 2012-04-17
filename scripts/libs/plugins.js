@@ -695,7 +695,7 @@ Lawnchair.adapter('webkit-sqlite', (function () {
 				$elem.css({
 				"position": "relative",
 				"right": right + "px",
-				"top": "-" + top + "px", 
+				"top": "-" + top + "px"
 				});
 			}
 			
