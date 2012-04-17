@@ -26,6 +26,6 @@ Readium.Views.NavWidgetView = Backbone.View.extend({
 		"click #fullscreen-button": 	function() { this.model.toggleFullScreen() },
 		"click #two-up-button": 		function() { this.model.toggleTwoUp() },
 		"click #page-back-button": 		function() { this.model.prevPage() },
-		"click #page-fwd-button": 		function() { this.model.nextPage() },
-  	},
+		"click #page-fwd-button": 		function() { this.model.nextPage() }
+  	}
 });

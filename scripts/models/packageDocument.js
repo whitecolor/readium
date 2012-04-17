@@ -1,7 +1,7 @@
 Readium.Models.ManifestItem = Backbone.Model.extend({});
 
 Readium.Collections.ManifestItems = Backbone.Collection.extend({
-	model: Readium.Models.ManifestItem,
+	model: Readium.Models.ManifestItem
 });
 
 /**
@@ -45,14 +45,14 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			spread: "//def:metadata/def:meta[@property='rendition:spread']",
 			orientation: "//def:metadata/def:meta[@property='rendition:orientation']",
 			ncx: "//def:spine/@toc",
-			page_prog_dir: "//def:spine/@page-progression-direction",
+			page_prog_dir: "//def:spine/@page-progression-direction"
 		 },
 
 		manifest: [ "//def:item", { 
 			id: "@id",
 			href: "@href",
 			media_type: "@media-type",
-			properties: "@properties",
+			properties: "@properties"
 		} ],
 							 
 		spine: [ "//def:itemref", { idref: "@idref", properties: "@properties" } ],
@@ -134,7 +134,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	resolveUri: function(rel_uri) {
 		uri = new URI(rel_uri);
 		return uri.resolve(this.uri_obj).toString();
-	},
+	}
 
 });
 
@@ -160,7 +160,7 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 		open_to_spread: false,
 		cover_href: '/images/library/missing-cover-image.png',
 		created_at: new Date(),
-		updated_at: new Date(),
+		updated_at: new Date()
 	},
 
 	parseIbooksDisplayOptions: function(content) {
@@ -331,7 +331,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		}
 
 		return null;
-	},
+	}
 
 
 });

@@ -340,7 +340,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		
 		// dunno that I should be calling this explicitly
 		this.changePage();
-	},
+	}
 
 	
 

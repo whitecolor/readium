@@ -29,5 +29,5 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 
 	show_library: function() {
 		window.router.navigate('/', {trigger: true});
-	},
+	}
 });

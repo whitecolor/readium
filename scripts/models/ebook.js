@@ -29,7 +29,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"two_up": false,
     	"full_screen": false,
     	"toolbar_visible": true,
-    	"toc_visible": false,
+    	"toc_visible": false
   	},
 
 	toggleTwoUp: function() {
@@ -200,7 +200,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			var that = this;
 			return Readium.Models.Toc.getToc(item, {
 				file_path: that.resolvePath(item.get("href")),
-				book: that,
+				book: that
 			});
 		}
 	},
@@ -301,6 +301,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	} else {
     		return new Readium.Views.ScrollingPaginationView({model: this});		
     	}
-	},
+	}
 	
 });
