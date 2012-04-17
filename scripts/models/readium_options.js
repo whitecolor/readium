@@ -1,14 +1,3 @@
-if( !window.Readium ) {
-	window.Readium = {
-		Models: {},
-		Collections: {},
-		Views: {},
-		Routers: {},
-		Utils: {}
-	};
-};
-
-// the options
 Readium.Models.ReadiumOptions = Backbone.Model.extend({
 
 	initialize: function() {

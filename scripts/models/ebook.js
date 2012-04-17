@@ -1,13 +1,3 @@
-if( !window.Readium ) {
-	window.Readium = {
-		Models: {},
-		Collections: {},
-		Views: {},
-		Routers: {},
-		Utils: {}
-	};
-};
-
 Readium.Models.Ebook = Backbone.Model.extend({
 
 	initialize: function() {

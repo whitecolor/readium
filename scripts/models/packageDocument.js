@@ -1,13 +1,3 @@
-if( !window.Readium ) {
-	window.Readium = {
-		Models: {},
-		Collections: {},
-		Views: {},
-		Routers: {},
-		Utils: {}
-	};
-}
-
 Readium.Models.ManifestItem = Backbone.Model.extend({});
 
 Readium.Collections.ManifestItems = Backbone.Collection.extend({
