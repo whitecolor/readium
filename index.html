@@ -28,6 +28,11 @@
 		<script src="/lib/bootstrap.min.js" type="text/javascript" ></script>
 		<script src="/lib/lawnchair-0.6.1.min.js" type="text/javascript" ></script>
 		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
+
+		<!-- css regions polyfill -->
+		<script src="/lib/jquery.lettering.js" type="text/javascript" ></script>
+		<script src="/lib/regions.jquery.min.js" type="text/javascript" ></script>
+
 		<!-- config jQuery mobile -->
 		<script>
 			$( document ).bind( "mobileinit", function() {
@@ -623,5 +628,8 @@
 			</iframe>
 		</script>
 	</div>
+
+	<!-- css regions test needs the document.body element, so we place it at the bottom -->
+	<script src="lib/modernizr.css-regions.js"></script>
 	</body>
 </html>
