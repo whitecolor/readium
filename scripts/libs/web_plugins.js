@@ -3,15 +3,18 @@
 
 // Listing of what is included (in order):
 
-// 1. Underscore.js
-// 2. Backbone.js
-// 3. Lawnchair v0.6.1
-// 4. Twitter Bootstrap.js
-// 5. Jquery mousewheel
-// 6. Pan and Zoom
-// 7. Jath
-// 8. URI.js
-// 9. ZipFile.complete.js
+// 1.  Underscore.js
+// 2.  Backbone.js
+// 3.  Lawnchair v0.6.1
+// 4.  Twitter Bootstrap.js
+// 5.  Jquery mousewheel
+// 6.  Pan and Zoom
+// 7.  Jath
+// 8.  URI.js
+// 9.  ZipFile.complete.js
+// 10. jquery.lettering.js
+// 11. regions.jquery.min.js
+// 
 
 // Underscore.js 1.3.1
 // (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
@@ -3356,3 +3359,78 @@ OTHER DEALINGS IN THE SOFTWARE.
     };
 
 })();
+
+/*global jQuery */
+/*!	
+* Lettering.JS 0.6.1
+*
+* Copyright 2010, Dave Rupert http://daverupert.com
+* Released under the WTFPL license 
+* http://sam.zoy.org/wtfpl/
+*
+* Thanks to Paul Irish - http://paulirish.com - for the feedback.
+*
+* Date: Mon Sep 20 17:14:00 2010 -0600
+*/
+(function($){
+	function injector(t, splitter, klass, after) {
+		var a = t.text().split(splitter), inject = '';
+		if (a.length) {
+			$(a).each(function(i, item) {
+				inject += '<span class="'+klass+(i+1)+'">'+item+'</span>'+after;
+			});	
+			t.empty().append(inject);
+		}
+	}
+	
+	var methods = {
+		init : function() {
+
+			return this.each(function() {
+				injector($(this), '', 'char', '');
+			});
+
+		},
+
+		words : function() {
+
+			return this.each(function() {
+				injector($(this), ' ', 'word', ' ');
+			});
+
+		},
+		
+		lines : function() {
+
+			return this.each(function() {
+				var r = "eefec303079ad17405c889e092e105b0";
+				// Because it's hard to split a <br/> tag consistently across browsers,
+				// (*ahem* IE *ahem*), we replaces all <br/> instances with an md5 hash 
+				// (of the word "split").  If you're trying to use this plugin on that 
+				// md5 hash string, it will fail because you're being ridiculous.
+				injector($(this).children("br").replaceWith(r).end(), r, 'line', '');
+			});
+
+		}
+	};
+
+	$.fn.lettering = function( method ) {
+		// Method calling logic
+		if ( method && methods[method] ) {
+			return methods[ method ].apply( this, [].slice.call( arguments, 1 ));
+		} else if ( method === 'letters' || ! method ) {
+			return methods.init.apply( this, [].slice.call( arguments, 0 ) ); // always pass an array
+		}
+		$.error( 'Method ' +  method + ' does not exist on jQuery.lettering' );
+		return this;
+	};
+
+})(jQuery);
+
+/*!	
+* Regions.js v0.1
+*
+* Copyright 2011, Robin Ricard
+* Released under the MIT license
+*/
+(function(e,f,g,a){var c=defaults={resizing:true,lazyTime:150,resizeOversizedElements:true},h=function(j,m,k){i(j,m,k);var l=false;e(f).resize(function(){if(!l){l=true;setTimeout(function(){i(j,m,k);l=false},k.lazyTime)}})},i=function(j,m,k){m=m.slice(0);j.css("display","none");var l=d(j,m[0]);m.shift();if(m.length>0){return i(l,m)}else{return l}},d=function(k,l){k=k.clone();if(l.css("position")==="static"){l.css("position","relative")}l.empty();l.append(k.children());l.children().first().css("margin-top","0");var j=b(l);l.children().last().css("margin-bottom","0");return j},b=function(n,q,j){if(q===a){q=n}var k=e("<div></div>"),m=n.children(),l=false;m.each(function(r,s){s=e(s);if(l){s.detach();k.append(e("<span> </span>"));k.append(s)}else{if(s.position().top+s.outerHeight(true)>=q.height()){s.detach();l=s}}});if(l){if(!j){l.contents().filter(function(){return this.nodeType===3}).wrap("<span></span").parent().lettering("words");j=true}if(l.children().length){n.append(l);var p=b(l,q,j),o=l.clone();o.empty();o.append(p.children());k.prepend(o)}else{k.prepend(l)}}if(l&&n.children().length===0){if(c.resizeOversizedElements){l.css({"max-width":q.innerWidth(),"max-height":q.innerHeight()})}n.append(l)}return k};e.fn.regions=function(k,j){j=e.extend(defaults,j);if(typeof k==="string"||k instanceof jQuery){if(!(k instanceof jQuery)){k=e(k)}regionsArray=e.makeArray(k);k=e.map(regionsArray,function(l){return e(l)})}else{k=e.map(k,function(l){if(typeof l==="string"){return e(l)}else{return l}})}if(j.resizing){h(e(this),k,j)}else{i(e(this),k,j)}return this}})(jQuery,window,document);
