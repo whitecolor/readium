@@ -15,3 +15,14 @@ end
 task :styles  do
 	`sass --watch css/sass:css -r ./css/sass/bourbon/lib/bourbon.rb`
 end
+
+
+task :deploy do
+	to_keep = [ ".", "..", ".git", ".gitignore", "CNAME", "publish" ]
+	Dir.foreach(".") do |x| 
+		unless to_keep.include? x
+			FileUtils.rm_rf x
+		end
+	end
+end
+
