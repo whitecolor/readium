@@ -19,10 +19,20 @@ end
 
 task :deploy do
 	to_keep = [ ".", "..", ".git", ".gitignore", "CNAME", "publish" ]
+
+	# delete everything we haven't explicitly set to keep
 	Dir.foreach(".") do |x| 
 		unless to_keep.include? x
 			FileUtils.rm_rf x
 		end
 	end
+
+	# cp everything from the publish dir up one step
+	FileUtils.cp_r 'publish', '.' 
+
+	# delete the publish dir
+	FileUtils.rm_rf 'publish'
+	
+
 end
 
