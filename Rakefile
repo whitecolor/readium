@@ -28,7 +28,10 @@ task :deploy do
 	end
 
 	# cp everything from the publish dir up one step
-	FileUtils.cp_r 'publish', '.' 
+	Dir.foreach("publish") do |x| 
+		FileUtils.cp_r "publish/#{x}", 'x' unless x == '.' ||  x == '..'
+	end
+	#FileUtils.cp_r 'publish', '.' 
 
 	# delete the publish dir
 	FileUtils.rm_rf 'publish'
