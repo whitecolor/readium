@@ -26,20 +26,20 @@ task :deploy do
 	# checkout a fresh copy of the branch
 	`git checkout -b gh-pages`
 
-	# # delete everything we haven't explicitly set to keep
-	# Dir.foreach(".") do |x| 
-	# 	unless to_keep.include? x
-	# 		FileUtils.rm_rf x
-	# 	end
-	# end
+	# delete everything we haven't explicitly set to keep
+	Dir.foreach(".") do |x| 
+		unless to_keep.include? x
+			FileUtils.rm_rf x
+		end
+	end
 
-	# # cp everything from the publish dir up one step
-	# Dir.foreach("publish") do |x| 
-	# 	FileUtils.cp_r "publish/#{x}", x unless x == '.' ||  x == '..'
-	# end
+	# cp everything from the publish dir up one step
+	Dir.foreach("publish") do |x| 
+		FileUtils.cp_r "publish/#{x}", x unless x == '.' ||  x == '..'
+	end
 
-	# # delete the publish dir
-	# FileUtils.rm_rf 'publish'
+	# delete the publish dir
+	FileUtils.rm_rf 'publish'
 
 	# commit the state of the directory
 	`git add .`
