@@ -627,6 +627,7 @@
       -->
 
       <echo message="Update the HTML to reference our concatenated script file: ${scripts.js}"/>
+      <echo message="The root script it: ${file.root.script}"/>
       <!-- Determines which Regex for AMD use -->
       <var name="matchRegex" value=""/>
       <var name="replaceRegex" value=""/>
@@ -639,7 +640,7 @@
           </then>
           <else>
               <echo message="Updating HTML to reflect the use of default script inclusion"/>
-              <var name="matchRegex" value="&lt;!-- scripts concatenated [\d\w\s\W]*&lt;script.*src=['&quot;]?(.*)/${file.root.script}(?:\?.*)?['&quot;]?\s*&gt;\s*&lt;/script&gt;[\d\w\s\W]*&lt;!-- end ((scripts)|(concatenated and minified scripts))\s*--&gt;" />
+              <var name="matchRegex" value="&lt;!-- scripts concatenated [\d\w\s\W]*&lt;!-- end ((scripts)|(concatenated and minified scripts))\s*--&gt;" />
               <var name="replaceRegex" value="&lt;script src='\1/${scripts.sha}.js\'&gt;&lt;/script&gt;" />
           </else>
       </if>

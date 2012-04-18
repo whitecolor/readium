@@ -1,6 +1,7 @@
-@root = File.expand_path(File.dirname(__FILE__))
+@root = File.expand_path(File.dirname(__FILE__), "publish")
 
 run Proc.new { |env|
+  
   # Extract the requested path from the request
   path = Rack::Utils.unescape(env['PATH_INFO'])
   index_file = @root + "#{path}/index.html"

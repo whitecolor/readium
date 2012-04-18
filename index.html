@@ -5,39 +5,18 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>  
 
 		<!-- Le styles -->
-		<link rel="stylesheet" type="text/css" href="/lib/bootstrap.min.css">
 		<style>
-			/* Must be exactly here No touchy! */
-			body {
-				padding-top: 40px;
-			}
+		body {
+			padding-top: 40px;
+		}
 		</style>
-		<link rel="stylesheet" type="text/css" href="/lib/bootstrap_responsive.css">
-		<link rel="stylesheet" type="text/css" href="/css/library.css">
-		<link rel="stylesheet" type="text/css" href="/css/viewer_manifest.css">
+		<link rel="stylesheet" type="text/css" href="/css/web_manifest.css">
 
-
-		<!-- All JavaScript at the bottom, except this Modernizr build.
-       Modernizr enables HTML5 elements & feature detects for optimal performance.
-       Create your own custom Modernizr build: www.modernizr.com/download/ -->
-  		<script src="lib/modernizr-2.5.3.min.js"></script>
-  		<!-- les bibliothèques -->
-		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
-
-		<!-- This one file: -->
-		<script src="/scripts/libs/web_plugins.js" type="text/javascript" ></script>
-		<!--contains the following concatenated in order: -->
-		<!--/lib/underscore.min.js-->
-		<!--/lib/backbone.min.js-->
-		<!--/lib/lawnchair-0.6.1.min.js-->
-		<!--/lib/bootstrap-custom.min.js-->
-		<!--/lib/jquery.mousewheel.js-->
-		<!--/lib/pan_and_zoom.js-->
-		<!--/lib/jath.js-->
-		<!--/lib/URI.js-->
-		<!--/lib/ZipFile.complete.js-->
 
 		
+  		<script src="lib/modernizr-2.5.3.min.js"></script>
+		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
+		<script src="/scripts/libs/web_plugins.js" type="text/javascript" ></script>		
 		<!-- config jQuery mobile -->
 		<script>
 			$( document ).bind( "mobileinit", function() {
@@ -49,9 +28,8 @@
 			});
 		</script>
 		<script src="/lib/jQuery.mobile-1.0.1.js"></script>
-		
-		
-		<!-- scripts concatenated and minified via build script -->
+	
+		<!-- scripts concatenated and minified via ant build script-->
 		<script src="scripts/namespaces/ws_namespace.js" type="text/javascript"></script>
 		<script src="scripts/utils/md5.js" type="text/javascript"></script>
 		<script src="scripts/fileSystemApi.js" type="text/javascript" ></script>
@@ -72,6 +50,7 @@
 		<script src="scripts/web_overrides/viewer.js" type="text/javascript"></script>
 		<script src="scripts/web_overrides/library.js" type="text/javascript"></script>
 		<!-- end scripts -->
+		
 		<script src="lib/mathjax/MathJax.js?config=readium" type="text/javascript"></script>
 		
   		<script>
