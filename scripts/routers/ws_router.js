@@ -23,10 +23,16 @@ Readium.Routers.ApplicationRouter = Backbone.Router.extend({
 			window._book = new Readium.Models.ReflowableEbook(book_attrs);
 		}
 		
-		window._libraryView = new Readium.Views.ViewerApplicationView({
+		var v = new Readium.Views.ViewerApplicationView({
 			model: window._book
 		});
-		this.changePage(window._libraryView);
+		this.changePage(v);
+		var cb = function() {
+			v.initPaginator();
+			$(document).off("pagechange", cb);
+		}
+
+		$(document).on("pagechange", cb);
 	},
 
 	showLibrary: function() {
