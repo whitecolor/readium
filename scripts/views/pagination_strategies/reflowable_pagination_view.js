@@ -15,6 +15,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	render: function(goToLastPage) {
+		this.resetEl();
 		var htmlText = this.model.get("current_content");
 		var parser = new window.DOMParser();
 		var dom = parser.parseFromString( htmlText, 'text/xml' );

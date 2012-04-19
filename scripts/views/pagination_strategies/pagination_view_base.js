@@ -1,5 +1,11 @@
+/*
+	Base class from which all pagination strategy classes are derived. This
+	class should not bet intialized (if it could be it would be abstract). It
+	exists for the purpose of sharing behaviour between the different strategies.
+*/
 Readium.Views.PaginationViewBase = Backbone.View.extend({
 
+	// all strategies are linked to the same dom elem
 	el: "#readium-book-view-el",
 
 	initialize: function(options) {
@@ -8,6 +14,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.bindingTemplate = _.template( $('#binding-template').html() );
 	},
 
+	// handle  clicks of anchor tags by navigating to
+	// the proper location in the epub spine, or opening
+	// a new window for external links
 	linkClickHandler: function(e) {
 		e.preventDefault();
 
@@ -103,13 +112,11 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		// first remove anything we already put up there
 		$('.readium-dynamic-sh').remove();
 
-		$($("link", bookDom).get().reverse()).each(function(){
-			link = this;
-			if(typeof link.rel === "string" && link.rel.toUpperCase() === "STYLESHEET") {
-				$link = $(link);
-				$link.addClass('readium-dynamic-sh');
-				$('head').prepend($link);
-			}
+		// now find any stylesheets
+		$($("link[rel*='stylesheet']", bookDom).get().reverse()).each(function(){
+			$link = $(this);
+			$link.addClass('readium-dynamic-sh');
+			$('head').prepend($link);
 		});
 	},
 
@@ -145,21 +152,15 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			$(this).toggleClass("hidden-page", !that.isPageVisible(index, currentPage));
 		});
 	},
-
-	appendContent: function(content) {
-		alert('not implemented yet')
-	},
 	
 	replaceContent: function(content) {
 		// TODO: put this where it belongs
 		this.$('#readium-content-container').
-			css('visibility', 'hidden').
-			html(content + "<div id='content-end'></div>");
-		_contentEnd = $('#content-end');
+		css('visibility', 'hidden').
+		html(content + "<div id='content-end'></div>");
 	},
 
 	toggleTwoUp: function() {
-		
 		//this.render();
 	},
 
@@ -169,12 +170,25 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.renderPages();
 	},
 
+	// inject mathML parsing code into an iframe
     injectMathJax: function (iframe) {
 		var doc = iframe.contentDocument;
 		var script = doc.createElement("script");
 		script.type = "text/javascript";
 		script.src = MathJax.Hub.config.root+"/MathJax.js?config=readium-iframe";
 		doc.getElementsByTagName("head")[0].appendChild(script);
+    },
+
+    resetEl: function() {
+    	$('body').removeClass("apple-fixed-layout");
+    	$("#readium-book-view-el").attr("style", "");
+    	this.replaceContent("");
+    	$('#page-wrap').css({
+    		"position": "relative",
+    		"right": "0px", 
+    		"top": "0px",
+    		"-webkit-transform": "scale(1.0) translate(0px, 0px)",
+    	});
     }
 	
 });
