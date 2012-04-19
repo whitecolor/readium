@@ -16,10 +16,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			}
 		});
 		this.on("change:num_pages", this.adjustCurrentPage, this);
-		if(this.isFixedLayout) {
-			this.toggleTwoUp();
-			this.on("change:current_content", this.parseMetaTags, this);
-		}
 	},
 
 	defaults: {
@@ -264,6 +260,10 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		return sections;
 	},
 
+	getCurrentSection: function() {
+		return this.buildSectionJSON(this.packageDocument.currentSection());
+	},
+
 
 	parseViewportTag: function(viewportTag) {
 		// this is going to be ugly
@@ -289,26 +289,16 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		var tag = dom.getElementsByName("viewport")[0];
 		if(tag) {
 			var pageSize = this.parseViewportTag(tag);
-			this.set({meta_width: pageSize.width, meta_height: pageSize.height});
+			this.set({"meta_width": pageSize.width, "meta_height": pageSize.height})
+			return {meta_width: pageSize.width, meta_height: pageSize.height};
 		}
-		this.packageDocument.off("change:spine_position");
-		this.off("current_content")
-		this.trigger("first_render_ready")
+		return null;
+		
+		
 	},
 
 	CreatePaginator: function() {
-		// TODO do this properly later:
-
-		if(this.isFixedLayout) {
-			return new Readium.Views.FixedPaginationView({model: this});
-		}
-		var optionString = localStorage["READIUM_OPTIONS"];
-    	var options = (optionString && JSON.parse(optionString) ) || {"singleton": {}};
-    	if( options["singleton"]["paginate_everything"] ) {
-    		return new Readium.Views.ReflowablePaginationView({model: this});	
-    	} else {
-    		return new Readium.Views.ScrollingPaginationView({model: this});		
-    	}
+    	return new Readium.Models.Paginator({book: this});
 	},
 	
 });

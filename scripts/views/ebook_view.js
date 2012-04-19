@@ -1,22 +1,66 @@
+Readium.Models.Paginator = Backbone.Model.extend({
 
-
-Readium.Views.PaginationViewBase = Backbone.View.extend({
-
-	el: "#readium-book-view-el",
 	renderToLastPage: false,
-
-	initialize: function(options) {
-		this.model.on("change:current_page", this.changePage, this);
+	// TODO do this properly later:
+	initialize: function() {
+		this.model = this.get("book");
+		//this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:font_size", this.setFontSize, this);
-		this.bindingTemplate = _.template( $('#binding-template').html() );
 		
-		// TODO: should I break layers here or pass through?
 		this.model.packageDocument.on("increased:spine_position", function() {
 			this.renderToLastPage = false;
 		}, this);
 		this.model.packageDocument.on("decreased:spine_position", function() {
 			this.renderToLastPage = true;
-		}, this);		
+		}, this);
+
+		//this.model.on("change:current_section_url", this.render, this);
+		this.model.on("change:current_content", this.renderSpineItem, this)
+
+	},
+
+	renderSpineItem: function(renderToLast) {
+		var book = this.model;
+		var spineItem = book.packageDocument.currentSpineItem();
+
+		if(this.shouldRenderAsFixed(spineItem)) {
+			this.v = new Readium.Views.FixedPaginationView({model: book});
+		}
+		else {
+			if(this.shouldScroll()) {
+				this.v = new Readium.Views.ScrollingPaginationView({model: book});
+			}
+			else {
+				this.v = new Readium.Views.ReflowablePaginationView({model: book});
+			}
+		}
+		this.v.render(this.renderToLastPage);
+	},
+
+	shouldRenderAsFixed: function(spineItem) {
+		if(typeof spineItem.properties.fixed_flow !== "undefined") {
+			return spineItem.properties.fixed_flow;
+		}
+		return this.model.isFixedLayout;
+	},
+
+	shouldScroll: function() {
+		var optionString = localStorage["READIUM_OPTIONS"];
+		var options = (optionString && JSON.parse(optionString) ) || {"singleton": {}};
+		return !options["singleton"]["paginate_everything"];
+	}
+	
+});
+
+
+Readium.Views.PaginationViewBase = Backbone.View.extend({
+
+	el: "#readium-book-view-el",
+
+	initialize: function(options) {
+		this.model.on("change:current_page", this.changePage, this);
+		this.model.on("change:font_size", this.setFontSize, this);
+		this.bindingTemplate = _.template( $('#binding-template').html() );
 	},
 
 	linkClickHandler: function(e) {
@@ -60,10 +104,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 				$el.html(content);
 			});
 		}
-	},
-
-	shouldRenderAsFixed: function(spineItem) {
-		return spineItem.properties.fixed_flow;
 	},
 
 	// parse the epub "switch" tags and hide
@@ -136,11 +176,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	// this doesn't seem to be working...
 	events: {
-
 		"click #page-margin": function(e) {
 			this.trigger("toggle_ui");
 		},
-		
 
 		"click #readium-content-container a": function(e) {
 			this.linkClickHandler(e);
@@ -148,9 +186,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	isPageVisible: function(pageNum, currentPages) {
-		
 		return currentPages.indexOf(pageNum) !== -1;
-		
 	},
 
 	changePage: function() {
@@ -205,7 +241,6 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.page_template = _.template( $('#scrolling-page-template').html() );
-		this.model.on("change:current_section_url", this.render, this);
 	},
 
 	render: function() {
@@ -237,12 +272,12 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.page_template = _.template( $('#reflowing-page-template').html() );
 		
 		this.model.on("repagination_event", this.renderPages, this);
-		this.model.on("change:current_content", this.render, this);
+		//this.model.on("change:current_content", this.render, this);
 		this.model.on("change:two_up", this.renderPages, this);
 
 	},
 
-	render: function() {
+	render: function(goToLastPage) {
 		var htmlText = this.model.get("current_content");
 		var parser = new window.DOMParser();
 		var dom = parser.parseFromString( htmlText, 'text/xml' );
@@ -260,7 +295,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         	function() {
 				that.renderPages();
 				that.toggleTwoUp();
-				if(that.renderToLastPage) {
+				if(goToLastPage) {
 					that.model.goToLastPage();
 				}
 				else {
@@ -355,28 +390,26 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.page_template = _.template( $('#fixed-page-template').html() );
 		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
-		this.model.on("first_render_ready", this.render, this);
-		this.model.on("change:two_up", this.setUpMode, this);
+		//this.model.on("first_render_ready", this.render, this);
+		//this.model.on("change:two_up", this.setUpMode, this);
 	},
 
 	render: function() {
 		// add all the pages
-		var sections = this.model.getAllSections();
 		$('body').addClass('apple-fixed-layout');
-		this.setUpMode();
-		this.$el.width(this.model.get("meta_width") * 2);
-		this.$el.height(this.model.get("meta_height"));
-		
-		for(var i = 0; i < sections.length; i++) {
-			sections[i].page_num = i + 1;
-			this.$('#container').append(this.page_template(sections[i]));
-		}
+		var metaTags = this.model.parseMetaTags();
+		this.$el.width(metaTags.meta_width * 2);
+		this.$el.height(metaTags.meta_height);
+		var sec = this.model.getCurrentSection();
+		sec.page_num = 1;
+		this.$('#container').html(this.page_template(sec));
 		var that = this;
 		this.$('.content-sandbox').on("load", function(e) {
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
 		});
-		this.model.changPageNumber(i);
+		this.model.changPageNumber(1);
+		currentPage = this.model.set("current_page", [1])
 		setTimeout(function() {
 			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
 		}, 10)
@@ -419,5 +452,3 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		}
 	}
 });
-			
-		
