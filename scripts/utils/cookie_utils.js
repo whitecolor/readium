@@ -1,13 +1,3 @@
-if( !window.Readium ) {
-	window.Readium = {
-		Models: {},
-		Collections: {},
-		Views: {},
-		Routers: {},
-		Utils: {}
-	};
-}
-	
 Readium.Utils.setCookie = function(c_name,value,exdays) {
 	var exdate=new Date();
 	exdate.setDate(exdate.getDate() + exdays);
