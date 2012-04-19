@@ -23,9 +23,9 @@ Readium.Collections.LibraryItems = Backbone.Collection.extend({
 
 Readium.Views.LibraryItemView = Backbone.View.extend({
 
-	tagName: 'div',
+	tagName: 'li',
 
-	className: "book-item clearfix",
+	//className: "book-item clearfix",
 
 	initialize: function() {
 		_.bindAll(this, "render");	
@@ -62,14 +62,25 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 	}
 });
 
+Readium.Views.LibraryItemModalView = Backbone.View.extend({
+
+	initialize: function() {
+		this.template = _.template( $('#library-item-modal-template').html() );
+	},
+
+	render: function() {
+		var renderedContent = this.template({data: this.model.toJSON()});
+		$(this.el).html(renderedContent);
+		return this;
+	}
+});
+
 Readium.Views.LibraryItemsView = Backbone.View.extend({
 	tagName: 'div',
 
 	id: "library-items-container",
 
-	className: 'row-view clearfix',
-
-	
+	className: '',
 
 	initialize: function() {
 		this.template = _.template( $('#library-items-template').html() );
@@ -78,18 +89,16 @@ Readium.Views.LibraryItemsView = Backbone.View.extend({
 	},
 
 	render: function() {
-		var collection = this.collection;
-		var $container = $(this.el);
-		$container.html(this.template({}));
-		this.$('#empty-message').toggle(this.collection.isEmpty());
+		var that = this;
+		this.$el.html(this.template({}));
 
-		collection.each(function(item) {
+		this.collection.each(function(item) {
 			var view = new Readium.Views.LibraryItemView({
 				model: item,
-				collection: collection,
+				collection: that.collection,
 				id: item.get('id')
 			});
-			$container.append( view.render().el );
+			that.$("#lib-list").append( view.render().el );
 
 		});
 		
@@ -245,98 +254,4 @@ Readium.Views.FilePickerView = Backbone.View.extend({
 		this.resetForm();
 		this.hide();
 	}
-
-	
-
-});
-
-Readium.Routers.ApplicationRouter = Backbone.Router.extend({
-	initialize: function(options) {
-		this.collection = options.collection;
-	},
-
-
-	routes: {
-		"view_book/:id": "openBook",
-		"": "showLibrary"
-	},
-
-	openBook: function(key) {
-		this.showViewer();
-		var book_attrs = this.collection.get(key).toJSON();
-		if(book_attrs.fixed_layout) {
-			console.log('initializing fixed layout book');
-			window._book = new Readium.Models.AppleFixedEbook(book_attrs);
-		}
-		else {
-			console.log('initializing reflowable book');
-			window._book = new Readium.Models.ReflowableEbook(book_attrs);
-		}
-		
-		window._libraryView = new Readium.Views.ViewerApplicationView({
-			model: window._book
-		});
-		window._libraryView.render();
-	},
-
-	showLibrary: function() {
-		$("#readium-library-activity").toggle(true);
-		$("#readium-viewer-activity").toggle(false);
-	},
-
-	showViewer: function() {
-		$("#readium-library-activity").toggle(false);
-		$("#readium-viewer-activity").toggle(true);
-	},
-
-	splat_handler: function(splat) {
-		console.log(splat);
-	}
-
-}); 
-
-/*
-Readium.Routers.LibraryRouter = Backbone.Router.extend({
-
-	initialize: function(options) {
-		this.picker = options.picker;
-	},
-
-	routes: {
-		"options": 		"showOptions", 
-		"/unpack/*url": 	"beginExtraction"
-	},
-
-	showOptions: function() {
-		$('#readium-options-modal').modal('show');
-	},
-
-	beginExtraction: function(url) {
-		var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: url});
-		this.picker.beginExtraction(extractor);
-	}
-
-});
-*/
-
-$(document).on("pageinit",function() {
-	window.options = Readium.Models.ReadiumOptions.getInstance();
-	window.optionsView = new Readium.Views.ReadiumOptionsView({model: window.options});
-		
-	window.Library = new Readium.Collections.LibraryItems(window.ReadiumLibraryData);
-	window.lib_view = new Readium.Views.LibraryItemsView({collection: window.Library});
-	window.fp_view = new Readium.Views.FilePickerView();
-	window.router = new Readium.Routers.ApplicationRouter({collection: window.Library});
-
-	Backbone.history.start({pushState: false})
-	// window.Library.fetch();
-	window.Library.trigger('reset')
-	
-	$("#block-view-btn").click(function(e) {
-		$('#library-items-container').addClass("block-view").removeClass("row-view")
-	});
-	$("#row-view-btn").click(function(e) {
-		$('#library-items-container').addClass("row-view").removeClass("block-view")
-	});
-	
 });

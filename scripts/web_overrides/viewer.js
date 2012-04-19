@@ -1,22 +1,23 @@
 Readium.Views.ViewerApplicationView = Backbone.View.extend({
-	el: '#readium-viewer-activity',
+	//el: '#readium-viewer-activity',
 
 	uiVisible: false,
 
 	initialize: function() {
-		this.model.on("change:full_screen", this.toggleFullscreen, this);
+		//this.model.on("change:full_screen", this.toggleFullscreen, this);
+		this.template = _.template($("#viewer-template").html());
 		
 		// the book's pages
 		this.paginator = this.model.CreatePaginator();
 		this.paginator.on("toggle_ui", this.toggleUI, this);
 
 		// the little overlay
-		this.navWidget = new Readium.Views.NavWidgetView({model: _book});
-		this.navWidget.render();
+	//	this.navWidget = new Readium.Views.NavWidgetView({model: _book});
+	//	this.navWidget.render();
 
 		// the top bar
-		this.toolbar = new Readium.Views.ToolbarView({model: _book});
-		this.toolbar.render();
+	//	this.toolbar = new Readium.Views.ToolbarView({model: _book});
+	//	this.toolbar.render();
 
 		this.model.on("change:has_toc", this.init_toc, this);
 
@@ -34,10 +35,10 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 	toggleFullscreen: function() {
 		if(this.model.get("full_screen")) {
-			document.documentElement.webkitRequestFullScreen();	
+			//document.documentElement.webkitRequestFullScreen();	
 		}
 		else {
-			document.webkitCancelFullScreen();				
+			//document.webkitCancelFullScreen();				
 		}
 	},
 
@@ -75,11 +76,9 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.toggleUI();
-		var that = this;
-		setTimeout(function() {
-			that.toggleUI();
-		}, 2000);
+		var renderedContent = this.template({data: this.model.toJSON()});
+		$(this.el).html(renderedContent);
+		return this;
 	},
 
 	init_toc: function() {
