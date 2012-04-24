@@ -273,7 +273,11 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	},
 
 	getManifestItem: function(spine_position) {
-		var target = this.get("spine")[spine_position];
+		var spine = this.get("spine");
+		if(spine_position < 0 || spine_position >= spine.length) {
+			return null;
+		}
+		var target = spine[spine_position];
 		return this.getManifestItemById(target.idref);
 	},
 
@@ -283,14 +287,20 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 				});
 	},
 
-	currentSection: function() {
-		var spine_pos = this.get("spine_position");
+	currentSection: function(offset) {
+		if(!offset) {
+			offset = 0;
+		}
+		var spine_pos = this.get("spine_position") + offset;
 		return this.getManifestItem(spine_pos);
 	},
 
-	currentSpineItem: function() {
+	currentSpineItem: function(offset) {
+		if(!offset) {
+			offset = 0;
+		}
 		var spine_pos = this.get("spine_position");
-		return this.get("spine")[spine_pos];
+		return this.get("spine")[spine_pos + offset];
 	},
 
 	hasNextSection: function() {

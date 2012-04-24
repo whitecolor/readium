@@ -12,25 +12,42 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	},
 
 	render: function() {
-		// add all the pages
+
 		$('body').addClass('apple-fixed-layout');
+
+		// appends one fixed layout page to those currently rendered
 		var metaTags = this.model.parseMetaTags();
 		this.$el.width(metaTags.meta_width * 2);
 		this.$el.height(metaTags.meta_height);
-		var sec = this.model.getCurrentSection();
-		sec.page_num = 1;
-		this.$('#container').html(this.page_template(sec));
+
+		// wipe the html
+		this.$('#container').html("");
+
+		// add the current section
+		this.addPage( this.model.getCurrentSection(), 1 );
+		currentPage = this.model.set("current_page", [1]);
+		setTimeout(function() {
+			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
+		}, 10)
+		return this.renderPages();
+	},
+
+	addPage: function(sec, pageNum) {
+
+		sec.page_num = pageNum;
+		var rendered_content = this.page_template(sec);
+		if(pageNum > 1) {
+			$(rendered_content).hide();
+		}
+		this.model.changPageNumber(pageNum);
+		this.$('#container').append(this.page_template(sec));
 		var that = this;
 		this.$('.content-sandbox').on("load", function(e) {
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
 		});
-		this.model.changPageNumber(1);
-		currentPage = this.model.set("current_page", [1])
-		setTimeout(function() {
-			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
-		}, 10)
-		return this.renderPages();
+		this.changePage();
+		
 	},
 
 	setUpMode: function() {

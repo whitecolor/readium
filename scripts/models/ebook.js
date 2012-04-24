@@ -6,7 +6,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.packageDocument = new Readium.Models.PackageDocument({}, {
 			file_path: this.get("package_doc_path")
 		});
-		this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
+		//this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.fetch({
 			success: function() {
 				// TODO: restore location here
@@ -234,15 +234,16 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				console.log("Failed to load file: " + path);
 			})
 		});
-		if(this.isFixedLayout) {
-			this.goToPage(this.packageDocument.get("spine_position"));
-		}
+		
 
 		// save the position
 		this.savePosition();
 	},
 
 	buildSectionJSON: function(manifest_item) {
+		if(!manifest_item) {
+			return null;
+		}
 		var section = {};
 		section.width = this.get("meta_width") || 0;
 		section.height = this.get("meta_height") || 0;
@@ -260,8 +261,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		return sections;
 	},
 
-	getCurrentSection: function() {
-		return this.buildSectionJSON(this.packageDocument.currentSection());
+	getCurrentSection: function(i) {
+		return this.buildSectionJSON(this.packageDocument.currentSection(i));
 	},
 
 
