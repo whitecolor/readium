@@ -10,13 +10,13 @@ Readium.Models.Trigger = function(domNode) {
 Readium.Models.Trigger.prototype.subscribe = function(dom) {
 	var selector = "#" + this.observer;
 	var that = this;
-	$(selector).on(this.event, function() {
-		that.execute();
+	$(selector, dom).on(this.event, function() {
+		that.execute(dom);
 	});
 };
 
-Readium.Models.Trigger.prototype.execute = function() {
-	var $target = $( "#" + this.ref);
+Readium.Models.Trigger.prototype.execute = function(dom) {
+	var $target = $( "#" + this.ref, dom);
 	switch(this.action)
 	{
 	case "show":

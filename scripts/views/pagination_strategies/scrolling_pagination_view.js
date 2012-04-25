@@ -15,6 +15,8 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 			that.applyBindings( $(e.srcElement).contents() );
             that.injectMathJax(e.srcElement);
             that.injectLinkHandler(e.srcElement);
+            var trigs = that.parseTriggers(e.srcElement.contentDocument);
+			that.applyTriggers(e.srcElement.contentDocument, trigs);
 		});
 		return this;
 	},
