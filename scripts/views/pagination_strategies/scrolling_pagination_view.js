@@ -10,11 +10,16 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 		var that = this;
 		var uri = this.model.get("current_section_url");
 		this.$('#container').html( this.page_template({uri: uri}) );
-		this.$('.content-sandbox').on("load", function(e) {
+		/*this.$('.content-sandbox').on("load", function(e) {
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
             that.injectMathJax(e.srcElement);
             that.injectLinkHandler(e.srcElement);
+            var trigs = that.parseTriggers(e.srcElement.contentDocument);
+			that.applyTriggers(e.srcElement.contentDocument, trigs);
+		});*/
+		this.$('.content-sandbox').on("load", function(e) {
+			that.iframeLoadCallback(e);
 		});
 		return this;
 	},
