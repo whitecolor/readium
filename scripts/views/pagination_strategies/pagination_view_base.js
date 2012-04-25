@@ -208,6 +208,15 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     		"top": "0px",
     		"-webkit-transform": "scale(1.0) translate(0px, 0px)",
     	});
-    }
+    },
+
+    iframeLoadCallback: function(e) {
+		// not sure why, on("load", this.applyBindings, this) was not working
+		this.applyBindings( $(e.srcElement).contents() );
+        this.injectMathJax(e.srcElement);
+        this.injectLinkHandler(e.srcElement);
+        var trigs = this.parseTriggers(e.srcElement.contentDocument);
+		this.applyTriggers(e.srcElement.contentDocument, trigs);
+	}
 	
 });
