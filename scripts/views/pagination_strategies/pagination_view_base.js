@@ -60,6 +60,25 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
+	applyTriggers: function(dom, triggers) {
+		for(var i = 0 ; i < triggers.length; i++) {
+			triggers[i].subscribe(dom);
+		}
+	},
+
+	// for reflowable content we only add what is in the body tag.
+	// lots of times the triggers are in the head of the dom
+	parseTriggers: function(dom) {
+		var triggers = [];
+		$('trigger', dom).each(function() {
+			
+
+			triggers.push(new Readium.Models.Trigger(this) );
+		});
+		
+		return triggers;
+	},	
+
 	// parse the epub "switch" tags and hide
 	// cases that are not supported
 	applySwitches: function(dom) {
