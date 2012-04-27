@@ -29,5 +29,5 @@
     }
   ],
    "options_page": "views/library.html#options",
-   "version": "0.2.2"
+   "version": "0.2.3"
 }
