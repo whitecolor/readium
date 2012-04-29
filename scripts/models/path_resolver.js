@@ -15,12 +15,23 @@ function encode_utf8( s )
   return unescape( encodeURIComponent( s ) );
 }
 
+// we probably don't want both of these - not sure about x-browser compat of ArrayBuffer WHM
+
 function string2Bin(str) {
   var result = [];
   for (var i = 0; i < str.length; i++) {
     result.push(str.charCodeAt(i)&0xff);
   }
   return result;
+}
+
+function string2ArrayBuffer(str){
+    var ba=new ArrayBuffer(str.length);
+    var bytes = new Uint8Array(ba);
+    for(var i=0;i<str.length; i++){
+        bytes[i] = str.charCodeAt(i);
+    }
+    return ba;
 }
 
 function bin2String(array) {
@@ -227,27 +238,7 @@ var readBinEntry = function(fileEntry, win, fail) {
 };
 
 
-// must be a better way to do this???
-var string2ArrayBuffer=function(str){
-    var ba=new ArrayBuffer(str.length);
-    var bytes = new Uint8Array(ba);
-    for(var i=0;i<str.length; i++){
-        bytes[i] = str.charCodeAt(i);
-    }
-    return ba;
-}
 
-/* could try this one: (but if binary is still available from Blob maybe there's a better way???)
-function string2ArrayBuffer(string, callback) {
-    var bb = new BlobBuilder();
-    bb.append(string);
-    var f = new FileReader();
-    f.onload = function(e) {
-        callback(e.target.result);
-    }
-    f.readAsArrayBuffer(bb.getBlob());
-}
-*/
 
 var writeBinEntry = function(fileEntry, content, win, fail) {
 	
