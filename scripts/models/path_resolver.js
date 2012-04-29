@@ -10,6 +10,23 @@ function PathResolver(rootPath) {
 	this.baseUrl = new URI(rootPath);
 };
 
+function encode_utf8( s )
+{
+  return unescape( encodeURIComponent( s ) );
+}
+
+function string2Bin(str) {
+  var result = [];
+  for (var i = 0; i < str.length; i++) {
+    result.push(str.charCodeAt(i)&0xff);
+  }
+  return result;
+}
+
+function bin2String(array) {
+  return String.fromCharCode.apply(String, array);
+}
+
 PathResolver.prototype.resolve = function(relativePath) {
 	var url = new URI(relativePath);
 	return url.resolve(this.baseUrl);
@@ -65,35 +82,36 @@ var fixXhtmlLinks = function(content, resolver) {
 };
 
 var fixFonts = function(content, resolver) {
-     if (content.indexOf("OTTO") == 0) {
-		// alert("TTF!");
+      if ((content.indexOf("OTTO") == 0)|| (content.indexOf("wOFF") == 0)) {
 		return content;
       }
       else
       {
-	//alert("OBFUSCATED!");
-	//return "BILL" + content.slice(4);
-	return (content[0] ^ g_uid_hashed[0]) +
-	       (content[1] ^ g_uid_hashed[1]) +
-	       (content[2] ^ g_uid_hashed[2]) +
-	       (content[3] ^ g_uid_hashed[3]) +
-	       content.slice(4);
+	var prefix = content.slice(0, 1040);
+	var bytes = string2Bin(prefix);
+	var masklen = g_uid_hashed.length;
+	for (var i = 0; i < 1040; i++)
+	{
+		bytes[i] = bytes[i] ^ (g_uid_hashed[i % masklen]);
+	}
+	var results = bin2String(bytes);
+	return results + content.slice(1040);
       }
 }
 
 var getBinaryFileFixingStrategy = function(fileEntryUrl, uid) {
 	
-	if (fileEntryUrl.substr(-4) === ".otf" ) {
+	// a hack - tecnically should process top-down from encryption.xml but we'll just sniff for now WHM
+	// does negative substr work in IE? WHM
+	if ((fileEntryUrl.substr(-4) === ".otf") || (fileEntryUrl.substr(-5) === ".woff")
+	    || (fileEntryUrl.substr(-4) === ".OTF") || (fileEntryUrl.substr(-5) === ".WOFF")) {
 		if (window.g_uid_hashed == null) {
-			var digest = window.Crypto.SHA1(uid);
-                        var digestBytes = window.Crypto.SHA1(uid.trim(), { asBytes: true });
-                        var digestString = window.Crypto.SHA1(uid, { asString: true });
+			var utf8_str = encode_utf8(uid.trim());
+                        var digestBytes = window.Crypto.SHA1(utf8_str, { asBytes: true });
 			window.g_uid_hashed = digestBytes; // which is it??
-		}
-		// kind of a hack - tecnically should process top-down from encryption.xml but we'll sniff for now
+		}	
 		return fixFonts;
 	}
-	
 	return null;
 }
 

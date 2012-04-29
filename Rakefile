@@ -1,11 +1,7 @@
 # stuff for jasmine
 begin
-  STDOUT.sync = true
-  puts "A"
   require 'jasmine'
-  puts "B"
   load 'jasmine/tasks/jasmine.rake'
-  puts "C"
 rescue LoadError
   task :jasmine do
     abort "Jasmine is not available. In order to run jasmine, you must: (sudo) gem install jasmine"
