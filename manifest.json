@@ -15,7 +15,7 @@
    },
 
    "minimum_chrome_version": "14",
-   "name": "Readium",
+   "name": "ReadiumAA",
    "permissions": [ 
 	  "contextMenus",
       "tabs",
@@ -29,5 +29,5 @@
     }
   ],
    "options_page": "views/library.html#options",
-   "version": "0.2.3"
+   "version": "0.3.1"
 }

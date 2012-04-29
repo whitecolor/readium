@@ -116,6 +116,7 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		var root = this.get("root_url");
 		var i = this.get("patch_position");
 		var manifest = this.get("manifest");
+		var uid = this.packageDoc.attributes.unique_identifier; // XXX  temp hack - need safer way to retrieve
 		var that = this;
 		
 		if( i === manifest.length) {
@@ -127,7 +128,7 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 					that.set("patch_position", i + 1);
 				}, function() {
 					that.set("failure", "ERROR: unkown problem durring unpacking process");
-				});
+				}, uid);
 		}
 	},
 

@@ -33,6 +33,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		metadata:  { 
 			id: "//def:metadata/dc:identifier",
 			epub_version: "//def:package/@version",
+			unique_identifier: "//def:package/@unique-identifier",
 			title: "//def:metadata/dc:title",
 			author: "//def:metadata/dc:creator",
 			publisher: "//def:metadata/dc:publisher",
