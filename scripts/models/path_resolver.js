@@ -2,11 +2,41 @@
 
 // get rid of webkit prefix
 window.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
-window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder; 
+window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+
+window.g_uid_hashed = null;
 
 function PathResolver(rootPath) {
 	this.baseUrl = new URI(rootPath);
 };
+
+function encode_utf8( s )
+{
+  return unescape( encodeURIComponent( s ) );
+}
+
+// we probably don't want both of these - not sure about x-browser compat of ArrayBuffer WHM
+
+function string2Bin(str) {
+  var result = [];
+  for (var i = 0; i < str.length; i++) {
+    result.push(str.charCodeAt(i)&0xff);
+  }
+  return result;
+}
+
+function string2ArrayBuffer(str){
+    var ba=new ArrayBuffer(str.length);
+    var bytes = new Uint8Array(ba);
+    for(var i=0;i<str.length; i++){
+        bytes[i] = str.charCodeAt(i);
+    }
+    return ba;
+}
+
+function bin2String(array) {
+  return String.fromCharCode.apply(String, array);
+}
 
 PathResolver.prototype.resolve = function(relativePath) {
 	var url = new URI(relativePath);
@@ -21,7 +51,7 @@ var domToString = function(dom) {
 var fixCssLinks = function(content, resolver) {
 
 	// fix import statements to  (unconditionally) have url(...) wrapper
-    content = content.replace(/@import\s+(?:url\()*(.+?)(?:\))*\s*;/g, "@import url\($1\);");
+        content = content.replace(/@import\s+(?:url\()*(.+?)(?:\))*\s*;/g, "@import url\($1\);");
 
 	var beginning = /url\s*\(\s*['"]*\s*/
 	var end = /['"]*\s*\)/
@@ -62,6 +92,40 @@ var fixXhtmlLinks = function(content, resolver) {
 	
 };
 
+var fixFonts = function(content, resolver) {
+      if ((content.indexOf("OTTO") == 0)|| (content.indexOf("wOFF") == 0)) {
+		return content;
+      }
+      else
+      {
+	var prefix = content.slice(0, 1040);
+	var bytes = string2Bin(prefix);
+	var masklen = g_uid_hashed.length;
+	for (var i = 0; i < 1040; i++)
+	{
+		bytes[i] = bytes[i] ^ (g_uid_hashed[i % masklen]);
+	}
+	var results = bin2String(bytes);
+	return results + content.slice(1040);
+      }
+}
+
+var getBinaryFileFixingStrategy = function(fileEntryUrl, uid) {
+	
+	// a hack - tecnically should process top-down from encryption.xml but we'll just sniff for now WHM
+	// does negative substr work in IE? WHM
+	if ((fileEntryUrl.substr(-4) === ".otf") || (fileEntryUrl.substr(-5) === ".woff")
+	    || (fileEntryUrl.substr(-4) === ".OTF") || (fileEntryUrl.substr(-5) === ".WOFF")) {
+		if (window.g_uid_hashed == null) {
+			var utf8_str = encode_utf8(uid.trim());
+                        var digestBytes = window.Crypto.SHA1(utf8_str, { asBytes: true });
+			window.g_uid_hashed = digestBytes; // which is it??
+		}	
+		return fixFonts;
+	}
+	return null;
+}
+
 var getLinkFixingStrategy = function(fileEntryUrl) {
 	if (fileEntryUrl.substr(-4) === ".css" ) {
 		return fixCssLinks;
@@ -75,15 +139,34 @@ var getLinkFixingStrategy = function(fileEntryUrl) {
 		// for now, I think i may need a different strategy for this
 		return fixXhtmlLinks;
 	}
+	
 
 	return null;
 };
 
 
 // this is the brains of the operation here
-var monkeyPatchUrls = function(fileEntryUrl, win, fail) {
-	var entry; 
+var monkeyPatchUrls = function(fileEntryUrl, win, fail, uid) {
+	var entry;
+	var binFixingStrategy;
 	var resolver = new PathResolver(fileEntryUrl);
+
+	var fixBinaryFile = function(content) {
+		content = binFixingStrategy(content, resolver);
+		writeBinEntry(entry, content, win, fail);		
+	};
+	
+        binFixingStrategy = getBinaryFileFixingStrategy(fileEntryUrl, uid);	
+	if (binFixingStrategy != null) {
+		window.resolveLocalFileSystemURL(fileEntryUrl, function(fileEntry) {
+		// capture the file entry in scope
+		entry = fileEntry;
+		readBinEntry(entry, fixBinaryFile, fail);
+	});
+		win();
+		return;
+	}
+	
 	var linkFixingStrategy = getLinkFixingStrategy(fileEntryUrl);
 
 	// no strategy => nothing to do === win :)
@@ -96,12 +179,13 @@ var monkeyPatchUrls = function(fileEntryUrl, win, fail) {
 		content = linkFixingStrategy(content, resolver);
 		writeEntry(entry, content, win, fail);		
 	};
-	
+
 	window.resolveLocalFileSystemURL(fileEntryUrl, function(fileEntry) {
 		// capture the file entry in scope
 		entry = fileEntry;
 		readEntry(entry, fixLinks, fail);
-	});	
+	});
+	
 };
 
 
@@ -114,6 +198,7 @@ var readEntry = function(fileEntry, win, fail) {
        reader.onloadend = function(e) {
          win(this.result);
        };
+       
        reader.readAsText(file);
 
     }, fail);
@@ -139,7 +224,45 @@ var writeEntry = function(fileEntry, content, win, fail) {
 	}, fail);
 };
 
+var readBinEntry = function(fileEntry, win, fail) {
 
+    fileEntry.file(function(file) {
+
+       var reader = new FileReader();
+       reader.onloadend = function(e) {
+         win(this.result);
+       };
+       reader.readAsBinaryString(file);
+    }, fail);
+
+};
+
+
+
+
+var writeBinEntry = function(fileEntry, content, win, fail) {
+	
+	
+	fileEntry.createWriter(function(fileWriter) {
+
+		fileWriter.onwriteend = function(e) {
+			win();
+		};
+
+		fileWriter.onerror = function(e) {
+			fail(e);
+		};
+                var i = content.length;
+		var bb = new BlobBuilder();
+		var ba = string2ArrayBuffer(content);
+		var k = ba.length;
+		bb.append(ba);
+		var blobObj = bb.getBlob('image/jpeg');
+		var j = blobObj.size;
+		fileWriter.write( blobObj );
+
+	}, fail);
+};
 
 
 
