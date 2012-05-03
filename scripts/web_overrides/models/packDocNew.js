@@ -331,24 +331,29 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 });
 
+
 function opfToJSON(opf) {
-    p = MiniXMLParser(opf);
+    p = MiniXMLQuery(opf);
 
     result = {
         'metadata': {
-        	id: p.text('identifier'),
+        	id: p.text('metadata/identifier'),
 			epub_version: p.attr('package', 'version'),
-			title: p.text('title'),
-			author: p.text('creator'),
-			publisher: p.text('publisher'),
-			description: p.text('description'),
-			rights: p.text('rights'),
-			language: p.text('language'),
-			pubdate: p.text('date'),
-			modified_date: p.textByAttrValue('meta', 'property', 'dcterms:modified'),
-			layout: p.textByAttrValue('meta', 'property', 'rendition:layout'),
-			spread: p.textByAttrValue('meta', 'property', 'rendition:spread'),
-			orientation: p.textByAttrValue('meta', 'property', 'rendition:orientation'),
+			title: p.text('metadata/title'),
+			author: p.text('metadata/creator'),
+			publisher: p.text('metadata/publisher'),
+			description: p.text('metadata/description'),
+			rights: p.text('metadata/rights'),
+			language: p.text('metadata/language'),
+			pubdate: p.text('metadata/date'),
+			modified_date: p.textByAttrValue('metadata/meta', 
+			    'property', 'dcterms:modified'),
+			layout: p.textByAttrValue('metadata/meta', 
+			    'property', 'rendition:layout'),
+			spread: p.textByAttrValue('metadata/meta', 
+			    'property', 'rendition:spread'),
+			orientation: p.textByAttrValue('metadata/meta', 
+			    'property', 'rendition:orientation'),
 			//ncx: p.attr('spine', 'toc')
         },
         'manifest': [],
@@ -356,7 +361,7 @@ function opfToJSON(opf) {
         'bindings': [],
     }
     
-    p.each('item', function (i, node) {
+    p.each('manifest/item', function (node) {
         result.manifest.push({
             id : node.attr('id'),
             href : node.attr('href'),
@@ -365,40 +370,60 @@ function opfToJSON(opf) {
         });
     });
     
-    p.each('itemref', function (i, node) {
+    p.each('spine/itemref', function (node) {
         result.spine.push({
             idref : node.attr('idref'),
             properties : node.attr('properties'),
         });
     });
     
-    p.each('mediaType', function (i, node) {
+    p.each('bindings/mediaType', function (node) {
         result.spine.push({
             handler : node.attr('handler'),
             media_type : node.attr('media-type'),
         });
     });
     
-    return result;
+    return result
 }
 
-function MiniXMLParser(xmlDoc) {
+
+function MiniXMLQuery(xmlDoc) {
     
     this.xmlDoc = xmlDoc
     
-    this.get = function (elements) {
-        if (elements === '') {
-            return new Array(this.xmlDoc)
+    this.checkParents = function (element, parents) {
+        if (parents.length == 0) {
+            return true;
+        } else {
+            var parent = element.parentNode
+            if (parent && parent.nodeName === parents.pop()) {
+                return this.checkParents(parent, parents)
+            } else {
+                return false
+            }
         }
-        else {
-            return this.xmlDoc.getElementsByTagName(elements)
+    }
+    
+    this.get = function (elements) {
+        var path = elements.split('/')
+        if (path.length === 1 && path[0] === '') {
+            return new Array(this.xmlDoc)
+        } else { 
+            var result = []
+            var el = this.xmlDoc.getElementsByTagName(_.last(path))
+            _.each(el, function (e) {
+                if (this.checkParents(e, path.slice(0, -1)))
+                    result.push(e)
+            });
+            return result
         }
     },
     
     this.text = function (elements) {
         try {
             var result = '';
-            $.each(this.get(elements), function(i, e) {
+            _.each(this.get(elements), function(e, i) {
                 if (i > 0) result += ", "
                 result += e.textContent
             });
@@ -414,7 +439,7 @@ function MiniXMLParser(xmlDoc) {
             attribute = elements
             elements = ''
         }
-        $.each(this.get(elements), function(i, e) {
+        _.each(this.get(elements), function(e, i) {
             var attr = e.attributes.getNamedItem(attribute)
             if (attr) {
                 result = attr.value
@@ -426,20 +451,20 @@ function MiniXMLParser(xmlDoc) {
     
     this.textByAttrValue = function (element, attribute, value) {
         var result = ''
-        $.each(this.get(element), function(i, e) {
+        _.each(this.get(element), function(e, i) {
             var attr = e.attributes.getNamedItem(attribute)
             if (attr && attr.value === value) {
                 result = e.textContent
             }
         });
-        return result;
+        return result
     }
     
     this.each = function (element, func) {
-        $.each(this.get(element), function (i, e) {
-            func(i, MiniXMLParser.apply(Object(), [e]));
+        _.each(this.get(element), function (e, i) {
+            func(MiniXMLQuery.apply(Object(), [e], i));
         });
     }
     
-    return this;
+    return this
 }
