@@ -94,15 +94,19 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
       		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
 		}
 		
-		Jath.resolver = function( prefix ) {
-    		var mappings = { 
-	    		def: "http://www.idpf.org/2007/opf",
-    			dc: "http://purl.org/dc/elements/1.1/"
-    		};
-    		return mappings[ prefix ];
-		}
+		if (xmlDom.evaluate) {
+		    Jath.resolver = function( prefix ) {
+        		var mappings = { 
+	        		def: "http://www.idpf.org/2007/opf",
+        			dc: "http://purl.org/dc/elements/1.1/"
+        		};
+        		return mappings[ prefix ];
+		    }
 
-		json = Jath.parse( this.jath_template, xmlDom);
+		    json = Jath.parse( this.jath_template, xmlDom);
+		} else {
+		    json = opfToJSON(xmlDom)
+		}
 
 		// try to find a cover image
 		cover = this.getCoverHref(xmlDom);
@@ -113,6 +117,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			json.metadata.fixed_layout = true;
 		}
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
+		
 		return json;
 	},
 
@@ -325,3 +330,116 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	}
 
 });
+
+function opfToJSON(opf) {
+    p = MiniXMLParser(opf);
+
+    result = {
+        'metadata': {
+        	id: p.text('identifier'),
+			epub_version: p.attr('package', 'version'),
+			title: p.text('title'),
+			author: p.text('creator'),
+			publisher: p.text('publisher'),
+			description: p.text('description'),
+			rights: p.text('rights'),
+			language: p.text('language'),
+			pubdate: p.text('date'),
+			modified_date: p.textByAttrValue('meta', 'property', 'dcterms:modified'),
+			layout: p.textByAttrValue('meta', 'property', 'rendition:layout'),
+			spread: p.textByAttrValue('meta', 'property', 'rendition:spread'),
+			orientation: p.textByAttrValue('meta', 'property', 'rendition:orientation'),
+			//ncx: p.attr('spine', 'toc')
+        },
+        'manifest': [],
+        'spine': [],
+        'bindings': [],
+    }
+    
+    p.each('item', function (i, node) {
+        result.manifest.push({
+            id : node.attr('id'),
+            href : node.attr('href'),
+            media_type : node.attr('media-type'),
+            properties : node.attr('properties'),
+        });
+    });
+    
+    p.each('itemref', function (i, node) {
+        result.spine.push({
+            idref : node.attr('idref'),
+            properties : node.attr('properties'),
+        });
+    });
+    
+    p.each('mediaType', function (i, node) {
+        result.spine.push({
+            handler : node.attr('handler'),
+            media_type : node.attr('media-type'),
+        });
+    });
+    
+    return result;
+}
+
+function MiniXMLParser(xmlDoc) {
+    
+    this.xmlDoc = xmlDoc
+    
+    this.get = function (elements) {
+        if (elements === '') {
+            return new Array(this.xmlDoc)
+        }
+        else {
+            return this.xmlDoc.getElementsByTagName(elements)
+        }
+    },
+    
+    this.text = function (elements) {
+        try {
+            var result = '';
+            $.each(this.get(elements), function(i, e) {
+                if (i > 0) result += ", "
+                result += e.textContent
+            });
+            return result;
+        } catch (err) {
+            return ''
+        }
+    },
+    
+    this.attr = function (elements, attribute) {
+        var result = ''
+        if (arguments.length == 1) {
+            attribute = elements
+            elements = ''
+        }
+        $.each(this.get(elements), function(i, e) {
+            var attr = e.attributes.getNamedItem(attribute)
+            if (attr) {
+                result = attr.value
+                return false
+            }
+        });
+        return result
+    },
+    
+    this.textByAttrValue = function (element, attribute, value) {
+        var result = ''
+        $.each(this.get(element), function(i, e) {
+            var attr = e.attributes.getNamedItem(attribute)
+            if (attr && attr.value === value) {
+                result = e.textContent
+            }
+        });
+        return result;
+    }
+    
+    this.each = function (element, func) {
+        $.each(this.get(element), function (i, e) {
+            func(i, MiniXMLParser.apply(Object(), [e]));
+        });
+    }
+    
+    return this;
+}
