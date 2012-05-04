@@ -10,7 +10,10 @@
 #   - lib/source2.js
 #   - dist/**/*.js
 #
+# NOTE: THIS FILE MUST BE LOADED BEFORE ALL OTHERS!!!
+# spec/javascripts/test_namespace.js
 src_files:
+  - spec/javascripts/test_namespace.js
   - lib/mock-ajax.js
   - lib/jquery-1.7.1.min.js
   - lib/underscore.min.js
