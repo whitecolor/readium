@@ -104,7 +104,7 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 				that.trigger("extraction_success");
 			},
 			failure: function() {
-				that.set("failure", "ERROR: unkown problem during unpacking process");
+				that.set("failure", "ERROR: unknown problem during unpacking process");
 			}
 		});
 	},
@@ -127,7 +127,7 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 			monkeyPatchUrls(root + "/" + manifest[i], function() {
 					that.set("patch_position", i + 1);
 				}, function() {
-					that.set("failure", "ERROR: unkown problem durring unpacking process");
+					that.set("failure", "ERROR: unknown problem during unpacking process");
 				}, uid);
 		}
 	},
