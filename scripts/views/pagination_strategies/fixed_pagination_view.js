@@ -8,7 +8,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		//this.model.on("first_render_ready", this.render, this);
-		//this.model.on("change:two_up", this.setUpMode, this);
+		this.model.on("change:two_up", this.setUpMode, this);
 	},
 
 	render: function() {
