@@ -110,10 +110,10 @@ html, body {
 
 	#spine-divider {
 	    position: absolute;
-	    top: 40px;
+	    top: 11px;
 	    left: 50%;
-	    height:87%;
-	    margin: 2% 0;
+	    height: 87%;
+	    margin: 0;
 	    width: 1px;
 	    @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));
 		display: none;

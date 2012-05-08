@@ -3,10 +3,10 @@ Syntax error: Undefined mixin 'box-shadow'.
         on line 118 of css/sass/readium_paginator.scss, in `box-shadow'
         from line 118 of css/sass/readium_paginator.scss
 
-113: 	    top: 40px;
+113: 	    top: 11px;
 114: 	    left: 50%;
-115: 	    height:87%;
-116: 	    margin: 2% 0;
+115: 	    height: 87%;
+116: 	    margin: 0;
 117: 	    width: 1px;
 118: 	    @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));
 119: 		display: none;
@@ -88,4 +88,4 @@ css/sass/readium_paginator.scss:118
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 118 of css/sass/readium_paginator.scss, in `box-shadow'\A         from line 118 of css/sass/readium_paginator.scss\A \A 113: 	    top: 40px;\A 114: 	    left: 50%;\A 115: 	    height:87%;\A 116: 	    margin: 2% 0;\A 117: 	    width: 1px;\A 118: 	    @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));\A 119: 		display: none;\A 120: 		background-color: #444;\A 121: 		opacity: 0.6;\A 122: 		z-index: 10;\A 123: 	}"; }
+  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 118 of css/sass/readium_paginator.scss, in `box-shadow'\A         from line 118 of css/sass/readium_paginator.scss\A \A 113: 	    top: 11px;\A 114: 	    left: 50%;\A 115: 	    height: 87%;\A 116: 	    margin: 0;\A 117: 	    width: 1px;\A 118: 	    @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));\A 119: 		display: none;\A 120: 		background-color: #444;\A 121: 		opacity: 0.6;\A 122: 		z-index: 10;\A 123: 	}"; }
