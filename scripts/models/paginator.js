@@ -8,39 +8,44 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		this.model = this.get("book");
 		
 		// keep track of which direction we are moving through the publication
-		this.model.packageDocument.on("increased:spine_position", function() {
-			this.renderToLastPage = false;
-
-			if(this.rendered_spine_positions.indexOf(this.model.get("spine_position"))  > -1) {
-				var sp = this.rendered_spine_positions[this.rendered_spine_positions.length - 1] + 1;
-				if(sp <  this.model.packageDocument.get("spine").length) {
-					this.model.packageDocument.set("spine_position", sp );	
-				}
-			}
-			else {
-				this.model.spinePositionChangedHandler();		
-			}
-			
-		}, this);
-		this.model.packageDocument.on("decreased:spine_position", function() {
-			this.renderToLastPage = true;
-			if(this.rendered_spine_positions.indexOf(this.model.packageDocument.get("spine_position"))  > -1) {
-				var sp = this.rendered_spine_positions[0] - 1;
-				if(sp >= 0) {
-					this.model.packageDocument.set("spine_position", sp);	
-				}
-			}
-			else {
-				this.model.spinePositionChangedHandler();	
-			}
-			
-		}, this);
+		this.model.packageDocument.on("increased:spine_position", this.increasedSpinePosHandler, this);
+		this.model.packageDocument.on("decreased:spine_position", this.decreasedSpinePosHandler, this);
 
 		// whenever current content changes it means, the spine item has been changed
 		// and it is loaded up and ready to go
 		this.model.on("change:current_content", this.renderSpineItem, this);
 
 	},
+
+	increasedSpinePosHandler: function() {
+		this.renderToLastPage = false;
+
+		if(this.rendered_spine_positions.indexOf(this.model.get("spine_position"))  > -1) {
+			var sp = this.rendered_spine_positions[this.rendered_spine_positions.length - 1] + 1;
+			if(sp <  this.model.packageDocument.get("spine").length) {
+				this.model.packageDocument.set("spine_position", sp );	
+			}
+		}
+		else {
+			this.model.spinePositionChangedHandler();		
+		}
+		
+	},
+
+	decreasedSpinePosHandler: function() {
+		this.renderToLastPage = true;
+		if(this.rendered_spine_positions.indexOf(this.model.packageDocument.get("spine_position"))  > -1) {
+			var sp = this.rendered_spine_positions[0] - 1;
+			if(sp >= 0) {
+				this.model.packageDocument.set("spine_position", sp);	
+			}
+		}
+		else {
+			this.model.spinePositionChangedHandler();	
+		}
+		
+	},
+
 
 	// determine what the current spine item is and render it out
 	renderSpineItem: function(renderToLast) {
@@ -50,7 +55,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			// the current spine position is already rended
 			return;
 		}
-		// we are going to clear everything out so start from scratch
+		// we are going to clear everything out and start from scratch
 		this.rendered_spine_positions = [];
 
 
@@ -65,7 +70,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			var i = 1; // we have added one so far
 
 			while( this.shouldPreRender(book.packageDocument.currentSpineItem(i)) ) {
-				this.v.addPage(book.getCurrentSection(i), i);
+				this.v.addPage(book.getCurrentSection(i), i + 1);
 				this.rendered_spine_positions.push(spine_position + i);
 				i += 1;
 			}

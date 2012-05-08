@@ -186,13 +186,16 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 	},
 
 	defaults: {
-		fixed_layout: false,
-		open_to_spread: false,
-		cover_href: '/images/library/missing-cover-image.png',
-		created_at: new Date(),
-		updated_at: new Date(),
+		fixed_layout: false, // default to fixed layout or reflowable format
+		apple_fixed: false, // is this file Apple's spec
+		open_to_spread: false, // specific to Apple, should two up be allowed?
+		cover_href: '/images/library/missing-cover-image.png', // default to no cover image
+		created_at: new Date(), // right now
+		updated_at: new Date(), // right now
 	},
 
+	// Apple created its own fixed layout spec for ibooks.
+	// this function parses the metadata used by this spec
 	parseIbooksDisplayOptions: function(content) {
 		var parseBool = function(string) {
 			return string.toLowerCase().trim() === 'true';	
@@ -203,7 +206,8 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 		var openToSpread = xmlDoc.getElementsByName("open-to-spread")[0];
 		this.set({
 			fixed_layout: ( fixedLayout && parseBool(fixedLayout.textContent) ),
-			open_to_spread: ( openToSpread && parseBool(openToSpread.textContent) )
+			open_to_spread: ( openToSpread && parseBool(openToSpread.textContent) ),
+			apple_fixed: true
 		})
 	},
 

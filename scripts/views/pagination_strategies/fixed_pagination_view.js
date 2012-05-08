@@ -50,22 +50,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		
 	},
 
-	setUpMode: function() {
-		// call super
-		Readium.Views.PaginationViewBase.prototype.setUpMode.call(this);
-		var two_up = this.model.get("two_up");
-		var height = this.model.get("meta_height");
-		var width = this.model.get("meta_width");
-		if(two_up) {
-			var content = this.empty_template({page_num: 0, height: height, width: width});
-			//this.$('#container').prepend(content);
-		} else {
-			$('#page-0').remove();
-		}
-	},
-
 	renderPages: function() {
-		
 		// lost myself in the complexity here but this seems right
 		this.changePage();
 		return this;

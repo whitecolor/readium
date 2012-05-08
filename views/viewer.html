@@ -148,7 +148,7 @@
 
 		<!-- templates -->
 		<script type="text/template" id='reflowing-page-template'>
-			<div id="page-<%= page_num %>" class="page-wrap <%= (page_num % 2 === 0) ? "even" : "odd" %>">
+			<div id="page-<%= page_num %>" class="page-wrap <%= (page_num % 2 === 0) ? "left" : "right" %>">
 				<div class="page-margin">
 					<% if(!empty) { %>
 					<div class="page"></div>
@@ -158,7 +158,7 @@
 		</script>
 
 		<script type="text/template" id='fixed-page-template'>
-			<div id="page-<%= page_num %>" class="fixed-page-wrap <%= (page_num % 2 === 0) ? "even" : "odd" %>">
+			<div id="page-<%= page_num %>" class="fixed-page-wrap <%= page_class %>">
 				<div class="fixed-page-margin">
 
 					<iframe scrolling="no" 

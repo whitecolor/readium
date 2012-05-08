@@ -220,6 +220,10 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
+	// when the spine position changes we need to update the
+	// state of this, this involes setting attributes that reflect
+	// the current section's url and content etc, and then we need
+	// to persist the position in a cookie
 	spinePositionChangedHandler: function() {
 		var that = this;
 		var sect = this.packageDocument.currentSection();
@@ -235,34 +239,75 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			})
 		});
 		
-
 		// save the position
 		this.savePosition();
 	},
 
-	buildSectionJSON: function(manifest_item) {
+	// this method creates the JSON representation of a manifest item
+	// that is used to render out a page view.
+	buildSectionJSON: function(manifest_item, spine_index) {
 		if(!manifest_item) {
 			return null;
 		}
-		var section = {};
+		var section = Object.create(null);
 		section.width = this.get("meta_width") || 0;
 		section.height = this.get("meta_height") || 0;
 		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
-
+		section.page_class = this.getPositionClass(manifest_item, spine_index);
 		return section;
+	},
+
+	// when rendering fixed layout pages we need to determine whether the page
+	// should be on the left or the right in two up mode, options are:
+	// 	left_page: 		render on the left side
+	//	right_page: 	render on the right side
+	//	center_page: 	always center the page horizontally
+	getPositionClass: function(manifest_item, spine_index) {
+
+		if(this.get("apple_fixed")) {
+			// the logic for apple fixed layout is a little different:
+			if(!this.get("open_to_spread")) {
+				// page spread is disabled for this book
+				return	"center_page"
+			}
+			else if(spine_index === 0) {
+				// for ibooks, odd pages go on the right. This means
+				// the first page (0th index) will always be on the right
+				// without a left counterpart, so center it
+				return "center_page";
+			}
+			else if (spine_index % 2 === 1 && 
+				spine_index === this.packageDocument.get("spine").length ) {
+
+				// if the last spine item in the book would be on the left, then
+				// it would have no left counterpart, so center it
+				return "center_page";
+			}
+			else {
+				// otherwise first page goes on the right, and then alternate
+				// left - right - left - right etc
+				return (spine_index % 2 === 0 ? "right_page" : "left_page");
+			}
+		}
+		else {
+			return (spine_index % 2 === 0 ? "right_page" : "left_page");
+		}
 	},
 
 	getAllSections: function() {
 		var spine = this.packageDocument.getResolvedSpine();
 		var sections = [];
 		for(var i = 0; i < spine.length; i++) {
-			sections.push(this.buildSectionJSON( spine[i] ));
+			sections.push(this.buildSectionJSON( spine[i], i ));
 		}
 		return sections;
 	},
 
 	getCurrentSection: function(i) {
-		return this.buildSectionJSON(this.packageDocument.currentSection(i));
+		// i is an optional arg, if it was not passed in default to 0
+		i = i || 0; 
+		var spine_index = i + this.packageDocument.get("spine_position");
+		return this.buildSectionJSON(this.packageDocument.currentSection(i), spine_index);
 	},
 
 

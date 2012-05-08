@@ -45,6 +45,9 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		var that = this;
 		var abs_path = this.base_dir_name + "/" + rel_path;
 
+		// If we get passed an APPLE FIXED LAYOUT metadata we need to 
+		// parse it before we write it out. Note, we do not parse this file
+		// again when we open the book
 		if(rel_path.indexOf(this.DISPLAY_OPTIONS) >= 0) {
 			if(typeof content === "string") {
 				this.packageDoc.parseIbooksDisplayOptions(content);
@@ -52,7 +55,7 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 			else {
 				this.readEntryByShortName(this.DISPLAY_OPTIONS, function(data) {
 					that.packageDoc.parseIbooksDisplayOptions(data);
-				})
+				});
 			}
 		}
 
@@ -87,6 +90,8 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		}
 	},
 
+	// remove all the callback handlers attached to
+	// events that might be registered on this
 	removeHandlers: function() {
 		this.off();
 	},
