@@ -34,12 +34,16 @@
 		width: 50%;
 	}
 
-	.fixed-page-wrap.odd { 
+	.fixed-page-wrap.right_page { 
 		left: 50%;
 	}
 
-	.fixed-page-wrap.even { 
+	.fixed-page-wrap.left_page  { 
 		left: 0%;
+	}
+
+	.fixed-page-wrap.center_page  { 
+		z-index: 11;
 	}
 
 }

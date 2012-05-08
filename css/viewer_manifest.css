@@ -213,10 +213,12 @@ html, body {
 
 .two-up .fixed-page-wrap {
   width: 50%; }
-.two-up .fixed-page-wrap.odd {
+.two-up .fixed-page-wrap.right_page {
   left: 50%; }
-.two-up .fixed-page-wrap.even {
+.two-up .fixed-page-wrap.left_page {
   left: 0%; }
+.two-up .fixed-page-wrap.center_page {
+  z-index: 11; }
 
 body.apple-fixed-layout {
   height: 100%;
