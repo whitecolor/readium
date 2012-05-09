@@ -83,19 +83,19 @@ html, body {
 		width: 50%;
 	}
 
-	.page-wrap.odd {
+	.page-wrap.right {
 		left: 50%;
 	}
 
-	.page-wrap.even {
+	.page-wrap.left {
 		left: 0;
 	}
 
-	.odd, .even .page-margin {
+	.right, .left .page-margin {
 		float: right;
-	}
+	} 
 
-	.even, .odd .page-margin {
+	.left, .right .page-margin {
 		float: left;
 	}
 

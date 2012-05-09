@@ -154,13 +154,13 @@ html, body {
 /* Style declarations for two up mode */
 .two-up .page-wrap {
   width: 50%; }
-.two-up .page-wrap.odd {
+.two-up .page-wrap.right {
   left: 50%; }
-.two-up .page-wrap.even {
+.two-up .page-wrap.left {
   left: 0; }
-.two-up .odd, .two-up .even .page-margin {
+.two-up .right, .two-up .left .page-margin {
   float: right; }
-.two-up .even, .two-up .odd .page-margin {
+.two-up .left, .two-up .right .page-margin {
   float: left; }
 .two-up .page-margin {
   width: 90%;
