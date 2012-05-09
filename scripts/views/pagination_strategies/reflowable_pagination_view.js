@@ -126,6 +126,75 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.changePage();
 	},
 
+	goToHashFragment: function() {
+		var fragment = this.model.get("hash_fragment");
+		if(!fragment) {
+			// false alarm
+			return;
+		}
+		console.log("attempting to find " + fragment);
+		var page = this.findHashFragment(fragment);
+		if(typeof page === "number") {
+			console.log("the fragment is on page " + page);
+			this.model.goToPage(page);
+		}
+		else {
+			// we didn't find the fragment so give up
+			console.log("could not find the frag");
+		}
+		// reset the fragment so that it will trigger events again
+		this.model.set("hash_fragment", null);
+	},
+
+	findHashFragment: function(frag) {
+		// find the page number that contains the element
+		// identified by the fragment:
+		var el = $("#" + frag);
+		if(el.length !== 1) {
+			// we aren't set up for this, fail fast
+			return null;
+		}
+		// so far we are getting better resolution by considering
+		// the first child
+		if(el.children().length > 0) {
+			el = el.children()[0];
+		}
+		else {
+			el = el[0];	
+		}
+		
+
+		// find out where it is rendered on the page
+		var pos = el.getBoundingClientRect().left;
+
+		// now wiggle the pages one by one and see if the 
+		// element wiggles:
+		var pages = $('.page-wrap');
+		var numPages = pages.length;
+		var reset;
+		var wigglePos;
+		for(var i = 0; i < numPages; i++) {
+			// get the original position of the page
+			reset = pages[i].style.left || 0;
+			// wiggle the page
+			pages[i].style.left = 100;
+			// get the position of the el of interest
+			wigglePos = el.getBoundingClientRect().left;
+			// move the page back
+			pages[i].style.left = 0;
+
+			if(wigglePos - pos > 10) {
+				// the element wiggled we found it
+				return i + 1; // NOTE: PAGE NUMBERS ARE 1 INDEXED
+			}
+
+		}
+
+		// we didn't find the page
+		return null;
+
+	}
+
 	
 
 	// decide if should open in two up based on viewport

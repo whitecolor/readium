@@ -179,7 +179,23 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	goToHref: function(href) {
-		this.packageDocument.goToHref(href);
+		// URL's with hash fragments require special treatment, so
+		// firs thing is to split off the hash frag from the reset
+		// of the url:
+		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
+
+		// handle the base url first:
+		if(splitUrl[1]) {
+			this.packageDocument.goToHref(splitUrl[1]);
+		}
+
+		// now try to handle the fragment if there was one,
+		if(splitUrl[2]) {
+			// just set observable property to broadcast event
+			// to anyone who cares
+			this.set({hash_fragment: splitUrl[2]});
+		}
+		
 	},
 
 	changPageNumber: function(num) {

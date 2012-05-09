@@ -11,6 +11,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	initialize: function(options) {
 		this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:font_size", this.setFontSize, this);
+		this.model.on("change:hash_fragment", this.goToHashFragment, this);
 		this.bindingTemplate = _.template( $('#binding-template').html() );
 	},
 
@@ -23,6 +24,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		// remove any listeners registered on the model
 		this.model.off("change:current_page", this.changePage);
 		this.model.off("change:font_size", this.setFontSize);
+		this.model.off("change:hash_fragment", this.goToHashFragment);
 		this.resetEl();
 	},
 
@@ -38,6 +40,11 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		} else {
 			this.model.goToHref(href);
 		}
+	},
+
+	goToHashFragment: function() {
+		// stub this in to the super class as a no-op for now
+		// just to prevent "no method error"s
 	},
 
 	getBindings: function() {
