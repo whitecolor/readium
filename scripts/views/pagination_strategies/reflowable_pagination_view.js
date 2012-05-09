@@ -14,6 +14,21 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	},
 
+	// sometimes these views hang around in memory before
+	// the GC's get them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+		console.log("Reflowing paginator destructor called");
+
+		// call the super constructor
+		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+
+		// remove any listeners registered on the model
+		this.model.off("repagination_event", this.renderPages);
+		//this.model.off("change:current_content", this.render);
+		this.model.off("change:two_up", this.renderPages);
+	},
+
 	render: function(goToLastPage) {
 		this.resetEl();
 		var htmlText = this.model.get("current_content");

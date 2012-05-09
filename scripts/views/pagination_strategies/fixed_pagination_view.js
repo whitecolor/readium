@@ -11,6 +11,19 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.model.on("change:two_up", this.setUpMode, this);
 	},
 
+	// sometimes these views hang around in memory before
+	// the GC's get them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+		console.log("Fixed paginator destructor called");
+
+		// call the super constructor
+		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+
+		// remove any listeners registered on the model
+		this.model.off("change:two_up", this.setUpMode);
+	},
+
 	render: function() {
 
 		$('body').addClass('apple-fixed-layout');
@@ -24,11 +37,11 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.$('#container').html("");
 
 		// add the current section
-		this.addPage( this.model.getCurrentSection(), 1 );
-		currentPage = this.model.set("current_page", [1]);
+		//this.addPage( this.model.getCurrentSection(), 1 );
+		//currentPage = this.model.set("current_page", [1]);
 		setTimeout(function() {
 			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
-		}, 10)
+		}, 1)
 		return this.renderPages();
 	},
 
@@ -46,7 +59,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
 		});
-		this.changePage();
+		//this.changePage();
 		
 	},
 

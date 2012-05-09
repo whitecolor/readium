@@ -14,6 +14,18 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.bindingTemplate = _.template( $('#binding-template').html() );
 	},
 
+	// sometimes these views hang around in memory before
+	// the GC's get them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+		console.log("Pagination base destructor called");
+
+		// remove any listeners registered on the model
+		this.model.off("change:current_page", this.changePage);
+		this.model.off("change:font_size", this.setFontSize);
+		this.resetEl();
+	},
+
 	// handle  clicks of anchor tags by navigating to
 	// the proper location in the epub spine, or opening
 	// a new window for external links
@@ -163,7 +175,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	changePage: function() {
 		var that = this;
 		var currentPage = this.model.get("current_page");
-		var two_up = this.model.get("two_up")
+		var two_up = this.model.get("two_up");
 		this.$(".page-wrap").each(function(index) {
 			if(!two_up) { 
 				index += 1;
@@ -201,6 +213,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     resetEl: function() {
     	$('body').removeClass("apple-fixed-layout");
     	$("#readium-book-view-el").attr("style", "");
+		this.$el.toggleClass("two-up", false);
+		this.$('#spine-divider').toggle(false);
+
     	this.replaceContent("");
     	$('#page-wrap').css({
     		"position": "relative",

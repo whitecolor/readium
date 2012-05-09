@@ -123,6 +123,10 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		}
 		return spine;
 	},
+
+	paginateBackwards: function(xmlDom) {
+		return $('spine', xmlDom).attr('page-progression-direction') === "ltr";
+	},
 	
 	parse: function(xmlDom) {
 		var json;
@@ -142,6 +146,9 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		}
 
 		json = Jath.parse( this.jath_template, xmlDom);
+
+		// parse the page-progression-direction if it is present
+		json.paginate_backwards = this.paginateBackwards(xmlDom);
 
 		// try to find a cover image
 		cover = this.getCoverHref(xmlDom);
@@ -192,6 +199,7 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 		cover_href: '/images/library/missing-cover-image.png', // default to no cover image
 		created_at: new Date(), // right now
 		updated_at: new Date(), // right now
+		paginate_backwards: false,
 	},
 
 	// Apple created its own fixed layout spec for ibooks.

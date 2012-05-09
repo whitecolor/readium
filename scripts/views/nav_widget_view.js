@@ -4,6 +4,7 @@ Readium.Views.NavWidgetView = Backbone.View.extend({
 
 	initialize: function() {
 		this.model.on("change:two_up", this.render, this);
+		this.model.on("change:can_two_up", this.render, this);
 		this.model.on("change:full_screen", this.render, this);
 		setTimeout(function() {
 			$('#settings').addClass('hover-fade')
@@ -17,6 +18,7 @@ Readium.Views.NavWidgetView = Backbone.View.extend({
 		this.$('#from-fs-icon').toggle( ebook.get("full_screen") );
 		this.$('#two-up-icon').toggle( !ebook.get("two_up") );
 		this.$('#one-up-icon').toggle( ebook.get("two_up") );
+	//	this.$('#two-up-button').toggle( ebook.get("can_two_up") );   <= todo restyle
 	},
 
 	events: {

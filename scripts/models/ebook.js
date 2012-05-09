@@ -26,28 +26,31 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"full_screen": false,
     	"toolbar_visible": true,
     	"toc_visible": false,
+    	"can_two_up": true,
   	},
 
 	toggleTwoUp: function() {
-		var twoUp = this.get("two_up");
-		var displayed = this.get("current_page");
-		var newPages = [];
-		if(twoUp) {
-			if (displayed[0] === 0) {
-				newPages[0] = 1;
-			} else {
-				newPages[0] = displayed[0];
+		if(this.get("can_two_up")) {
+			var twoUp = this.get("two_up");
+			var displayed = this.get("current_page");
+			var newPages = [];
+			if(twoUp) {
+				if (displayed[0] === 0) {
+					newPages[0] = 1;
+				} else {
+					newPages[0] = displayed[0];
+				}
 			}
-		}
-		else if(displayed[0] % 2 === 0) {
-			newPages[0] = displayed[0];
-			newPages[1] = displayed[0] + 1;
-		}
-		else {
-			newPages[0] = displayed[0] - 1;
-			newPages[1] = displayed[0];
-		}
-		this.set({two_up: !twoUp, current_page: newPages});
+			else if(displayed[0] % 2 === 0) {
+				newPages[0] = displayed[0];
+				newPages[1] = displayed[0] + 1;
+			}
+			else {
+				newPages[0] = displayed[0] - 1;
+				newPages[1] = displayed[0];
+			}
+			this.set({two_up: !twoUp, current_page: newPages});
+		}	
 	},
 
 	toggleFullScreen: function() {
@@ -146,7 +149,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
 		var num = this.get("num_pages");
-		var two_up = this.get("two_up")
+		var two_up = this.get("two_up");
 		if(cp[cp.length - 1] > num) {
 			this.goToLastPage();
 		}

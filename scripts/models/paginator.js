@@ -58,21 +58,33 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		// we are going to clear everything out and start from scratch
 		this.rendered_spine_positions = [];
 
+		// clean up the old view if there is one
+		if(this.v) {
+			this.v.destruct();
+		}
+
 
 		var spineItem = book.packageDocument.currentSpineItem();
 		if(this.shouldRenderAsFixed(spineItem)) {
+			this.should_two_up = book.get("two_up");
+			book.set("two_up", false);
 			this.rendered_spine_positions.push(spine_position);
 			this.v = new Readium.Views.FixedPaginationView({model: book});
 
 			// add any consecutive fixed layout sections
 			this.v.render();
 
-			var i = 1; // we have added one so far
+			var pageNum = 1; // we have added one so far
+			var offset = this.findPrerenderStart();
 
-			while( this.shouldPreRender(book.packageDocument.currentSpineItem(i)) ) {
-				this.v.addPage(book.getCurrentSection(i), i + 1);
-				this.rendered_spine_positions.push(spine_position + i);
-				i += 1;
+			while( this.shouldPreRender(book.packageDocument.currentSpineItem(offset)) ) {
+				this.v.addPage(book.getCurrentSection(offset), pageNum );
+				this.rendered_spine_positions.push(spine_position + offset);
+				pageNum += 1;
+				offset += 1;
+				if(offset === 0) {
+					book.set("current_page", [pageNum]);
+				}
 			}
 		}
 		else {
@@ -80,11 +92,23 @@ Readium.Models.Paginator = Backbone.Model.extend({
 				this.v = new Readium.Views.ScrollingPaginationView({model: book});
 			}
 			else {
+				if(this.should_two_up) {
+					book.set("two_up", true);
+				}
 				this.v = new Readium.Views.ReflowablePaginationView({model: book});
 			}
 			this.v.render(this.renderToLastPage);
 			this.rendered_spine_positions.push(spine_position);
 		}
+	},
+
+	findPrerenderStart: function() {
+		var i = 0;
+		var pd = this.model.packageDocument;
+		while ( this.shouldPreRender(pd.currentSpineItem(i-1)) ) {
+			i -= 1;
+		}
+		return i;
 	},
 
 	shouldRenderAsFixed: function(spineItem) {

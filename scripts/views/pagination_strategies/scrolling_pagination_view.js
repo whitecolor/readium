@@ -6,6 +6,16 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 		this.page_template = _.template( $('#scrolling-page-template').html() );
 	},
 
+	// sometimes these views hang around in memory before
+	// the GC's get them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+		console.log("Scrolling paginator destructor called");
+
+		// call the super destructor
+		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+	},
+
 	render: function() {
 		var that = this;
 		var uri = this.model.get("current_section_url");
