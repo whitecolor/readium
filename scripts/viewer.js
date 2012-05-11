@@ -7,8 +7,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
 		
 		// the book's pages
-		this.paginator = this.model.CreatePaginator();
-		this.paginator.on("toggle_ui", this.toggleUI, this);
+		this.paginator = new Readium.Models.Paginator({book: _book});
 
 		// the little overlay
 		this.navWidget = new Readium.Views.NavWidgetView({model: _book});
@@ -22,14 +21,6 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 		this.addGlobalEventHandlers();
 
-	},
-
-	toggleUI: function() {
-		/*
-		this.uiVisible = !this.uiVisible;
-		$('#top-bar').css("top", (this.uiVisible ? "0px" : "-44px") );
-		$('#settings').toggleClass('hover-fade', !this.uiVisible);
-		*/
 	},
 
 	toggleFullscreen: function() {
@@ -59,11 +50,9 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.toggleUI();
-		var that = this;
-		setTimeout(function() {
-			that.toggleUI();
-		}, 2000);
+		// right now we dont do anything but 
+		// convention is to return this from render
+		return this; 
 	},
 
 	init_toc: function() {

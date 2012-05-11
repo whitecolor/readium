@@ -16,7 +16,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	// sometimes these views hang around in memory before
-	// the GC's get them. we need to remove all of the handlers
+	// the GC gets them. we need to remove all of the handlers
 	// that were registered on the model
 	destruct: function() {
 		console.log("Pagination base destructor called");

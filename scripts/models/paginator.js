@@ -20,11 +20,12 @@ Readium.Models.Paginator = Backbone.Model.extend({
 	increasedSpinePosHandler: function() {
 		this.renderToLastPage = false;
 
-		if(this.rendered_spine_positions.indexOf(this.model.get("spine_position"))  > -1) {
-			var sp = this.rendered_spine_positions[this.rendered_spine_positions.length - 1] + 1;
-			if(sp <  this.model.packageDocument.get("spine").length) {
-				this.model.packageDocument.set("spine_position", sp );	
-			}
+		var spine_pos = this.model.packageDocument.get("spine_position");
+		var page_index = this.rendered_spine_positions.indexOf(spine_pos);
+
+		if(page_index > -1) {
+			this.model.goToPage(page_index + 1);
+			this.model.savePosition();
 		}
 		else {
 			this.model.spinePositionChangedHandler();		
@@ -34,7 +35,9 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 	decreasedSpinePosHandler: function() {
 		this.renderToLastPage = true;
-		if(this.rendered_spine_positions.indexOf(this.model.packageDocument.get("spine_position"))  > -1) {
+		var spine_pos = this.model.packageDocument.get("spine_position");
+
+		if(this.rendered_spine_positions.indexOf(spine_pos)  > -1) {
 			var sp = this.rendered_spine_positions[0] - 1;
 			if(sp >= 0) {
 				this.model.packageDocument.set("spine_position", sp);	
@@ -68,13 +71,13 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		if(this.shouldRenderAsFixed(spineItem)) {
 			this.should_two_up = book.get("two_up");
 			book.set("two_up", false);
-			this.rendered_spine_positions.push(spine_position);
+			//this.rendered_spine_positions.push(spine_position);
 			this.v = new Readium.Views.FixedPaginationView({model: book});
 
 			// add any consecutive fixed layout sections
 			this.v.render();
 
-			var pageNum = 1; // we have added one so far
+			var pageNum = 1; // start from page 1
 			var offset = this.findPrerenderStart();
 
 			while( this.shouldPreRender(book.packageDocument.currentSpineItem(offset)) ) {
@@ -82,10 +85,12 @@ Readium.Models.Paginator = Backbone.Model.extend({
 				this.rendered_spine_positions.push(spine_position + offset);
 				pageNum += 1;
 				offset += 1;
-				if(offset === 0) {
-					book.set("current_page", [pageNum]);
-				}
 			}
+
+			// set the page we should be on
+			var page = this.rendered_spine_positions.indexOf(spine_position) + 1;
+			book.goToPage(page);
+			book.set("pages_are_spine_items", true);
 		}
 		else {
 			if(this.shouldScroll()) {
@@ -99,6 +104,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			}
 			this.v.render(this.renderToLastPage);
 			this.rendered_spine_positions.push(spine_position);
+			book.set("pages_are_spine_items", false);
 		}
 	},
 

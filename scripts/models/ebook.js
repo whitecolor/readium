@@ -2,14 +2,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	initialize: function() {
 		var that = this;
-		this.isFixedLayout = this.get("fixed_layout");
 		this.packageDocument = new Readium.Models.PackageDocument({}, {
 			file_path: this.get("package_doc_path")
 		});
 		//this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.fetch({
 			success: function() {
-				// TODO: restore location here
 				that.packageDocument.set({spine_position: that.restorePostition()});
 				that.packageDocument.trigger("change:spine_position");
 				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
@@ -26,7 +24,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"full_screen": false,
     	"toolbar_visible": true,
     	"toc_visible": false,
-    	"can_two_up": true,
+    	"can_two_up": true
   	},
 
 	toggleTwoUp: function() {
@@ -101,15 +99,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		else {
 			return this.set("current_page", [firstPage, firstPage+1]);
 		}
-	},
-	
-	goToFirstPage: function() {
-		if( this.get("two_up") ) {
-			this.set("current_page", [0,1])
-		}
-		else {
-			this.set("current_page", [1]);
-		} 
 	},
 
 	goToLastPage: function() {
@@ -227,7 +216,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	goToPage: function(page) {
 		if(this.get("two_up")) {
-			if(page % 2 === 0) {
+			if(page % 2 === 0) { // this logic needs to be smartened up
 				this.set("current_page", [page, page + 1]);	
 			}
 			else {
@@ -313,15 +302,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
-	getAllSections: function() {
-		var spine = this.packageDocument.getResolvedSpine();
-		var sections = [];
-		for(var i = 0; i < spine.length; i++) {
-			sections.push(this.buildSectionJSON( spine[i], i ));
-		}
-		return sections;
-	},
-
 	getCurrentSection: function(i) {
 		// i is an optional arg, if it was not passed in default to 0
 		i = i || 0; 
@@ -358,12 +338,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			return {meta_width: pageSize.width, meta_height: pageSize.height};
 		}
 		return null;
-		
-		
-	},
-
-	CreatePaginator: function() {
-    	return new Readium.Models.Paginator({book: this});
-	},
+	}
 	
 });

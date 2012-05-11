@@ -55,7 +55,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 					that.model.goToLastPage();
 				}
 				else {
-					that.model.goToFirstPage();
+					that.model.goToPage(1);
 				}
         	}
 		);
