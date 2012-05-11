@@ -1,5 +1,5 @@
-# @root = File.expand_path(File.dirname(__FILE__), "publish")
-@root = File.expand_path(File.dirname(__FILE__))
+@root = File.expand_path(File.dirname(__FILE__), "publish")
+# @root = File.expand_path(File.dirname(__FILE__))
 
 run Proc.new { |env|
   
