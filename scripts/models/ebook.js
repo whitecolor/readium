@@ -10,7 +10,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			success: function() {
 				that.packageDocument.set({spine_position: that.restorePostition()});
 				that.packageDocument.trigger("change:spine_position");
-				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
+				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
 		this.on("change:num_pages", this.adjustCurrentPage, this);
@@ -103,9 +103,17 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	goToLastPage: function() {
 		var page = this.get("num_pages");
+		goToPage(page);
+	},
 
-		if( this.get("two_up") ) {
-			this.set("current_page", [page-1, page])
+	goToPage: function(page) {
+		if(this.get("two_up")) {
+			if(page % 2 === 0) { // this logic needs to be smartened up
+				this.set("current_page", [page, page + 1]);	
+			}
+			else {
+				this.set("current_page", [page - 1, page]);
+			}
 		}
 		else {
 			this.set("current_page", [page])
@@ -201,20 +209,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				file_path: that.resolvePath(item.get("href")),
 				book: that,
 			});
-		}
-	},
-
-	goToPage: function(page) {
-		if(this.get("two_up")) {
-			if(page % 2 === 0) { // this logic needs to be smartened up
-				this.set("current_page", [page, page + 1]);	
-			}
-			else {
-				this.set("current_page", [page - 1, page]);
-			}
-		}
-		else {
-			this.set("current_page", [page])
 		}
 	},
 
