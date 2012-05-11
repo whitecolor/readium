@@ -53,6 +53,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			href: "@href",
 			media_type: "@media-type",
 			properties: "@properties",
+            media_overlay: "@media-overlay",
 		} ],
 							 
 		spine: [ "//def:itemref", { idref: "@idref", properties: "@properties" } ],
