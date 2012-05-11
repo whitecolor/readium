@@ -22,6 +22,8 @@ describe('packDocNew', function() {
   xmlString += '<item id="Page_1"  href="Page_1.html"  media-type="application/xhtml+xml"/>'
   xmlString += '<item id="Page_2"  href="Page_2.html"  media-type="application/xhtml+xml"/>'
   xmlString += '<item id="Page_3"  href="Page_3.html"  media-type="application/xhtml+xml"/>'
+  xmlString += '<item id="Page_4"  href="Page_4.html" media-overlay="Page_4_MO" media-type="application/xhtml+xml"/>'
+  xmlString += '<item id="Page_4_MO"  href="Page_4_MO.smil" media-type="application/smil+xml"/>'
   xmlString += '<item id="css" href="styles.css" media-type="text/css" />'
   xmlString += '<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />'
   xmlString += '<item id="cover" href="images/cover.jpg" media-type="image/jpeg"/>'
@@ -91,6 +93,12 @@ describe('packDocNew', function() {
     it("it sets properties as empty object if there are none", function() {
       var res = packDoc.parse(dom);
       expect(res.spine[1].properties).toEqual({});
+    });
+    
+    it("parses the media-overlay attribute", function() {
+       var res = packDoc.parse(dom);
+       expect(res.manifest.at(3).media_overlay == "Page_4_MO"); 
+       expect(res.manifest.at(4).media_overlay == "");
     });
   });
 
