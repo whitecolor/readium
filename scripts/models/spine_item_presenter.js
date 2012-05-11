@@ -1,10 +1,8 @@
-Readium.Collections.SpinePresenter = Backbone.Collection.extend({
-
-	model: Readium.Models.ManifestItemPresenter
-
+Readium.Collections.ManifestItems = Backbone.Collection.extend({
+	model: Readium.Models.ManifestItem
 });
 
-Readium.Models.ManifestItemPresenter = Backbone.Model.extend({
+Readium.Models.ManifestItem = Backbone.Model.extend({
 	
 	// this method creates the JSON representation of a manifest item
 	// that is used to render out a page view.
@@ -103,6 +101,10 @@ Readium.Models.ManifestItemPresenter = Backbone.Model.extend({
 			var that = this;
 			
 		}
+	},
+
+	isFixedLayout: function() {
+			
 	}
 	
 });

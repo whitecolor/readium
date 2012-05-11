@@ -396,5 +396,14 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		return null;
 	},
 
+	parse: function(content) {
+		//call super
+		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, content);
+		
+		
+
+		return json;
+	},
+
 
 });
