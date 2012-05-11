@@ -67,8 +67,8 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
                 var src = $(this).attr("src");
                 // broadcast the text properties so that any listeners can do the right thing wrt loading/highlighting text
                 self.set({
-                    current_text_document_url: Readium.Models.MediaOverlay.Utils.stripFragment(src), 
-                    current_text_element_id: Readium.Models.MediaOverlay.Utils.getFragment(src)
+                    current_text_document_url: self.stripFragment(src), 
+                    current_text_element_id: self.getFragment(src)
                 });
             }
         });
@@ -99,6 +99,21 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     },
     setVolume: function(volume) {
         this.audioplayer.setVolume(volume);
+    },
+    
+    getFragment: function(url) {
+        if (url.indexOf("#") != -1 && url.indexOf("#") < url.length -1) {
+            return url.substr(url.indexOf("#")+1);
+        }
+        return "";
+    },
+    stripFragment: function(url) {
+        if (url.indexOf("#") == -1) {
+            return url;
+        }
+        else {
+            return url.substr(0, url.indexOf("#"));
+        }
     }
 });
 
@@ -293,16 +308,16 @@ Readium.Models.MediaOverlay.SmilModel = function() {
         // process audio nodes' clock values
         if (node.tagName == "audio") {
             if ($(node).attr("src") != undefined) {
-                $(node).attr("src", Readium.Models.MediaOverlay.Utils.resolveUrl($(node).attr("src"), url));
+                $(node).attr("src", resolveUrl($(node).attr("src"), url));
             }    
             if ($(node).attr("clipBegin") != undefined) {
-                $(node).attr("clipBegin", Readium.Models.MediaOverlay.Utils.resolveClockValue($(node).attr("clipBegin")));
+                $(node).attr("clipBegin", resolveClockValue($(node).attr("clipBegin")));
             }
             else {
                 $(node).attr("clipBegin", 0);
             }
             if ($(node).attr("clipEnd") != undefined) {
-                $(node).attr("clipEnd", Readium.Models.MediaOverlay.Utils.resolveClockValue($(node).attr("clipEnd")));
+                $(node).attr("clipEnd", resolveClockValue($(node).attr("clipEnd")));
             }
             else {
                 // TODO check if this is reasonable
@@ -316,33 +331,7 @@ Readium.Models.MediaOverlay.SmilModel = function() {
         return true;
     }
     
-};
-
-
-// utility functions
-Readium.Models.MediaOverlay.Utils = {
-    // assume both are full paths
-    isSameDocument: function(url1, url2) {
-        if (url1 == null || url2 == null) {
-            return false;
-        }
-        return Readium.Models.MediaOverlay.Utils.stripFragment(url1) == Readium.Models.MediaOverlay.Utils.stripFragment(url2);
-    },
-    getFragment: function(url) {
-        if (url.indexOf("#") != -1 && url.indexOf("#") < url.length -1) {
-            return url.substr(url.indexOf("#")+1);
-        }
-        return "";
-    },
-    stripFragment: function(url) {
-        if (url.indexOf("#") == -1) {
-            return url;
-        }
-        else {
-            return url.substr(0, url.indexOf("#"));
-        }
-    },
-    resolveUrl: function(url, baseUrl) {
+    function resolveUrl(url, baseUrl) {
         if (url.indexOf("://") != -1) {
             return url;
         }
@@ -352,10 +341,11 @@ Readium.Models.MediaOverlay.Utils = {
             base = baseUrl.substr(0, baseUrl.lastIndexOf("/") + 1);
         }
         return base + url;
-    },
+    }
+    
     // parse the timestamp and return the value in seconds
     // supports this syntax: http://idpf.org/epub/30/spec/epub30-mediaoverlays.html#app-clock-examples
-    resolveClockValue: function(value) {        
+    function resolveClockValue(value) {        
         var hours = 0;
         var mins = 0;
         var secs = 0;
