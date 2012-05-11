@@ -173,6 +173,21 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		return uri.resolve(this.uri_obj).toString();
 	},
 
+	// reslove a relative file path to relative to this the
+	// the path of this pack docs file path
+	resolvePath: function(path) {
+		var suffix;
+		var pack_doc_path = this.file_path;
+		if(path.indexOf("../") === 0) {
+			suffix = path.substr(3);
+		}
+		else {
+			suffix = path;
+		}
+		var ind = pack_doc_path.lastIndexOf("/")
+		return pack_doc_path.substr(0, ind) + "/" + suffix;
+	}
+
 });
 
 /**
@@ -359,15 +374,6 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 				break;
 			}
 		}
-	},
-
-	getResolvedSpine: function() {
-		var spine_length = this.get("spine").length;
-		var res_spine = [];
-		for(var i = 0; i < spine_length; i++) {
-			res_spine.push( this.getManifestItem(i) );
-		}
-		return res_spine;
 	},
 
 	getTocItem: function() {

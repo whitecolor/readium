@@ -121,18 +121,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		Readium.Utils.setCookie(this.get("key"), this.packageDocument.get("spine_position"), 365);
 	},
 
-	// TODO: do move this into package doc class (no sense it being here)
 	resolvePath: function(path) {
-		var suffix;
-		var pack_doc_path = this.packageDocument.file_path;
-		if(path.indexOf("../") === 0) {
-			suffix = path.substr(3);
-		}
-		else {
-			suffix = path;
-		}
-		var ind = pack_doc_path.lastIndexOf("/")
-		return pack_doc_path.substr(0, ind) + "/" + suffix;
+		return this.packageDocument.resolvePath(path);
 	},
 
 	adjustCurrentPage: function() {
