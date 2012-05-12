@@ -99,7 +99,7 @@ Readium.Models.SmilModel = function() {
     // node is the root of the SMIL tree, for example the body node of the DOM
     this.build = function(node) {
         root = node;
-        processTree(node, 0);
+        processTree(node);
     };
     
     // prepare the tree to start rendering from a node
@@ -117,7 +117,8 @@ Readium.Models.SmilModel = function() {
     };
     
     this.findNodeByAttrValue = function(nodename, attr, val) {
-        return $(root).find(nodename + "[" + attr + "='" + val + "']")[0];
+        var res = $(root).find(nodename + "[" + attr + "='" + val + "']");
+        res.length == 0 ? return null : return res[0];
     };
     
     // see what the next audio node is going to be
@@ -207,7 +208,7 @@ Readium.Models.SmilModel = function() {
         }
     }
     
-    // in the future, this will act as a skippability filter
+    // TODO in the future, this will act as a skippability filter
     function canPlayNode(node) {
         return true;
     }

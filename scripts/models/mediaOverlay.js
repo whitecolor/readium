@@ -95,7 +95,11 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         this.audioplayer.resume();        
     },
     findNodeByTextSrc: function(src) {
-        return this.smilModel.findNodeByAttrValue("text", "src", src);
+        var elm = this.smilModel.findNodeByAttrValue("text", "src", src);
+        if (elm == null){
+            elm = this.smilModel.findNodeByAttrValue("seq", "epub:textref", src);
+        }    
+        return elm;
     },
     setVolume: function(volume) {
         this.audioplayer.setVolume(volume);
