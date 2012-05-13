@@ -1,9 +1,69 @@
-Readium.Collections.ManifestItems = Backbone.Collection.extend({
-	model: Readium.Models.ManifestItem
-});
+
 
 Readium.Models.ManifestItem = Backbone.Model.extend({
 	
+
+	getCurrentSection: function(i) {
+		// i is an optional arg, if it was not passed in default to 0
+		i = i || 0; 
+		var spine_index = i + this.packageDocument.get("spine_position");
+		return this.buildSectionJSON(this.packageDocument.currentSection(i), spine_index);
+	},
+
+	parseMetaTags: function() {
+		var parser = new window.DOMParser();
+		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
+		var tag = dom.getElementsByName("viewport")[0];
+		if(tag) {
+			var pageSize = this.parseViewportTag(tag);
+			this.set({"meta_width": pageSize.width, "meta_height": pageSize.height})
+			return {meta_width: pageSize.width, meta_height: pageSize.height};
+		}
+		return null;
+	},
+
+	parseViewportTag: function(viewportTag) {
+		// this is going to be ugly
+		var str = viewportTag.getAttribute('content');
+		str = str.replace(/\s/g, '');
+		var valuePairs = str.split(',');
+		var values = {};
+		var pair;
+		for(var i = 0; i < valuePairs.length; i++) {
+			pair = valuePairs[i].split('=');
+			if(pair.length === 2) {
+				values[ pair[0] ] = pair[1];
+			}
+		}
+		values['width'] = parseFloat(values['width']);
+		values['height'] = parseFloat(values['height']);
+		return values;
+	},
+
+	// when the spine position changes we need to update the
+	// state of this, this involes setting attributes that reflect
+	// the current section's url and content etc, and then we need
+	// to persist the position in a cookie
+	spinePositionChangedHandler: function() {
+		var that = this;
+		var sect = this.packageDocument.currentSection();
+		var path = sect.get("href");
+		var url = this.packageDocument.resolveUri(path);;
+		path = this.resolvePath(path);
+		this.set("current_section_url", url);
+		Readium.FileSystemApi(function(api) {
+			api.readTextFile(path, function(result) {
+				that.set( {content: result} );
+			}, function() {
+				console.log("Failed to load file: " + path);
+			})
+		});
+	},
+	
+});
+
+Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
+
 	// this method creates the JSON representation of a manifest item
 	// that is used to render out a page view.
 	buildSectionJSON: function(manifest_item, spine_index) {
@@ -55,56 +115,18 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 		}
 	},
 
-	getCurrentSection: function(i) {
-		// i is an optional arg, if it was not passed in default to 0
-		i = i || 0; 
-		var spine_index = i + this.packageDocument.get("spine_position");
-		return this.buildSectionJSON(this.packageDocument.currentSection(i), spine_index);
-	},
-
-	parseMetaTags: function() {
-		var parser = new window.DOMParser();
-		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
-		var tag = dom.getElementsByName("viewport")[0];
-		if(tag) {
-			var pageSize = this.parseViewportTag(tag);
-			this.set({"meta_width": pageSize.width, "meta_height": pageSize.height})
-			return {meta_width: pageSize.width, meta_height: pageSize.height};
-		}
-		return null;
-	},
-
-	parseViewportTag: function(viewportTag) {
-		// this is going to be ugly
-		var str = viewportTag.getAttribute('content');
-		str = str.replace(/\s/g, '');
-		var valuePairs = str.split(',');
-		var values = {};
-		var pair;
-		for(var i = 0; i < valuePairs.length; i++) {
-			pair = valuePairs[i].split('=');
-			if(pair.length === 2) {
-				values[ pair[0] ] = pair[1];
-			}
-		}
-		values['width'] = parseFloat(values['width']);
-		values['height'] = parseFloat(values['height']);
-		return values;
-	},
-
-	getCurrentContent: function(cb) {
-		var cc = this.get("current_content");
-		if(cc) {
-			cb(cc);
-		}
-		else {
-			var that = this;
-			
-		}
-	},
-
 	isFixedLayout: function() {
-			
+		debugger;
 	}
-	
+
+});
+
+
+
+Readium.Collections.ManifestItems = Backbone.Collection.extend({
+	model: Readium.Models.ManifestItem
+});
+
+Readium.Collections.Spine = Backbone.Collection.extend({
+	model: Readium.Models.SpineItem
 });

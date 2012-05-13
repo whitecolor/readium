@@ -1,9 +1,3 @@
-Readium.Models.ManifestItem = Backbone.Model.extend({});
-
-Readium.Collections.ManifestItems = Backbone.Collection.extend({
-	model: Readium.Models.ManifestItem,
-});
-
 /**
  * This is root of all PackageDocument subclasses and the EBook class
  * it, contains only the logic for parsing a packagedoc.xml and 
@@ -159,9 +153,31 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(json.metadata.layout === "pre-paginated") {
 			json.metadata.fixed_layout = true;
 		}
-		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
+		json.manifest = new Readium.Collections.ManifestItems(json.manifest)
 		json.spine = this.parseSpineProperties(json.spine);
+		json.res_spine = this.crunchSpine(json.spine, json.manifest);
 		return json;
+	},
+
+
+	// combine the spine item data with the corresponding manifest
+	// data to build useful set of backbone objects
+	crunchSpine: function(spine, manifest) {
+		var bbSpine = new Readium.Collections.Spine(spine);
+		// give it a reference to the package doc
+		bbSpine.PackageDocument = this; 
+		bbSpine.each(function(spineItem) {
+			var manItem = manifest.find(function(x) {
+				if(x.get("id") === spineItem.get("idref")) return x;
+			});
+			if(manItem) {
+				spineItem.set(manItem.attributes);
+			}
+			else {
+				throw "Invalid OPF, a spine item with no manifest item was encountered";
+			}
+		});
+		return bbSpine;
 	},
 
 	reset: function(data) {
@@ -299,7 +315,8 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	defaults: {
 		spine_position: 0
 	},
-
+	
+/* dead code
 	getManifestItem: function(spine_position) {
 		var spine = this.get("spine");
 		if(spine_position < 0 || spine_position >= spine.length) {
@@ -308,7 +325,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		var target = spine[spine_position];
 		return this.getManifestItemById(target.idref);
 	},
-
+*/
 	getManifestItemById: function(id) {
 		return this.get("manifest").find(function(x) { 
 					if(x.get("id") === id) return x;
@@ -320,7 +337,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 			offset = 0;
 		}
 		var spine_pos = this.get("spine_position") + offset;
-		return this.getManifestItem(spine_pos);
+		return this.get("res_spine").at(spine_pos);
 	},
 
 	currentSpineItem: function(offset) {
@@ -395,16 +412,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		}
 
 		return null;
-	},
-
-	parse: function(content) {
-		//call super
-		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, content);
-		
-		
-
-		return json;
-	},
+	}
 
 
 });

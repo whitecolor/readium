@@ -17,6 +17,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.toolbar = new Readium.Views.ToolbarView({model: _book});
 		this.toolbar.render();
 
+		// the table of contents
 		this.model.on("change:has_toc", this.init_toc, this);
 
 		this.addGlobalEventHandlers();
