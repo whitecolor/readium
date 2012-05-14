@@ -1,8 +1,6 @@
 
-
 Readium.Models.ManifestItem = Backbone.Model.extend({
 	
-
 	getCurrentSection: function(i) {
 		// i is an optional arg, if it was not passed in default to 0
 		i = i || 0; 
@@ -11,8 +9,13 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 	},
 
 	parseMetaTags: function() {
+		// only need to go through this one time, so only parse it
+		// if it is not already known
+		if(typeof this.get("meta_width") !== "undefined") {
+			return;
+		}
 		var parser = new window.DOMParser();
-		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
+		var dom = parser.parseFromString(this.get('content'), 'text/xml');
 		var tag = dom.getElementsByName("viewport")[0];
 		if(tag) {
 			var pageSize = this.parseViewportTag(tag);
@@ -40,17 +43,22 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 		return values;
 	},
 
+	resolvePath: function(path) {
+		return this.collection.packageDocument.resolvePath(path)
+	},
+
+	resolveUri: function(path) {
+		return this.collection.packageDocument.resolveUri(path)	
+	},
+
 	// when the spine position changes we need to update the
 	// state of this, this involes setting attributes that reflect
 	// the current section's url and content etc, and then we need
 	// to persist the position in a cookie
-	spinePositionChangedHandler: function() {
+	loadContent: function() {
 		var that = this;
-		var sect = this.packageDocument.currentSection();
-		var path = sect.get("href");
-		var url = this.packageDocument.resolveUri(path);;
-		path = this.resolvePath(path);
-		this.set("current_section_url", url);
+		var path = this.resolvePath(this.get("href"));
+		
 		Readium.FileSystemApi(function(api) {
 			api.readTextFile(path, function(result) {
 				that.set( {content: result} );
@@ -63,6 +71,13 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 });
 
 Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
+
+	initialize: function() {
+		if(this.isFixedLayout()) {
+			this.on("change:content", this.parseMetaTags, this);
+		}
+		this.loadContent();
+	},
 
 	// this method creates the JSON representation of a manifest item
 	// that is used to render out a page view.
@@ -78,16 +93,30 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 		return section;
 	},
 
+	toJSON: function() {
+		if(this.isFixedLayout()) {
+			this.parseMetaTags();
+		}
+		var json = {};
+		json.width = this.get("meta_width") || 0;
+		json.height = this.get("meta_height") || 0;
+		json.uri = this.resolveUri(this.get('href'));
+		json.page_class = this.getPositionClass();
+		return json;
+	},
+
 	// when rendering fixed layout pages we need to determine whether the page
 	// should be on the left or the right in two up mode, options are:
 	// 	left_page: 		render on the left side
 	//	right_page: 	render on the right side
 	//	center_page: 	always center the page horizontally
-	getPositionClass: function(manifest_item, spine_index) {
-
-		if(this.get("apple_fixed")) {
+	getPositionClass: function() {
+		debugger;
+		var book = this.collection.packageDocument.get("book");
+		var spine_index = this.get("spine_index");
+		if(book.get("apple_fixed")) {
 			// the logic for apple fixed layout is a little different:
-			if(!this.get("open_to_spread")) {
+			if(!book.get("open_to_spread")) {
 				// page spread is disabled for this book
 				return	"center_page"
 			}
@@ -98,7 +127,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 				return "center_page";
 			}
 			else if (spine_index % 2 === 1 && 
-				spine_index === this.packageDocument.get("spine").length ) {
+				spine_index === this.collection.length ) {
 
 				// if the last spine item in the book would be on the left, then
 				// it would have no left counterpart, so center it
@@ -116,27 +145,33 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	},
 
 	isFixedLayout: function() {
-		debugger;
-		return !!(this.get("fixed_flow")) || this.collection.isBookFixedLayout();// || this.collection.packageDocument.
+		if(typeof this.get("fixed_flow") !== 'undefined') {
+			return this.get('fixed_flow');
+		}
+		return this.collection.isBookFixedLayout();
 	},
 
-	shouldPreRender: function() {
-		return false;
-	}
 
 });
 
 
 
 Readium.Collections.ManifestItems = Backbone.Collection.extend({
-	model: Readium.Models.ManifestItem
+	model: Readium.Models.ManifestItem,
+
+	initialize: function(models, options) {
+		this.packageDocument = options.packageDocument;
+	},
 });
 
 Readium.Collections.Spine = Backbone.Collection.extend({
 	model: Readium.Models.SpineItem,
 
+	initialize: function(models, options) {
+		this.packageDocument = options.packageDocument;
+	},
+
 	isBookFixedLayout: function() {
-		debugger;
 		return this.packageDocument.get("book").isFixedLayout();
 	}
 });

@@ -80,7 +80,8 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			var pageNum = 1; // start from page 1
 			var offset = this.findPrerenderStart();
 
-			while( this.model.getCurrentSection(offset).shouldPreRender() ) {
+			while( this.shouldPreRender( this.model.getCurrentSection(offset) ) ) {
+				debugger;
 				this.v.addPage(book.getCurrentSection(offset).toJSON(), pageNum );
 				this.rendered_spine_positions.push(spine_position + offset);
 				pageNum += 1;
@@ -110,10 +111,10 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 	findPrerenderStart: function() {
 		var i = 0;
-		while( this.model.getCurrentSection(i).shouldPreRender(i) ) {
+		while( this.shouldPreRender( this.model.getCurrentSection(i) ) ) {
 			i -= 1;
 		}
-		return i;
+		return i + 1; // sloppy fix for an off by one error
 	},
 
 	shouldRenderAsFixed: function(spineItem) {

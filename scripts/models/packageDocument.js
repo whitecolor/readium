@@ -156,7 +156,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(json.metadata.layout === "pre-paginated") {
 			json.metadata.fixed_layout = true;
 		}
-		json.manifest = new Readium.Collections.ManifestItems(json.manifest)
+		json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this})
 		json.spine = this.parseSpineProperties(json.spine);
 		json.res_spine = this.crunchSpine(json.spine, json.manifest);
 		return json;
@@ -166,26 +166,17 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	// combine the spine item data with the corresponding manifest
 	// data to build useful set of backbone objects
 	crunchSpine: function(spine, manifest) {
-		var bbSpine = new Readium.Collections.Spine(spine);
-		var index = 0; // to keep track of the index of each spine item
-
-		// give it a reference to the package doc
-		bbSpine.packageDocument = this; 
-
-		bbSpine.each(function(spineItem) {
-			var manItem = manifest.find(function(x) {
-				if(x.get("id") === spineItem.get("idref")) return x;
-			});
-			if(manItem) {
-				spineItem.set(manItem.attributes);
-				spineItem.set("spineIndex", index);
-			}
-			else {
-				throw "Invalid OPF, a spine item with no manifest item was encountered";
-			}
+		//var bbSpine = new Readium.Collections.Spine(spine, {packageDocument: this});
+		var index = -1; // to keep track of the index of each spine item
+		var bbSpine = _.map(spine, function(spineItem) {
 			index += 1;
+			var manItem = manifest.find(function(x) {
+				if(x.get("id") === spineItem["idref"]) return x;
+			});
+			// crunch spine attrs and manifest attrs together into one obj
+			return _.extend({}, spineItem, manItem.attributes, {"spine_index": index});
 		});
-		return bbSpine;
+		return new Readium.Collections.Spine(bbSpine, {packageDocument: this});
 	},
 
 	reset: function(data) {
