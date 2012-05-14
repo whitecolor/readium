@@ -8,8 +8,10 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		//this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.fetch({
 			success: function() {
-				that.packageDocument.set({spine_position: that.restorePostition()});
-				that.packageDocument.trigger("change:spine_position");
+				var pos = that.restorePosition();
+				that.set("spine_position", pos);
+				that.packageDocument.set({spine_position: pos}); // TODO: get rid of this
+				that.packageDocument.trigger("change:spine_position"); // TODO: get rid of this
 				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
@@ -24,7 +26,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"full_screen": false,
     	"toolbar_visible": true,
     	"toc_visible": false,
-    	"can_two_up": true
+    	"can_two_up": true,
+    	"rendered_spine_items": [],
+    	"spine_position": 0
   	},
 
 	toggleTwoUp: function() {
@@ -120,13 +124,13 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
-	restorePostition: function() {
+	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.get("key"));
 		return parseInt(pos, 10) || 0;
 	},
 
 	savePosition: function() {
-		Readium.Utils.setCookie(this.get("key"), this.packageDocument.get("spine_position"), 365);
+		Readium.Utils.setCookie(this.get("key"), this.get("spine_position"), 365);
 	},
 
 	resolvePath: function(path) {
@@ -158,6 +162,22 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
+	hasNextSection: function() {
+		return this.get("spine_position") < (this.packageDocument.spineLength() - 1);
+	},
+
+	hasPrevSection: function() {
+		return this.get("spine_position") > 0;
+	},
+
+	setSpinePos: function(pos) {
+
+	},
+
+	setSpinePosBackwards: function(pos) {
+		
+	},
+
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
 		// firs thing is to split off the hash frag from the reset
@@ -166,7 +186,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 		// handle the base url first:
 		if(splitUrl[1]) {
-			this.packageDocument.goToHref(splitUrl[1]);
+			var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
+			this.setSpinePos(spine_pos);
 		}
 
 		// now try to handle the fragment if there was one,
@@ -211,7 +232,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	// to persist the position in a cookie
 	spinePositionChangedHandler: function() {
 		var that = this;
-		var sect = this.packageDocument.currentSection();
+		var sect = this.getCurrentSection();
 		var path = sect.get("href");
 		var url = this.packageDocument.resolveUri(path);;
 		path = this.resolvePath(path);
@@ -228,9 +249,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.savePosition();
 	},
 
-	getCurrentSection: function(i) {
-		// delegate to packageDocument
-		return this.packageDocument.currentSection(i);
+	getCurrentSection: function(offset) {
+		if(!offset) {
+			offset = 0;
+		}
+		var spine_pos = this.get("spine_position") + offset;
+		return this.packageDocument.getSpineItem(spine_pos);
 	},
 
 	// is this book set to fixed layout at the meta-data level

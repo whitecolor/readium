@@ -1,13 +1,6 @@
 
 Readium.Models.ManifestItem = Backbone.Model.extend({
 	
-	getCurrentSection: function(i) {
-		// i is an optional arg, if it was not passed in default to 0
-		i = i || 0; 
-		var spine_index = i + this.packageDocument.get("spine_position");
-		return this.buildSectionJSON(this.packageDocument.currentSection(i), spine_index);
-	},
-
 	parseMetaTags: function() {
 		// only need to go through this one time, so only parse it
 		// if it is not already known
@@ -148,6 +141,13 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 			return this.get('fixed_flow');
 		}
 		return this.collection.isBookFixedLayout();
+	},
+
+	getPageView: function() {
+		if(!this.view) {
+			this.view = new Readium.Views.FixedPageView({model: this});
+		}
+		return this.view;
 	}
 
 

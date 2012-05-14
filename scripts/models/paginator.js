@@ -81,7 +81,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			var offset = this.findPrerenderStart();
 
 			while( this.shouldPreRender( this.model.getCurrentSection(offset) ) ) {
-				this.v.addPage(book.getCurrentSection(offset).toJSON(), pageNum );
+				this.v.addPage(book.getCurrentSection(offset), pageNum );
 				this.rendered_spine_positions.push(spine_position + offset);
 				pageNum += 1;
 				offset += 1;

@@ -158,7 +158,6 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		}
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this})
 		json.spine = this.parseSpineProperties(json.spine);
-		json.res_spine = this.crunchSpine(json.spine, json.manifest);
 		return json;
 	},
 
@@ -315,44 +314,18 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		spine_position: 0
 	},
 	
-/* dead code
-	getManifestItem: function(spine_position) {
-		var spine = this.get("spine");
-		if(spine_position < 0 || spine_position >= spine.length) {
-			return null;
-		}
-		var target = spine[spine_position];
-		return this.getManifestItemById(target.idref);
-	},
-*/
 	getManifestItemById: function(id) {
 		return this.get("manifest").find(function(x) { 
 					if(x.get("id") === id) return x;
 				});
 	},
 
-	currentSection: function(offset) {
-		if(!offset) {
-			offset = 0;
-		}
-		var spine_pos = this.get("spine_position") + offset;
-		return this.get("res_spine").at(spine_pos);
-	},
-/*
-	currentSpineItem: function(offset) {
-		if(!offset) {
-			offset = 0;
-		}
-		var spine_pos = this.get("spine_position");
-		return this.get("spine")[spine_pos + offset];
-	},
-*/
-	hasNextSection: function() {
-		return this.get("spine_position") < (this.get("spine").length - 1);
+	getSpineItem: function(index) {
+		return this.get("res_spine").at(index);
 	},
 
-	hasPrevSection: function() {
-		return this.get("spine_position") > 0;
+	spineLength: function() {
+		return this.get("res_spine").length;
 	},
 
 	goToNextSection: function() {
@@ -363,6 +336,19 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	goToPrevSection: function() {
 		var cp = this.get("spine_position");
 		this.set({spine_position: (cp - 1) });	
+	},
+
+	spineIndexFromHref: function() {
+		var spine = this.get("res_spine");
+		href = this.resolveUri(href).replace(/#.*$/, "");
+		for(var i = 0; i < spine.length; i++) {
+			var path = spine.at(i).get("href");
+			path = this.resolveUri(path).replace(/#.*$/, "");
+			if(path === spine) {
+				return i;
+			}
+		}
+		return -1;
 	},
 
 	goToHref: function(href) {
@@ -411,6 +397,12 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		}
 
 		return null;
+	},
+
+	parse: function(data) {
+		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, data);
+		json.res_spine = this.crunchSpine(json.spine, json.manifest);
+		return json;
 	}
 
 
