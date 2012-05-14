@@ -111,7 +111,6 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	//	right_page: 	render on the right side
 	//	center_page: 	always center the page horizontally
 	getPositionClass: function() {
-		debugger;
 		var book = this.collection.packageDocument.get("book");
 		var spine_index = this.get("spine_index");
 		if(book.get("apple_fixed")) {
@@ -149,7 +148,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 			return this.get('fixed_flow');
 		}
 		return this.collection.isBookFixedLayout();
-	},
+	}
 
 
 });

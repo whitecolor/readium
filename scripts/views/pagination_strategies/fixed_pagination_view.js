@@ -29,9 +29,9 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		$('body').addClass('apple-fixed-layout');
 
 		// appends one fixed layout page to those currently rendered
-		var metaTags = this.model.parseMetaTags();
-		this.$el.width(metaTags.meta_width * 2);
-		this.$el.height(metaTags.meta_height);
+		//var metaTags = this.model.parseMetaTags();
+		//this.$el.width(metaTags.meta_width * 2);
+		//this.$el.height(metaTags.meta_height);
 
 		// wipe the html
 		this.$('#container').html("");
@@ -57,7 +57,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		var that = this;
 		this.$('.content-sandbox').on("load", function(e) {
 			// not sure why, on("load", this.applyBindings, this) was not working
-			that.applyBindings( $(e.srcElement).contents() );
+			that.iframeLoadCallback(e);
 		});
 		//this.changePage();
 		
@@ -78,9 +78,4 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		});
 	},
 
-	events: {
-		'click #page-wrap a': function(e) {
-			this.linkClickHandler(e)
-		}
-	}
 });

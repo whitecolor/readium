@@ -217,6 +217,14 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		doc.getElementsByTagName("head")[0].appendChild(script);
     },
 
+    injectLinkHandler: function(iframe) {
+    	var that = this;
+    	$('a', iframe.contentDocument).click(function(e) {
+    		debugger;
+    		that.linkClickHandler(e)
+    	});
+    },
+
     resetEl: function() {
     	$('body').removeClass("apple-fixed-layout");
     	$("#readium-book-view-el").attr("style", "");
@@ -233,7 +241,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     },
 
     iframeLoadCallback: function(e) {
-		// not sure why, on("load", this.applyBindings, this) was not working
+		
 		this.applyBindings( $(e.srcElement).contents() );
         this.injectMathJax(e.srcElement);
         this.injectLinkHandler(e.srcElement);
