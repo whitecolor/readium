@@ -117,6 +117,11 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 
 	isFixedLayout: function() {
 		debugger;
+		return !!(this.get("fixed_flow")) || this.collection.isBookFixedLayout();// || this.collection.packageDocument.
+	},
+
+	shouldPreRender: function() {
+		return false;
 	}
 
 });
@@ -128,5 +133,10 @@ Readium.Collections.ManifestItems = Backbone.Collection.extend({
 });
 
 Readium.Collections.Spine = Backbone.Collection.extend({
-	model: Readium.Models.SpineItem
+	model: Readium.Models.SpineItem,
+
+	isBookFixedLayout: function() {
+		debugger;
+		return this.packageDocument.get("book").isFixedLayout();
+	}
 });

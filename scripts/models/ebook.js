@@ -2,7 +2,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	initialize: function() {
 		var that = this;
-		this.packageDocument = new Readium.Models.PackageDocument({}, {
+		this.packageDocument = new Readium.Models.PackageDocument({ book: that }, {
 			file_path: this.get("package_doc_path")
 		});
 		//this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
@@ -287,10 +287,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	getCurrentSection: function(i) {
-		// i is an optional arg, if it was not passed in default to 0
-		i = i || 0; 
-		var spine_index = i + this.packageDocument.get("spine_position");
-		return this.buildSectionJSON(this.packageDocument.currentSection(i), spine_index);
+		// delegate to packageDocument
+		return this.packageDocument.currentSection(i);
 	},
 
 
@@ -322,6 +320,11 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			return {meta_width: pageSize.width, meta_height: pageSize.height};
 		}
 		return null;
+	},
+
+	// is this book set to fixed layout at the meta-data level
+	isFixedLayout: function() {
+		return this.get("fixed_layout") || this.get("apple_fixed");
 	}
 	
 });

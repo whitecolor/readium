@@ -67,7 +67,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		}
 
 
-		var spineItem = book.packageDocument.currentSpineItem();
+		var spineItem = book.getCurrentSection();
 		if(this.shouldRenderAsFixed(spineItem)) {
 			this.should_two_up = book.get("two_up");
 			book.set("two_up", false);
@@ -80,8 +80,8 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			var pageNum = 1; // start from page 1
 			var offset = this.findPrerenderStart();
 
-			while( this.shouldPreRender(book.packageDocument.currentSpineItem(offset)) ) {
-				this.v.addPage(book.getCurrentSection(offset), pageNum );
+			while( this.model.getCurrentSection(offset).shouldPreRender() ) {
+				this.v.addPage(book.getCurrentSection(offset).toJSON(), pageNum );
 				this.rendered_spine_positions.push(spine_position + offset);
 				pageNum += 1;
 				offset += 1;
@@ -110,18 +110,14 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 	findPrerenderStart: function() {
 		var i = 0;
-		var pd = this.model.packageDocument;
-		while ( this.shouldPreRender(pd.currentSpineItem(i-1)) ) {
+		while( this.model.getCurrentSection(i).shouldPreRender(i) ) {
 			i -= 1;
 		}
 		return i;
 	},
 
 	shouldRenderAsFixed: function(spineItem) {
-		if(typeof spineItem.properties.fixed_flow !== "undefined") {
-			return spineItem.properties.fixed_flow;
-		}
-		return this.model.isFixedLayout;
+		return spineItem.isFixedLayout();
 	},
 
 	shouldPreRender: function(sec) {

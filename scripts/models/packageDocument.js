@@ -114,7 +114,10 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			
 		}
 		for(var i = 0; i < spine.length; i++) {
-			spine[i].properties = parseProperiesString(spine[i].properties);
+			
+			var props = parseProperiesString(spine[i].properties);
+			// add all the properties to the spine item
+			_.extend(spine[i], props);
 		}
 		return spine;
 	},
@@ -164,18 +167,23 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	// data to build useful set of backbone objects
 	crunchSpine: function(spine, manifest) {
 		var bbSpine = new Readium.Collections.Spine(spine);
+		var index = 0; // to keep track of the index of each spine item
+
 		// give it a reference to the package doc
-		bbSpine.PackageDocument = this; 
+		bbSpine.packageDocument = this; 
+
 		bbSpine.each(function(spineItem) {
 			var manItem = manifest.find(function(x) {
 				if(x.get("id") === spineItem.get("idref")) return x;
 			});
 			if(manItem) {
 				spineItem.set(manItem.attributes);
+				spineItem.set("spineIndex", index);
 			}
 			else {
 				throw "Invalid OPF, a spine item with no manifest item was encountered";
 			}
+			index += 1;
 		});
 		return bbSpine;
 	},
@@ -339,7 +347,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		var spine_pos = this.get("spine_position") + offset;
 		return this.get("res_spine").at(spine_pos);
 	},
-
+/*
 	currentSpineItem: function(offset) {
 		if(!offset) {
 			offset = 0;
@@ -347,7 +355,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		var spine_pos = this.get("spine_position");
 		return this.get("spine")[spine_pos + offset];
 	},
-
+*/
 	hasNextSection: function() {
 		return this.get("spine_position") < (this.get("spine").length - 1);
 	},
