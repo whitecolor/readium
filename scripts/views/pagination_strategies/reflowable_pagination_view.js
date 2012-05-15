@@ -39,6 +39,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.replaceContent( dom.body.innerHTML );
 		var trigs = this.parseTriggers(dom);
 		this.applyTriggers(document, trigs);
+		this.applySwitches(document);
 		
 		// need to add one page for calculation to work (TODO: this can be fixed)
 		this.$('#container').html( this.page_template({page_num: 1, empty: false}) );

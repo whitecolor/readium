@@ -121,25 +121,24 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 
 		$('switch', dom).each(function(ind) {
-			var supportedCase;
-			var $cases = $('case', this);
-			// start by hiding all the cases, this each statement
-			// IS needed, jquery doesn't like the xml nodes we are
-			// fiddling with
-			$cases.each(function() { 
-				var $el = $(this);
-				$el.data("style", ($el.attr("style") || "") );
-				$el.attr("style", "display: none");
-			})
+			
+			// keep track of whether or now we found one
+			var found = false;
 
-			// find the first case that is supported
-			supportedCase = _.find($cases, isSupported);
 
-			if(supportedCase) {
-				// show one if we found one
-				$(supportedCase).attr("style", $(supportedCase).data("style") );
-				// and hide the default
-				$('default', this).attr("style", "display: none");
+			$('case', this).each(function() {
+
+				if( !found && isSupported(this) ) {
+					found = true; // we found the node, don't remove it
+				}
+				else {
+					$(this).remove(); // remove the node from the dom
+				}
+			});
+
+			if(found) {
+				// if we found a supported case, remove the default
+				$('default', this).remove();
 			}
 		})
 	},
@@ -235,6 +234,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     iframeLoadCallback: function(e) {
 		// not sure why, on("load", this.applyBindings, this) was not working
 		this.applyBindings( $(e.srcElement).contents() );
+		this.applySwitches( $(e.srcElement).contents() );
         this.injectMathJax(e.srcElement);
         this.injectLinkHandler(e.srcElement);
         var trigs = this.parseTriggers(e.srcElement.contentDocument);
