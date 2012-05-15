@@ -92,9 +92,17 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 		else if(!this.get("two_up")){
 			this.set("current_page", [lastPage]);
+			if(this.get("rendered_spine_items").length > 1) {
+				var pos = this.get("rendered_spine_items")[lastPage - 1];
+				this.set("spine_position", pos);
+			}
 		}
 		else {
 			this.set("current_page", [lastPage - 1, lastPage]);
+			if(this.get("rendered_spine_items").length > 1) {
+				var pos = this.get("rendered_spine_items")[lastPage - 2];
+				this.set("spine_position", pos);
+			}
 		}
 	},
 	
@@ -105,10 +113,18 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			this.goToNextSection();
 		}
 		else if(!this.get("two_up")){
-			return this.set("current_page", [firstPage]);
+			this.set("current_page", [firstPage]);
+			if(this.get("rendered_spine_items").length > 1) {
+				var pos = this.get("rendered_spine_items")[firstPage - 1];
+				this.set("spine_position", pos);
+			}
 		}
 		else {
-			return this.set("current_page", [firstPage, firstPage+1]);
+			this.set("current_page", [firstPage, firstPage+1]);
+			if(this.get("rendered_spine_items").length > 1) {
+				var pos = this.get("rendered_spine_items")[firstPage - 1];
+				this.set("spine_position", pos);
+			}
 		}
 	},
 
