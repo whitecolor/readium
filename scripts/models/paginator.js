@@ -8,12 +8,12 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		this.model = this.get("book");
 		
 		// keep track of which direction we are moving through the publication
-		this.model.packageDocument.on("increased:spine_position", this.increasedSpinePosHandler, this);
-		this.model.packageDocument.on("decreased:spine_position", this.decreasedSpinePosHandler, this);
+		//this.model.packageDocument.on("increased:spine_position", this.increasedSpinePosHandler, this);
+		//this.model.packageDocument.on("decreased:spine_position", this.decreasedSpinePosHandler, this);
 
 		// whenever current content changes it means, the spine item has been changed
 		// and it is loaded up and ready to go
-		this.model.on("change:current_content", this.renderSpineItem, this);
+		//this.model.on("change:current_content", this.renderSpineItems, this);
 
 	},
 
@@ -51,13 +51,10 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 
 	// determine what the current spine item is and render it out
-	renderSpineItem: function(renderToLast) {
+	renderSpineItems: function(renderToLast) {
 		var book = this.model;
-		var spine_position = book.packageDocument.get("spine_position");
-		if(this.rendered_spine_positions.indexOf(spine_position) > -1) {
-			// the current spine position is already rended
-			return;
-		}
+		var spine_position = book.get("spine_position");
+		
 		// we are going to clear everything out and start from scratch
 		this.rendered_spine_positions = [];
 
@@ -74,7 +71,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			//this.rendered_spine_positions.push(spine_position);
 			this.v = new Readium.Views.FixedPaginationView({model: book});
 
-			// add any consecutive fixed layout sections
+			// throw down the UI
 			this.v.render();
 
 			var pageNum = 1; // start from page 1
@@ -90,7 +87,6 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			// set the page we should be on
 			var page = this.rendered_spine_positions.indexOf(spine_position) + 1;
 			book.goToPage(page);
-			book.set("pages_are_spine_items", true);
 		}
 		else {
 			if(this.shouldScroll()) {
@@ -102,10 +98,10 @@ Readium.Models.Paginator = Backbone.Model.extend({
 				}
 				this.v = new Readium.Views.ReflowablePaginationView({model: book});
 			}
-			this.v.render(this.renderToLastPage);
+			this.v.render(!!renderToLast);
 			this.rendered_spine_positions.push(spine_position);
-			book.set("pages_are_spine_items", false);
 		}
+		return this.rendered_spine_positions;
 	},
 
 	findPrerenderStart: function() {

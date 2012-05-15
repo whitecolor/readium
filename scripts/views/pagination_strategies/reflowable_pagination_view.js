@@ -7,10 +7,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 
 		this.page_template = _.template( $('#reflowing-page-template').html() );
-		
+		this.section = this.model.getCurrentSection();
 		this.model.on("repagination_event", this.renderPages, this);
+
 		//this.model.on("change:current_content", this.render, this);
 		this.model.on("change:two_up", this.renderPages, this);
+		this.section.on("change:content", function() { 
+			this.render(!!this.render_to_last) 
+		}, this);
 
 	},
 
@@ -27,11 +31,16 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.off("repagination_event", this.renderPages);
 		//this.model.off("change:current_content", this.render);
 		this.model.off("change:two_up", this.renderPages);
+		this.section.off("change:content", this.render);
 	},
 
 	render: function(goToLastPage) {
 		this.resetEl();
-		var htmlText = this.model.get("current_content");
+		var htmlText = this.section.get("content");
+		if(!htmlText) {
+			this.render_to_last = goToLastPage;
+			return this; // the content is not loaded yet, it will be in a second
+		}
 		var parser = new window.DOMParser();
 		var dom = parser.parseFromString( htmlText, 'text/xml' );
 		this.addStyleSheets( dom );

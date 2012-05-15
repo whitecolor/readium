@@ -2,6 +2,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	initialize: function() {
 		var that = this;
+		// the book's pages
+		this.paginator = new Readium.Models.Paginator({book: this});
+
 		this.packageDocument = new Readium.Models.PackageDocument({ book: that }, {
 			file_path: this.get("package_doc_path")
 		});
@@ -10,12 +13,17 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			success: function() {
 				var pos = that.restorePosition();
 				that.set("spine_position", pos);
-				that.packageDocument.set({spine_position: pos}); // TODO: get rid of this
-				that.packageDocument.trigger("change:spine_position"); // TODO: get rid of this
+				var items = that.paginator.renderSpineItems(false);
+				that.set("rendered_spine_items", items);
+
+				//that.packageDocument.set({spine_position: pos}); // TODO: get rid of this
+				//that.packageDocument.trigger("change:spine_position"); // TODO: get rid of this
+				
 				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
 		this.on("change:num_pages", this.adjustCurrentPage, this);
+		this.on("change:spine_position", this.savePosition, this);
 	},
 
 	defaults: {
@@ -76,12 +84,11 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 	
 	prevPage: function() {
-
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
 		if(curr_pg[0] <= 1) {
-			this.packageDocument.goToPrevSection();
+			this.goToPrevSection();
 		}
 		else if(!this.get("two_up")){
 			this.set("current_page", [lastPage]);
@@ -93,9 +100,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	
 	nextPage: function() {
 		var curr_pg = this.get("current_page");
-		var firstPage =curr_pg[curr_pg.length-1] + 1;
+		var firstPage = curr_pg[curr_pg.length-1] + 1;
 		if (curr_pg[curr_pg.length-1] >= this.get("num_pages") ) {
-			this.packageDocument.goToNextSection();
+			this.goToNextSection();
 		}
 		else if(!this.get("two_up")){
 			return this.set("current_page", [firstPage]);
@@ -107,7 +114,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	goToLastPage: function() {
 		var page = this.get("num_pages");
-		goToPage(page);
+		this.goToPage(page);
 	},
 
 	goToPage: function(page) {
@@ -149,16 +156,18 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	goToNextSection: function() {
 		// Is this check even necessary?
 		// I think package doc validations takes care of it
-		if(this.packageDocument.hasNextSection() ) {
-			this.packageDocument.goToNextSection();	
+		if(this.hasNextSection() ) {
+			var pos = this.get("spine_position");
+			this.setSpinePos(pos + 1);
 		}
 	},
 	
 	goToPrevSection: function() {
 		// Is this check even necessary?
 		// I think package doc validations takes care of it
-		if(this.packageDocument.hasPrevSection() ) {
-			this.packageDocument.goToPrevSection();		
+		if(this.hasPrevSection() ) {
+			var pos = this.get("spine_position");
+			this.setSpinePosBackwards(pos - 1);	
 		}
 	},
 
@@ -171,17 +180,38 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	setSpinePos: function(pos) {
-
+		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
+			// invalid position
+			return;
+		}
+		this.set("spine_position", pos);
+		if(this.get("rendered_spine_items").indexOf(pos) >= 0) {
+			// the spine item is already on the page, nothing to do
+			return;
+		}
+		var items = this.paginator.renderSpineItems(false);
+		this.set("rendered_spine_items", items);
 	},
 
 	setSpinePosBackwards: function(pos) {
-		
+		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
+			// invalid position
+			return;
+		}
+		this.set("spine_position", pos);
+		if(this.get("rendered_spine_items").indexOf(pos) >= 0) {
+			// the spine item is already on the page, nothing to do
+			return;
+		}
+		var items = this.paginator.renderSpineItems(true);
+		this.set("rendered_spine_items", items);
 	},
 
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
 		// firs thing is to split off the hash frag from the reset
 		// of the url:
+		debugger;
 		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
 
 		// handle the base url first:

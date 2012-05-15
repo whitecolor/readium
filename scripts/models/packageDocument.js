@@ -344,7 +344,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		for(var i = 0; i < spine.length; i++) {
 			var path = spine.at(i).get("href");
 			path = this.resolveUri(path).replace(/#.*$/, "");
-			if(path === spine) {
+			if(path === href) {
 				return i;
 			}
 		}
