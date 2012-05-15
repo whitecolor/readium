@@ -184,13 +184,23 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			// invalid position
 			return;
 		}
+		var spineItems = this.get("rendered_spine_items");
 		this.set("spine_position", pos);
-		if(this.get("rendered_spine_items").indexOf(pos) >= 0) {
-			// the spine item is already on the page, nothing to do
-			return;
+		if(spineItems.indexOf(pos) >= 0) {
+			// the spine item is already on the page
+			if(spineItems.length > 1) {
+				// we are in fixed layout state, one spine item per page
+				this.goToPage(spineItems.indexOf(pos) + 1);
+			}
+			// else nothing to do, because the section is already rendered out
+			
 		}
-		var items = this.paginator.renderSpineItems(false);
-		this.set("rendered_spine_items", items);
+		else {
+			// the section is not rendered out, need to do so
+			var items = this.paginator.renderSpineItems(false);
+			this.set("rendered_spine_items", items);	
+		}
+		
 	},
 
 	setSpinePosBackwards: function(pos) {
