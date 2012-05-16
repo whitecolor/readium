@@ -3,7 +3,7 @@
 // to conver the XML => JSON
 // 
 // I wrote my own library to do the XML => JSON it is called 
-describe('packDocNew', function() {
+describe('packageDocument', function() {
 
   // an example of an epub 2 package doc
   var xmlString = '';
