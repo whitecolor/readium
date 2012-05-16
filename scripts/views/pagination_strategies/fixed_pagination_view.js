@@ -59,7 +59,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 			// not sure why, on("load", this.applyBindings, this) was not working
 			that.applyBindings( $(e.srcElement).contents() );
 		});
-		//this.changePage();
+		this.changePage();
 		
 	},
 
