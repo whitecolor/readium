@@ -15,15 +15,7 @@
 		</script>
 		<title>Readium Library</title>
 
-		<!-- Le styles -->
-		<link rel="stylesheet" type="text/css" href="/lib/bootstrap.min.css">
-		<style>
-			/* Must be exactly here No touchy! */
-			body {
-				padding-top: 40px;
-			}
-		</style>
-		<link rel="stylesheet" type="text/css" href="/lib/bootstrap_responsive.css">
+		
 		<link rel="stylesheet" type="text/css" href="/css/library.css">
 
 		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
@@ -62,37 +54,38 @@
 		<div class="navbar navbar-fixed-top"><!-- le top bar -->
 
 			<div class="navbar-inner" id="inner-top-bar">
-				<div class="container-fluid" style="width: 100%">
+				<div class="container" style="width: 100%">
 
-
-					<div class="bar-icon wide">
-						<a href="#add-book-modal" data-toggle="modal">
-							<img src="/images/top_bar/add_book.png" class="small"/>
-						</a>
-					</div>
-					
-					<div class="bar-icon">
-						<a href="#" id='block-view-btn'>
-							<img src="/images/top_bar/thumb_view.png" class="small"/>
-						</a>
-					</div>
-					
-					<div class="bar-icon">
-						<a href="#" id="row-view-btn">
-							<img src="/images/top_bar/list_view.png" class="small"/>
-						</a>
-					</div>
-
-					<div class="bar-icon">
-						<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
-							<img src="/images/top_bar/options.png" class="small"/>
-						</a>
-					</div>
-
-
-					<a class="pull-right" data-toggle="modal" href="#readium-info" id='bar-logo'>
-						<img src="/images/top_bar/READIUM_TOOLBAR_LOGO.png"/>
+					<a class="brand" data-toggle="modal" href="#readium-info" id='bar-logo'>
+						<img src="/images/top_bar/readium_logo.png"/>
 					</a>
+
+					<ul class="nav pull-right">
+						<li class="divider-vertical stubby"></li>
+						<li>
+							<a href="#" id="row-view-btn">
+								<img src="/images/top_bar/list_view.png" class="small"/>
+							</a>
+						</li>
+						<li>
+							<a href="#" id='block-view-btn'>
+								<img src="/images/top_bar/thumb_view.png" class="small"/>
+							</a>
+						</li>
+						<li class="divider-vertical stubby"></li>
+						<li>
+							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
+								<img src="/images/top_bar/options.png" class="small"/>
+							</a>
+						</li>
+						<li class="divider-vertical"></li>
+						<li style="margin-right: 15px">
+							<a href="#add-book-modal" data-toggle="modal">
+								<img src="/images/top_bar/add_book.png" class="small"/>
+							</a>
+						</li>
+
+					</ul>
 
 				</div>
 			</div>
@@ -102,7 +95,7 @@
 
     	
 
-		<div class='shmontainer' >
+		<div class='library-container' >
 		<div id="flash-container"></div>
 		<div class='content'>
 			<div id="library-books-list">

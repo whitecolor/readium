@@ -1,0 +1,21 @@
+.navbar {
+
+	.nav > li > a {
+		padding: 5px 0;
+	}
+
+	.brand {
+		padding: 5px;
+		margin-left: 10px;
+	}
+
+	.divider-vertical {
+		height: 46px;
+	}
+
+	.divider-vertical.stubby {
+		margin-top: 8px;
+		height: 30px;
+	}
+
+}
