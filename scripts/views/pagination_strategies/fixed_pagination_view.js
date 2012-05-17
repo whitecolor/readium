@@ -53,7 +53,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 			that.iframeLoadCallback(e);
 		});
 		this.$('#container').append(content);
-	
+		this.changePage();
 		return this;
 	},
 
