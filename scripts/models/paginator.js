@@ -6,49 +6,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 		this.rendered_spine_positions = [];
 		this.model = this.get("book");
-		
-		// keep track of which direction we are moving through the publication
-		//this.model.packageDocument.on("increased:spine_position", this.increasedSpinePosHandler, this);
-		//this.model.packageDocument.on("decreased:spine_position", this.decreasedSpinePosHandler, this);
-
-		// whenever current content changes it means, the spine item has been changed
-		// and it is loaded up and ready to go
-		//this.model.on("change:current_content", this.renderSpineItems, this);
-
 	},
-
-	increasedSpinePosHandler: function() {
-		this.renderToLastPage = false;
-
-		var spine_pos = this.model.packageDocument.get("spine_position");
-		var page_index = this.rendered_spine_positions.indexOf(spine_pos);
-
-		if(page_index > -1) {
-			this.model.goToPage(page_index + 1);
-			this.model.savePosition();
-		}
-		else {
-			this.model.spinePositionChangedHandler();		
-		}
-		
-	},
-
-	decreasedSpinePosHandler: function() {
-		this.renderToLastPage = true;
-		var spine_pos = this.model.packageDocument.get("spine_position");
-
-		if(this.rendered_spine_positions.indexOf(spine_pos)  > -1) {
-			var sp = this.rendered_spine_positions[0] - 1;
-			if(sp >= 0) {
-				this.model.packageDocument.set("spine_position", sp);	
-			}
-		}
-		else {
-			this.model.spinePositionChangedHandler();	
-		}
-		
-	},
-
 
 	// determine what the current spine item is and render it out
 	renderSpineItems: function(renderToLast) {
@@ -86,6 +44,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 			// set the page we should be on
 			var page = this.rendered_spine_positions.indexOf(spine_position) + 1;
+			book.set("num_pages", pageNum - 1);
 			book.goToPage(page);
 		}
 		else {

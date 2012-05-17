@@ -108,11 +108,14 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 		var spine_index = this.get("spine_index");
 		if(book.get("apple_fixed")) {
 			// the logic for apple fixed layout is a little different:
+			/*
 			if(!book.get("open_to_spread")) {
 				// page spread is disabled for this book
 				return	"center_page"
 			}
 			else if(spine_index === 0) {
+				*/
+			if(spine_index === 0) {
 				// for ibooks, odd pages go on the right. This means
 				// the first page (0th index) will always be on the right
 				// without a left counterpart, so center it

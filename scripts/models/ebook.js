@@ -24,6 +24,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		});
 		this.on("change:num_pages", this.adjustCurrentPage, this);
 		this.on("change:spine_position", this.savePosition, this);
+		this.on("change:spine_position", this.setMetaSize, this);
 	},
 
 	defaults: {
@@ -100,7 +101,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		else {
 			this.set("current_page", [lastPage - 1, lastPage]);
 			if(this.get("rendered_spine_items").length > 1) {
-				var pos = this.get("rendered_spine_items")[lastPage - 2];
+
+				var ind = (lastPage > 1 ? lastPage - 2 : 0);
+				var pos = this.get("rendered_spine_items")[ind];
 				this.set("spine_position", pos);
 			}
 		}
@@ -280,6 +283,21 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				book: that,
 			});
 		}
+	},
+
+	setMetaSize: function() {
+
+		if(this.meta_section) {
+			this.meta_section.off("change:meta_height", this.setMetaSize);
+		}
+		this.meta_section = this.getCurrentSection();
+		if(this.meta_section.get("meta_height")) {
+			this.set("meta_size", {
+				width: this.meta_section.get("meta_width"),
+				height: this.meta_section.get("meta_height")
+			});
+		}
+		this.meta_section.on("change:meta_height", this.setMetaSize, this);
 	},
 
 	// when the spine position changes we need to update the

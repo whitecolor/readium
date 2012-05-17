@@ -9,6 +9,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		//this.model.on("first_render_ready", this.render, this);
 		this.model.on("change:two_up", this.setUpMode, this);
+		this.model.on("change:meta_size", this.setContainerSize, this);
 	},
 
 	// sometimes these views hang around in memory before
@@ -22,11 +23,13 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 		// remove any listeners registered on the model
 		this.model.off("change:two_up", this.setUpMode);
+		this.model.off("change:meta_size", this.setUpMode);
 	},
 
 	render: function() {
 
 		$('body').addClass('apple-fixed-layout');
+
 
 		// appends one fixed layout page to those currently rendered
 		//var metaTags = this.model.parseMetaTags();
@@ -35,14 +38,27 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 		// wipe the html
 		this.$('#container').html("");
+		this.setContainerSize();
 
 		// add the current section
 		//this.addPage( this.model.getCurrentSection(), 1 );
 		//currentPage = this.model.set("current_page", [1]);
-		setTimeout(function() {
-			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
-		}, 1)
+		
 		return this.renderPages();
+	},
+
+	setContainerSize: function() {
+		var meta = this.model.get("meta_size");
+		if(meta) {
+			this.$el.width(meta.width * 2);
+			this.$el.height(meta.height);
+			if(!this.zoomed) {
+				this.zoomed = true;
+				setTimeout(function() {
+					$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
+				}, 1)	
+			}
+		}
 	},
 
 	addPage: function(sec, pageNum) {
