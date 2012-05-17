@@ -3501,10 +3501,9 @@ html, body, .library-container {
   overflow-x: hidden; }
 
 .library-container {
-  margin-top: 45px; }
+  padding-top: 45px; }
 
-/*************** BEGIN: INFO MODAL ***************/
-#version-info, .green, .modal-detail.green {
+.green {
   color: #6FA64D; }
 
 #readium-info {
@@ -3517,11 +3516,27 @@ html, body, .library-container {
   background-image: -ms-linear-gradient(top, #cccccc, white);
   background-image: -o-linear-gradient(top, #cccccc, white);
   background-image: linear-gradient(top, #cccccc, white); }
+  #readium-info #version-info, #readium-info .green, #readium-info .modal-detail.green {
+    color: #6FA64D; }
+  #readium-info p {
+    margin: 0;
+    margin-bottom: 15px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: #333;
+    text-align: center; }
+  #readium-info div {
+    text-align: center; }
+  #readium-info h3 {
+    line-height: 27px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    margin: 0;
+    text-rendering: optimizelegibility;
+    display: block; }
 
-#readium-info p {
-  margin-bottom: 15px; }
-
-/*************** END: INFO MODAL ***************/
 /*************** BEGIN: LIBRARY BOOKS ************/
 /***** General Rules ***********/
 .book-item .cover-image {
@@ -3652,17 +3667,19 @@ img.details-cover-image {
 
 /***** No Books message ******/
 #empty-message {
-  padding: 5px 25px; }
+  padding: 7px 0px;
+  text-align: right; }
 
 #empty-message-text {
   text-align: center;
-  position: relative;
   width: 250px;
   font-size: 2em;
   line-height: 1.1;
-  top: -60px;
-  left: 70px;
-  font-weight: 200; }
+  font-weight: 200;
+  display: inline-block;
+  position: relative;
+  left: 54px;
+  top: 62px; }
 
 /*************** END: LIBRARY BOOKS ************/
 #progress-container {

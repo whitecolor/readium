@@ -9,28 +9,14 @@ html, body, .library-container {
 }
 
 .library-container {
-  margin-top: 45px;
+  padding-top: 45px;
 }
 
-
-/*************** BEGIN: INFO MODAL ***************/
-
-#version-info, .green, .modal-detail.green {
+.green {
   color: #6FA64D;
 }
 
-#readium-info {
-  text-align: center; 
-  padding: 30px;
-  @include linear-gradient(top, #CCCCCC, #FFFFFF);
-
-}
-
-#readium-info p {
-  margin-bottom: 15px;
-}
-
-/*************** END: INFO MODAL ***************/
+@import 'readium_info_modal';
 
 /*************** BEGIN: LIBRARY BOOKS ************/
 
@@ -197,18 +183,20 @@ padding-top: 20px;
 /***** No Books message ******/
 
 #empty-message {
-  padding: 5px 25px;
+  padding: 7px 0px;
+  text-align: right;
 }
 
 #empty-message-text {
   text-align: center;
-  position: relative;
   width: 250px;
   font-size: 2em;
   line-height: 1.1;
-  top: -60px;
-  left: 70px;
   font-weight: 200;
+  display: inline-block;
+  position: relative;
+  left: 54px;
+  top: 62px;
 }
 
 

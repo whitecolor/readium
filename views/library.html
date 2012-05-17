@@ -113,7 +113,7 @@
 			
 			
 				
-			<div class="modal fade" id="readium-info" ><!-- le info modal -->
+			<div class="modal fade" id="readium-info" style="display: none" ><!-- le info modal -->
 				<div>
 					<img src="/images/info_modal/about_readium_logo.png">
 				</div>
@@ -193,7 +193,7 @@
 			</div><!-- end add le book -->
 
 
-		<div class="modal fade" id="readium-options-modal" ><!-- le settings modal -->
+		<div class="modal fade" id="readium-options-modal"  style="display: none"><!-- le settings modal -->
 			<div class="modal-header">
 				<a class="close" data-dismiss="modal">&times;</a>
 				<h2>Readium Options:</h2>
@@ -304,16 +304,17 @@
 
 		<script type="text/template" id='library-items-template'>
 			<div id='empty-message'>
-				<img id='empty-arrow' src='/images/library/empty_library_arrow.png' />
 				<p id='empty-message-text' class='green'>
 					Add items to your</br>library here!
 				</p>
+				<img id='empty-arrow' src='/images/library/empty_library_arrow.png' />
+				
 			</div>
 		</script>
 
 		<script type="text/template" id='extracting-item-template'>
 			<h5><%= log_message %></h5>
-			<div class="progress progress-striped active ">	
+			<div class="progress progress-striped progress-success active ">	
 	  			<div class="bar" style="width: <%= progress %>%;"></div>
 			</div>
 		</script>
