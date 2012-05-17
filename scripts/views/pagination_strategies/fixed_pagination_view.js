@@ -30,12 +30,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 		$('body').addClass('apple-fixed-layout');
 
-
-		// appends one fixed layout page to those currently rendered
-		//var metaTags = this.model.parseMetaTags();
-		//this.$el.width(metaTags.meta_width * 2);
-		//this.$el.height(metaTags.meta_height);
-
 		// wipe the html
 		this.$('#container').html("");
 		this.setContainerSize();
@@ -63,11 +57,12 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 	addPage: function(sec, pageNum) {
 		var that = this;
+		var view = sec.getPageView();
+		view.on("iframe_loaded", function() {
+			this.iframeLoadCallback({srcElement: view.iframe()});
+		}, this);
 		var content = sec.getPageView().render().el;
 		$(content).attr("id", "page-" + pageNum.toString());
-		$('.content-sandbox', content).on("load", function(e) {
-			that.iframeLoadCallback(e);
-		});
 		this.$('#container').append(content);
 		this.changePage();
 		return this;

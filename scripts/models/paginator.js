@@ -12,6 +12,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 	renderSpineItems: function(renderToLast) {
 		var book = this.model;
 		var spine_position = book.get("spine_position");
+		var that = this;
 		
 		// we are going to clear everything out and start from scratch
 		this.rendered_spine_positions = [];
@@ -46,6 +47,9 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			var page = this.rendered_spine_positions.indexOf(spine_position) + 1;
 			book.set("num_pages", pageNum - 1);
 			book.goToPage(page);
+			setTimeout(function() {
+				that.v.setContainerSize();
+			}, 5);
 		}
 		else {
 			if(this.shouldScroll()) {
