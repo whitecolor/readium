@@ -37,7 +37,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"toc_visible": false,
     	"can_two_up": true,
     	"rendered_spine_items": [],
-    	"spine_position": 0
+    	//"spine_position": 0
   	},
 
 	toggleTwoUp: function() {
