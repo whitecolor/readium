@@ -1,7 +1,8 @@
 @import 'bourbon/bourbon';
-@import 'bootstrap_sass/stylesheets/bootstrap';
+@import 'library_bootstrap';
 @import 'navbar_overrides';
 @import 'clearfix';
+@import 'readium_info_modal';
 
 html, body, .library-container {
   width: 100%;
@@ -15,8 +16,6 @@ html, body, .library-container {
 .green {
   color: #6FA64D;
 }
-
-@import 'readium_info_modal';
 
 /*************** BEGIN: LIBRARY BOOKS ************/
 

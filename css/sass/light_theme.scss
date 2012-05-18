@@ -3,14 +3,12 @@
 // general styles
 
 html, body, #container { 
-	background-color: #BBB;
+	background-color: white;
 }
 
 // reflowable paginated style
 
-	.page-margin {
-		@include box-shadow(0 0 5px 5px #777);
-	}
+	
 
 	.page-margin, .page {
 		background-color: #FFF;

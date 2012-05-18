@@ -15,8 +15,6 @@
 		<meta charset="UTF-8">
 
 		<!-- Le styles -->
-		<link rel="stylesheet" type="text/css" href="/lib/bootstrap-custom.min.css">
-		<link rel="stylesheet" type="text/css" href="/lib/bootstrap_responsive.css">
 		<link rel="stylesheet" type="text/css" href="/css/viewer_manifest.css">
 
 
@@ -67,30 +65,69 @@
  			
  		</div> 
 
- 		<div id='toolbar-el'>
-	 		<div id='top-bar'>
-	 			<!--<div id="title">This Is A Title</div>-->
-	 			<span class='top-bar-button' id="back-to-lib-button" >
-	 				<a href='/views/library.html'>
-						<img id='readium-icon' src="/images/top_bar/back_to_library.png" alt="lib" />
-					</a>
-				</span>
-				
+ 		<div class="navbar navbar-fixed-top" id='toolbar-el'><!-- le top bar -->
 
-				<div id='right-wrapper'>
-					<a data-toggle="modal" href="#readium-info" id='bar-logo'>
-						<img src="/images/top_bar/READIUM_TOOLBAR_LOGO.png" height="37px" width="139px"/>
+			<div class="navbar-inner" id="top-bar">
+				<div class="container" style="width: 100%">
+
+					<a class="brand" data-toggle="modal" href="#readium-info" id='bar-logo'>
+						<img src="/images/top_bar/readium_logo.png"/>
 					</a>
-					<div class='bar-divider'></div>
-					<a id="hide-toolbar-button" class="toggle-bar-btn">
-		 				<img src="/images/top_bar/Up.png" alt="X" width="12px" height="12px" />
-					</a>
+
+					<ul class="nav pull-right">
+						<li class="divider-vertical stubby"></li>
+						<li>
+							<a href="#" id="back-to-lib-button">
+								<img src="/images/top_bar/ico_library.png" class="small"/>
+							</a>
+						</li>
+						<li>
+							<a href="#" id='block-view-btn'>
+								<img src="/images/top_bar/ico_toc.png" class="small"/>
+							</a>
+						</li>
+						<li>
+							<a href="#" id='block-view-btn'>
+								<img src="/images/top_bar/ico_tts.png" class="small"/>
+							</a>
+						</li>
+						<li class="divider-vertical stubby"></li>
+						<li>
+							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
+								<img src="/images/top_bar/options.png" class="small"/>
+							</a>
+						</li>
+						<li>
+							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
+								<img src="/images/top_bar/ico_nightmode_toggle_off.png" class="small"/>
+							</a>
+						</li>
+						<li>
+							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
+								<img src="/images/top_bar/ico_fs_toggle_on.png" class="small"/>
+							</a>
+						</li>
+						<li class="divider-vertical"></li>
+						<li style="margin-right: 15px">
+							<a id="hide-toolbar-button" class="toggle-bar-btn">
+		 						<img src="/images/top_bar/ico_closeUI.png" alt="X" />
+							</a>
+						</li>
+
+					</ul>
+			
+
 				</div>
- 			</div>
- 			<span id="show-toolbar-button" class="pull-right toggle-bar-btn" >
- 				<img src="/images/top_bar/Down.png" alt="V" width="12px" height="12px" />
+			</div>
+			<span id="show-toolbar-button" class="pull-right">
+ 				<img src="/images/top_bar/ico_openUI.png" alt="V"  />
 			</span>
- 		</div>
+    	</div><!-- end le top bar -->
+
+    	<a id="next-page-button"></a>
+    	<a id="prev-page-button"></a>
+
+    		
 
  		<div id="settings" class="clearfix">
 			<span class='setting-button' id="show-toc-button">

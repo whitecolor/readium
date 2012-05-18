@@ -8,3 +8,7 @@
 .navbar .divider-vertical.stubby {
   margin-top: 8px;
   height: 30px; }
+
+#show-toolbar-button {
+  padding: 5px;
+  margin-right: 12px; }
