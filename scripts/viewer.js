@@ -60,5 +60,12 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 			toc_item.fetch();
 
 		}
-	}
+	},
+
+	
+	
+	events: {
+		"click #prev-page-button": 		function() { this.model.prevPage() },
+		"click #next-page-button": 		function() { this.model.nextPage() }
+  	},
 });
