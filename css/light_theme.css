@@ -1,6 +1,26 @@
 html, body, #container {
   background-color: white; }
 
+.default-theme {
+  background-color: white;
+  color: black; }
+
+.vancouver-theme {
+  background-color: #DDD;
+  color: #576b96; }
+
+.ballard-theme {
+  background-color: #576b96;
+  color: #DDD; }
+
+.parchment-theme {
+  background-color: #f7f1cf;
+  color: #774c27; }
+
+.night-theme {
+  background-color: black;
+  color: white; }
+
 .page-margin, .page {
   background-color: #FFF; }
 

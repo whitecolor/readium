@@ -93,18 +93,19 @@
 						</li>
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
+							<a href="#viewer-settings-modal" id="options-btn" data-toggle="modal">
 								<img src="/images/top_bar/options.png" class="small"/>
 							</a>
 						</li>
 						<li>
-							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
+							<a href="#" id="nightmode-btn" data-toggle="modal">
 								<img src="/images/top_bar/ico_nightmode_toggle_off.png" class="small"/>
 							</a>
 						</li>
 						<li>
-							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
-								<img src="/images/top_bar/ico_fs_toggle_on.png" class="small"/>
+							<a href="#" id="fs-toggle-btn" >
+								<img src="/images/top_bar/ico_fs_toggle_on.png" class="small" id="go-to-fs-ico"/>
+								<img src="/images/top_bar/ico_fs_toggle_off.png" class="small" id="leave-fs-ico"/>
 							</a>
 						</li>
 						<li class="divider-vertical"></li>
@@ -169,6 +170,55 @@
 				<div id='spine-divider'></div>
 			</div>
 		</div>
+
+		<div class="modal fade" id="viewer-settings-modal"  style="display: none"><!-- le settings modal -->
+			<div id='settings-margin'>
+				<div id="preview-text">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus neque dui, congue a suscipit non, feugiat eu urna. Donec tempus, nunc vel rutrum posuere, quam magna imperdiet elit, eget facilisis mauris tellus non eros. Cras in felis sed orci aliquam sagittis. Cras adipiscing rhoncus justo commodo sodales. Phasellus vel mauris vel ipsum semper feugiat at ut sapien. Mauris consectetur aliquam aliquam. Nunc viverra dictum enim sit amet cursus.
+
+					Proin adipiscing rutrum ante. Vivamus tristique nisl quis neque viverra facilisis. Maecenas quis quam risus, at lacinia quam. Maecenas imperdiet, eros quis vulputate rutrum, metus neque sollicitudin libero, vel lobortis elit nisl sit amet lectus. Proin metus elit, mollis in fringilla sit amet, fermentum et odio. Sed sapien metus, consequat a bibendum et, eleifend eu mi. Praesent interdum lorem non risus sollicitudin vitae viverra nisi accumsan. Donec felis odio, tempus quis venenatis ac, auctor vitae sapien. Aenean quis nisl risus. Nulla sed pellentesque mauris.
+				</div>
+				<div>
+					<h3 class="setting-header">FONT SIZE</h3>
+					<div class="clearfix">
+						<span id="font-size-icon"></span>
+						<input type="range" id="font-size-input" />
+					</div>
+				</div>
+				<div>
+					<h3 class="setting-header">MARGINS</h3>
+					<div class="clearfix">
+						<span id="margin-option-1" class="margin-radio clickable"></span>
+						<span id="margin-option-2" class="margin-radio clickable"></span>
+						<span id="margin-option-3" class="margin-radio clickable"></span>
+						<span id="margin-option-4" class="margin-radio clickable"></span>
+						<span id="margin-option-5" class="margin-radio clickable"></span>
+					</div>
+				</div>
+				<div>
+					<h3 class="setting-header">TEXT AND BACKGROUND COLOR</h3>
+					<div class="clearfix">
+						<span id="default-theme-option" class="theme-option default-theme clickable">Black and White</span>
+						<span id="default-theme-option" class="theme-option night-theme clickable">Arabian Nights</span>
+						<span id="parchment-theme-option" class="theme-option parchment-theme clickable">Sands of Dune</span>
+						<span id="ballard-theme-option" class="theme-option ballard-theme clickable">Ballard Blues</span>
+						<span id="vancouver-theme-option" class="theme-option vancouver-theme clickable">Vancouver Mist</span>
+					</div>
+				</div>
+				<div>
+					<h3 class="setting-header">DISPLAY FORMAT</h3>
+					<div class="clearfix" id="two-up-options">
+						<span id="one-up-option clickable" class="simple-radio clickable">Single Pages</span>
+						<span id="two-up-option clickable" class="simple-radio clickable">Double Pages</span>
+					</div>
+				</div>
+			</div>
+			<div id="settings-form-footer" class="clearfix">
+				<button class='btn btn-inverse'>Cancel</button>
+				<button class='btn btn-inverse'>Save Settings</button>
+			</div>
+			
+		</div><!-- end le info modal -->
 
 		<div class="modal fade" id="readium-info"  style="display: none"><!-- le info modal -->
 			<div>
