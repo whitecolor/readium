@@ -5,6 +5,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 	initialize: function() {
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
+		this.model.on("change:current_theme", this.renderTheme, this);
 
 		this.optionsPresenter = new Readium.Models.OptionsPresenter({
 			book: this.model
@@ -56,7 +57,23 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	render: function() {
 		// right now we dont do anything but 
 		// convention is to return this from render
+		this.renderTheme();
 		return this; 
+	},
+
+	renderTheme: function() {
+		var theme = this.model.get("current_theme");
+		this.$el.toggleClass("default-theme", "default-theme" === theme);
+		this.$el.toggleClass("night-theme", "night-theme" === theme);
+		this.$el.toggleClass("parchment-theme", "parchment-theme" === theme);
+		this.$el.toggleClass("ballard-theme", "ballard-theme" === theme);
+		this.$el.toggleClass("vancouver-theme", "vancouver-theme" === theme);
+
+		this.$("#readium-book-view-el").toggleClass("default-theme", "default-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("night-theme", "night-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("parchment-theme", "parchment-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("ballard-theme", "ballard-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("vancouver-theme", "vancouver-theme" === theme);
 	},
 
 	init_toc: function() {

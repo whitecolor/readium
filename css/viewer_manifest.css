@@ -1635,9 +1635,6 @@ body.apple-fixed-layout {
   margin: 5px;
   list-style: none; }
 
-html, body, #container {
-  background-color: white; }
-
 .default-theme {
   background-color: white;
   color: black; }
@@ -1657,12 +1654,6 @@ html, body, #container {
 .night-theme {
   background-color: black;
   color: white; }
-
-.page-margin, .page {
-  background-color: #FFF; }
-
-#content {
-  color: #EEE; }
 
 .dark-theme html, .dark-theme body, .dark-theme #container {
   background-color: #000; }
