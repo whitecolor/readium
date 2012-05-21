@@ -5,6 +5,12 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 	initialize: function() {
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
+
+		this.optionsPresenter = new Readium.Models.OptionsPresenter({
+			book: this.model
+		});
+		this.optionsView = new Readium.Views.OptionsView({model: this.optionsPresenter});
+		this.optionsView.render();
 		
 		// the little overlay
 		this.navWidget = new Readium.Views.NavWidgetView({model: _book});
