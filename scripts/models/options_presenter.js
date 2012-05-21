@@ -25,7 +25,7 @@ Readium.Models.OptionsPresenter = Backbone.Model.extend({
 			"font_size": 		book.get("font_size"),
 	    	"two_up": 			book.get("two_up"),
 	    	"current_theme": 	book.get("current_theme"),
-	    	"current_margin": 	book.get("current_margin") 
+	    	"current_margin": 	book.get("current_margin")
 		});
 	}
 
