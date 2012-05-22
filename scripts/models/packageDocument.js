@@ -150,6 +150,27 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		return manifest;
 	},
 
+    resolveMediaOverlays2: function(manifest) {
+		var that = this;
+        var momap = {};
+        
+        // create a bunch of media overlay objects
+	    manifest.forEach( function(item) {
+			if(item.media_type == "application/smil+xml") {
+                var url = that.resolveUri(item.href);
+                var moObject = new Readium.Models.MediaOverlay({smilUrl: url});
+                momap[item.id] = moObject;
+            }
+		});
+        
+        // assign MOs to manifest items
+	    manifest.forEach( function(item) {
+			if(item.media_overlay != "") {
+                item.mediaOverlayObject = momap[item.media_overlay];
+            }
+		});
+    },
+    
 	paginateBackwards: function(xmlDom) {
 		return $('spine', xmlDom).attr('page-progression-direction') === "ltr";
 	},
@@ -184,7 +205,9 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(json.metadata.layout === "pre-paginated") {
 			json.metadata.fixed_layout = true;
 		}
-		json.manifest = this.resolveMediaOverlays(json.manifest);
+        
+        this.resolveMediaOverlays2(json.manifest);
+		//json.manifest = this.resolveMediaOverlays(json.manifest);
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this})
 		json.spine = this.parseSpineProperties(json.spine);
 		return json;
