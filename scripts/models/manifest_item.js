@@ -159,7 +159,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
     
     getMediaOverlay: function() {
         if (this.hasMediaOverlay()) {  
-            return this.collection.getMediaOverlay(this.media_overlay);
+            return this.collection.packageDocument.getMediaOverlay(this.media_overlay);
         } 
         return null;
     }
@@ -172,10 +172,6 @@ Readium.Collections.ManifestItems = Backbone.Collection.extend({
 
 	initialize: function(models, options) {
 		this.packageDocument = options.packageDocument;   
-    },
-    
-    getMediaOverlay: function(idref) {
-        return this.packageDocument.getMediaOverlay(idref);
     }
 });
 
