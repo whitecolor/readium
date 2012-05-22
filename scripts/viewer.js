@@ -5,11 +5,14 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 	initialize: function() {
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
-		
-		// the book's pages
-		this.paginator = this.model.CreatePaginator();
-		this.paginator.on("toggle_ui", this.toggleUI, this);
+		this.model.on("change:current_theme", this.renderTheme, this);
 
+		this.optionsPresenter = new Readium.Models.OptionsPresenter({
+			book: this.model
+		});
+		this.optionsView = new Readium.Views.OptionsView({model: this.optionsPresenter});
+		this.optionsView.render();
+		
 		// the little overlay
 		this.navWidget = new Readium.Views.NavWidgetView({model: _book});
 		this.navWidget.render();
@@ -18,18 +21,11 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.toolbar = new Readium.Views.ToolbarView({model: _book});
 		this.toolbar.render();
 
+		// the table of contents
 		this.model.on("change:has_toc", this.init_toc, this);
 
 		this.addGlobalEventHandlers();
 
-	},
-
-	toggleUI: function() {
-		/*
-		this.uiVisible = !this.uiVisible;
-		$('#top-bar').css("top", (this.uiVisible ? "0px" : "-44px") );
-		$('#settings').toggleClass('hover-fade', !this.uiVisible);
-		*/
 	},
 
 	toggleFullscreen: function() {
@@ -59,11 +55,25 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.toggleUI();
-		var that = this;
-		setTimeout(function() {
-			that.toggleUI();
-		}, 2000);
+		// right now we dont do anything but 
+		// convention is to return this from render
+		this.renderTheme();
+		return this; 
+	},
+
+	renderTheme: function() {
+		var theme = this.model.get("current_theme");
+		this.$el.toggleClass("default-theme", "default-theme" === theme);
+		this.$el.toggleClass("night-theme", "night-theme" === theme);
+		this.$el.toggleClass("parchment-theme", "parchment-theme" === theme);
+		this.$el.toggleClass("ballard-theme", "ballard-theme" === theme);
+		this.$el.toggleClass("vancouver-theme", "vancouver-theme" === theme);
+
+		this.$("#readium-book-view-el").toggleClass("default-theme", "default-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("night-theme", "night-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("parchment-theme", "parchment-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("ballard-theme", "ballard-theme" === theme);
+		this.$("#readium-book-view-el").toggleClass("vancouver-theme", "vancouver-theme" === theme);
 	},
 
 	init_toc: function() {
@@ -73,5 +83,12 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 			toc_item.fetch();
 
 		}
-	}
+	},
+
+	
+	
+	events: {
+		"click #prev-page-button": 		function() { this.model.prevPage() },
+		"click #next-page-button": 		function() { this.model.nextPage() }
+  	},
 });

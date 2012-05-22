@@ -2,23 +2,41 @@
 
 // general styles
 
-html, body, #container { 
-	background-color: #BBB;
+.default-theme {
+	background-color: white;
+	color: black;
 }
 
+.vancouver-theme {
+	background-color: #DDD;
+	color: #576b96;
+}
+
+.ballard-theme {
+	background-color: #576b96;
+	color: #DDD;
+}
+
+.parchment-theme {
+	background-color: #f7f1cf;
+	color: #774c27;
+}
+
+.night-theme {
+	background-color: black;
+	color: white;
+}
 // reflowable paginated style
 
-	.page-margin {
-		@include box-shadow(0 0 5px 5px #777);
-	}
+	
 
-	.page-margin, .page {
-		background-color: #FFF;
-	}
+//	.page-margin, .page {
+//		background-color: #FFF;
+//	}
 
-	#content {
-		color: #EEE;
-	}
+//	#content {
+//		color: #EEE;
+//	}
 
 .dark-theme {
 	html, body, #container { 

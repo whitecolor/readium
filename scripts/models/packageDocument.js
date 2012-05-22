@@ -1,9 +1,3 @@
-Readium.Models.ManifestItem = Backbone.Model.extend({});
-
-Readium.Collections.ManifestItems = Backbone.Collection.extend({
-	model: Readium.Models.ManifestItem,
-});
-
 /**
  * This is root of all PackageDocument subclasses and the EBook class
  * it, contains only the logic for parsing a packagedoc.xml and 
@@ -120,7 +114,10 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			
 		}
 		for(var i = 0; i < spine.length; i++) {
-			spine[i].properties = parseProperiesString(spine[i].properties);
+			
+			var props = parseProperiesString(spine[i].properties);
+			// add all the properties to the spine item
+			_.extend(spine[i], props);
 		}
 		return spine;
 	},
@@ -159,9 +156,26 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(json.metadata.layout === "pre-paginated") {
 			json.metadata.fixed_layout = true;
 		}
-		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
+		json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this})
 		json.spine = this.parseSpineProperties(json.spine);
 		return json;
+	},
+
+
+	// combine the spine item data with the corresponding manifest
+	// data to build useful set of backbone objects
+	crunchSpine: function(spine, manifest) {
+		//var bbSpine = new Readium.Collections.Spine(spine, {packageDocument: this});
+		var index = -1; // to keep track of the index of each spine item
+		var bbSpine = _.map(spine, function(spineItem) {
+			index += 1;
+			var manItem = manifest.find(function(x) {
+				if(x.get("id") === spineItem["idref"]) return x;
+			});
+			// crunch spine attrs and manifest attrs together into one obj
+			return _.extend({}, spineItem, manItem.attributes, {"spine_index": index});
+		});
+		return new Readium.Collections.Spine(bbSpine, {packageDocument: this});
 	},
 
 	reset: function(data) {
@@ -173,6 +187,21 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		uri = new URI(rel_uri);
 		return uri.resolve(this.uri_obj).toString();
 	},
+
+	// reslove a relative file path to relative to this the
+	// the path of this pack docs file path
+	resolvePath: function(path) {
+		var suffix;
+		var pack_doc_path = this.file_path;
+		if(path.indexOf("../") === 0) {
+			suffix = path.substr(3);
+		}
+		else {
+			suffix = path;
+		}
+		var ind = pack_doc_path.lastIndexOf("/")
+		return pack_doc_path.substr(0, ind) + "/" + suffix;
+	}
 
 });
 
@@ -284,44 +313,19 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	defaults: {
 		spine_position: 0
 	},
-
-	getManifestItem: function(spine_position) {
-		var spine = this.get("spine");
-		if(spine_position < 0 || spine_position >= spine.length) {
-			return null;
-		}
-		var target = spine[spine_position];
-		return this.getManifestItemById(target.idref);
-	},
-
+	
 	getManifestItemById: function(id) {
 		return this.get("manifest").find(function(x) { 
 					if(x.get("id") === id) return x;
 				});
 	},
 
-	currentSection: function(offset) {
-		if(!offset) {
-			offset = 0;
-		}
-		var spine_pos = this.get("spine_position") + offset;
-		return this.getManifestItem(spine_pos);
+	getSpineItem: function(index) {
+		return this.get("res_spine").at(index);
 	},
 
-	currentSpineItem: function(offset) {
-		if(!offset) {
-			offset = 0;
-		}
-		var spine_pos = this.get("spine_position");
-		return this.get("spine")[spine_pos + offset];
-	},
-
-	hasNextSection: function() {
-		return this.get("spine_position") < (this.get("spine").length - 1);
-	},
-
-	hasPrevSection: function() {
-		return this.get("spine_position") > 0;
+	spineLength: function() {
+		return this.get("res_spine").length;
 	},
 
 	goToNextSection: function() {
@@ -332,6 +336,19 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 	goToPrevSection: function() {
 		var cp = this.get("spine_position");
 		this.set({spine_position: (cp - 1) });	
+	},
+
+	spineIndexFromHref: function() {
+		var spine = this.get("res_spine");
+		href = this.resolveUri(href).replace(/#.*$/, "");
+		for(var i = 0; i < spine.length; i++) {
+			var path = spine.at(i).get("href");
+			path = this.resolveUri(path).replace(/#.*$/, "");
+			if(path === href) {
+				return i;
+			}
+		}
+		return -1;
 	},
 
 	goToHref: function(href) {
@@ -362,15 +379,6 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		}
 	},
 
-	getResolvedSpine: function() {
-		var spine_length = this.get("spine").length;
-		var res_spine = [];
-		for(var i = 0; i < spine_length; i++) {
-			res_spine.push( this.getManifestItem(i) );
-		}
-		return res_spine;
-	},
-
 	getTocItem: function() {
 		var manifest = this.get("manifest");
 		var spine_id = this.get("metadata").ncx;
@@ -390,6 +398,12 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 
 		return null;
 	},
+
+	parse: function(data) {
+		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, data);
+		json.res_spine = this.crunchSpine(json.spine, json.manifest);
+		return json;
+	}
 
 
 });

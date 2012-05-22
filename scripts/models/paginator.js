@@ -6,55 +6,14 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 		this.rendered_spine_positions = [];
 		this.model = this.get("book");
-		
-		// keep track of which direction we are moving through the publication
-		this.model.packageDocument.on("increased:spine_position", this.increasedSpinePosHandler, this);
-		this.model.packageDocument.on("decreased:spine_position", this.decreasedSpinePosHandler, this);
-
-		// whenever current content changes it means, the spine item has been changed
-		// and it is loaded up and ready to go
-		this.model.on("change:current_content", this.renderSpineItem, this);
-
 	},
-
-	increasedSpinePosHandler: function() {
-		this.renderToLastPage = false;
-
-		if(this.rendered_spine_positions.indexOf(this.model.get("spine_position"))  > -1) {
-			var sp = this.rendered_spine_positions[this.rendered_spine_positions.length - 1] + 1;
-			if(sp <  this.model.packageDocument.get("spine").length) {
-				this.model.packageDocument.set("spine_position", sp );	
-			}
-		}
-		else {
-			this.model.spinePositionChangedHandler();		
-		}
-		
-	},
-
-	decreasedSpinePosHandler: function() {
-		this.renderToLastPage = true;
-		if(this.rendered_spine_positions.indexOf(this.model.packageDocument.get("spine_position"))  > -1) {
-			var sp = this.rendered_spine_positions[0] - 1;
-			if(sp >= 0) {
-				this.model.packageDocument.set("spine_position", sp);	
-			}
-		}
-		else {
-			this.model.spinePositionChangedHandler();	
-		}
-		
-	},
-
 
 	// determine what the current spine item is and render it out
-	renderSpineItem: function(renderToLast) {
+	renderSpineItems: function(renderToLast) {
 		var book = this.model;
-		var spine_position = book.packageDocument.get("spine_position");
-		if(this.rendered_spine_positions.indexOf(spine_position) > -1) {
-			// the current spine position is already rended
-			return;
-		}
+		var spine_position = book.get("spine_position");
+		var that = this;
+		
 		// we are going to clear everything out and start from scratch
 		this.rendered_spine_positions = [];
 
@@ -64,28 +23,33 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		}
 
 
-		var spineItem = book.packageDocument.currentSpineItem();
+		var spineItem = book.getCurrentSection();
 		if(this.shouldRenderAsFixed(spineItem)) {
 			this.should_two_up = book.get("two_up");
 			book.set("two_up", false);
-			this.rendered_spine_positions.push(spine_position);
+			//this.rendered_spine_positions.push(spine_position);
 			this.v = new Readium.Views.FixedPaginationView({model: book});
 
-			// add any consecutive fixed layout sections
+			// throw down the UI
 			this.v.render();
 
-			var pageNum = 1; // we have added one so far
+			var pageNum = 1; // start from page 1
 			var offset = this.findPrerenderStart();
 
-			while( this.shouldPreRender(book.packageDocument.currentSpineItem(offset)) ) {
+			while( this.shouldPreRender( this.model.getCurrentSection(offset) ) ) {
 				this.v.addPage(book.getCurrentSection(offset), pageNum );
 				this.rendered_spine_positions.push(spine_position + offset);
 				pageNum += 1;
 				offset += 1;
-				if(offset === 0) {
-					book.set("current_page", [pageNum]);
-				}
 			}
+
+			// set the page we should be on
+			var page = this.rendered_spine_positions.indexOf(spine_position) + 1;
+			book.set("num_pages", pageNum - 1);
+			book.goToPage(page);
+			setTimeout(function() {
+				that.v.setContainerSize();
+			}, 5);
 		}
 		else {
 			if(this.shouldScroll()) {
@@ -97,25 +61,22 @@ Readium.Models.Paginator = Backbone.Model.extend({
 				}
 				this.v = new Readium.Views.ReflowablePaginationView({model: book});
 			}
-			this.v.render(this.renderToLastPage);
+			this.v.render(!!renderToLast);
 			this.rendered_spine_positions.push(spine_position);
 		}
+		return this.rendered_spine_positions;
 	},
 
 	findPrerenderStart: function() {
 		var i = 0;
-		var pd = this.model.packageDocument;
-		while ( this.shouldPreRender(pd.currentSpineItem(i-1)) ) {
+		while( this.shouldPreRender( this.model.getCurrentSection(i) ) ) {
 			i -= 1;
 		}
-		return i;
+		return i + 1; // sloppy fix for an off by one error
 	},
 
 	shouldRenderAsFixed: function(spineItem) {
-		if(typeof spineItem.properties.fixed_flow !== "undefined") {
-			return spineItem.properties.fixed_flow;
-		}
-		return this.model.isFixedLayout;
+		return spineItem.isFixedLayout();
 	},
 
 	shouldPreRender: function(sec) {

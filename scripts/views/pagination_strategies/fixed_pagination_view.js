@@ -9,6 +9,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		//this.model.on("first_render_ready", this.render, this);
 		this.model.on("change:two_up", this.setUpMode, this);
+		this.model.on("change:meta_size", this.setContainerSize, this);
 	},
 
 	// sometimes these views hang around in memory before
@@ -22,45 +23,49 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 		// remove any listeners registered on the model
 		this.model.off("change:two_up", this.setUpMode);
+		this.model.off("change:meta_size", this.setUpMode);
 	},
 
 	render: function() {
 
 		$('body').addClass('apple-fixed-layout');
 
-		// appends one fixed layout page to those currently rendered
-		var metaTags = this.model.parseMetaTags();
-		this.$el.width(metaTags.meta_width * 2);
-		this.$el.height(metaTags.meta_height);
-
 		// wipe the html
 		this.$('#container').html("");
+		this.setContainerSize();
 
 		// add the current section
 		//this.addPage( this.model.getCurrentSection(), 1 );
 		//currentPage = this.model.set("current_page", [1]);
-		setTimeout(function() {
-			$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
-		}, 1)
+		
 		return this.renderPages();
 	},
 
-	addPage: function(sec, pageNum) {
-
-		sec.page_num = pageNum;
-		var rendered_content = this.page_template(sec);
-		if(pageNum > 1) {
-			$(rendered_content).hide();
+	setContainerSize: function() {
+		var meta = this.model.get("meta_size");
+		if(meta) {
+			this.$el.width(meta.width * 2);
+			this.$el.height(meta.height);
+			if(!this.zoomed) {
+				this.zoomed = true;
+				setTimeout(function() {
+					$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
+				}, 1)	
+			}
 		}
-		this.model.changPageNumber(pageNum);
-		this.$('#container').append(this.page_template(sec));
+	},
+
+	addPage: function(sec, pageNum) {
 		var that = this;
-		this.$('.content-sandbox').on("load", function(e) {
-			// not sure why, on("load", this.applyBindings, this) was not working
-			that.applyBindings( $(e.srcElement).contents() );
-		});
-		//this.changePage();
-		
+		var view = sec.getPageView();
+		view.on("iframe_loaded", function() {
+			this.iframeLoadCallback({srcElement: view.iframe()});
+		}, this);
+		var content = sec.getPageView().render().el;
+		$(content).attr("id", "page-" + pageNum.toString());
+		this.$('#container').append(content);
+		this.changePage();
+		return this;
 	},
 
 	renderPages: function() {
@@ -78,9 +83,35 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		});
 	},
 
-	events: {
-		'click #page-wrap a': function(e) {
-			this.linkClickHandler(e)
-		}
+});
+
+
+Readium.Views.FixedPageView = Backbone.View.extend({
+
+	className: "fixed-page-wrap",
+
+	initialize: function() {
+		this.template = _.template( $('#fixed-page-template').html() );
+		this.model.on("change", this.render, this);
+	},
+
+	destruct: function() {
+		this.model.off("change", this.render);
+	},
+
+	render: function() {
+		var that = this;
+		var json = this.model.toJSON();
+		this.$el.html( this.template( json ) );
+		this.$el.addClass( this.model.getPositionClass() );
+		this.$('.content-sandbox').on("load", function() {
+			that.trigger("iframe_loaded");
+		});
+		return this;
+	},
+
+	iframe: function() {
+		return this.$('.content-sandbox')[0];
 	}
+
 });

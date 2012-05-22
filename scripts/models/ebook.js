@@ -2,20 +2,29 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	initialize: function() {
 		var that = this;
-		this.isFixedLayout = this.get("fixed_layout");
-		this.packageDocument = new Readium.Models.PackageDocument({}, {
+		// the book's pages
+		this.paginator = new Readium.Models.Paginator({book: this});
+
+		this.packageDocument = new Readium.Models.PackageDocument({ book: that }, {
 			file_path: this.get("package_doc_path")
 		});
 		//this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
 		this.packageDocument.fetch({
 			success: function() {
-				// TODO: restore location here
-				that.packageDocument.set({spine_position: that.restorePostition()});
-				that.packageDocument.trigger("change:spine_position");
-				that.set("has_toc", (!!that.packageDocument.getTocItem() ) );
+				var pos = that.restorePosition();
+				that.set("spine_position", pos);
+				var items = that.paginator.renderSpineItems(false);
+				that.set("rendered_spine_items", items);
+
+				//that.packageDocument.set({spine_position: pos}); // TODO: get rid of this
+				//that.packageDocument.trigger("change:spine_position"); // TODO: get rid of this
+				
+				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
 		this.on("change:num_pages", this.adjustCurrentPage, this);
+		this.on("change:spine_position", this.savePosition, this);
+		this.on("change:spine_position", this.setMetaSize, this);
 	},
 
 	defaults: {
@@ -27,6 +36,10 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"toolbar_visible": true,
     	"toc_visible": false,
     	"can_two_up": true,
+    	"rendered_spine_items": [],
+    	"current_theme": "default",
+    	"current_margin": 3
+    	//"spine_position": 0
   	},
 
 	toggleTwoUp: function() {
@@ -74,76 +87,82 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 	
 	prevPage: function() {
-
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
 		if(curr_pg[0] <= 1) {
-			this.packageDocument.goToPrevSection();
+			this.goToPrevSection();
 		}
 		else if(!this.get("two_up")){
 			this.set("current_page", [lastPage]);
+			if(this.get("rendered_spine_items").length > 1) {
+				var pos = this.get("rendered_spine_items")[lastPage - 1];
+				this.set("spine_position", pos);
+			}
 		}
 		else {
 			this.set("current_page", [lastPage - 1, lastPage]);
+			if(this.get("rendered_spine_items").length > 1) {
+
+				var ind = (lastPage > 1 ? lastPage - 2 : 0);
+				var pos = this.get("rendered_spine_items")[ind];
+				this.set("spine_position", pos);
+			}
 		}
 	},
 	
 	nextPage: function() {
 		var curr_pg = this.get("current_page");
-		var firstPage =curr_pg[curr_pg.length-1] + 1;
+		var firstPage = curr_pg[curr_pg.length-1] + 1;
 		if (curr_pg[curr_pg.length-1] >= this.get("num_pages") ) {
-			this.packageDocument.goToNextSection();
+			this.goToNextSection();
 		}
 		else if(!this.get("two_up")){
-			return this.set("current_page", [firstPage]);
+			this.set("current_page", [firstPage]);
+			if(this.get("rendered_spine_items").length > 1) {
+				var pos = this.get("rendered_spine_items")[firstPage - 1];
+				this.set("spine_position", pos);
+			}
 		}
 		else {
-			return this.set("current_page", [firstPage, firstPage+1]);
+			this.set("current_page", [firstPage, firstPage+1]);
+			if(this.get("rendered_spine_items").length > 1) {
+				var pos = this.get("rendered_spine_items")[firstPage - 1];
+				this.set("spine_position", pos);
+			}
 		}
-	},
-	
-	goToFirstPage: function() {
-		if( this.get("two_up") ) {
-			this.set("current_page", [0,1])
-		}
-		else {
-			this.set("current_page", [1]);
-		} 
 	},
 
 	goToLastPage: function() {
 		var page = this.get("num_pages");
+		this.goToPage(page);
+	},
 
-		if( this.get("two_up") ) {
-			this.set("current_page", [page-1, page])
+	goToPage: function(page) {
+		if(this.get("two_up")) {
+			if(page % 2 === 0) { // this logic needs to be smartened up
+				this.set("current_page", [page, page + 1]);	
+			}
+			else {
+				this.set("current_page", [page - 1, page]);
+			}
 		}
 		else {
 			this.set("current_page", [page])
 		}
 	},
 
-	restorePostition: function() {
+	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.get("key"));
 		return parseInt(pos, 10) || 0;
 	},
 
 	savePosition: function() {
-		Readium.Utils.setCookie(this.get("key"), this.packageDocument.get("spine_position"), 365);
+		Readium.Utils.setCookie(this.get("key"), this.get("spine_position"), 365);
 	},
 
-	// TODO: do move this into package doc class (no sense it being here)
 	resolvePath: function(path) {
-		var suffix;
-		var pack_doc_path = this.packageDocument.file_path;
-		if(path.indexOf("../") === 0) {
-			suffix = path.substr(3);
-		}
-		else {
-			suffix = path;
-		}
-		var ind = pack_doc_path.lastIndexOf("/")
-		return pack_doc_path.substr(0, ind) + "/" + suffix;
+		return this.packageDocument.resolvePath(path);
 	},
 
 	adjustCurrentPage: function() {
@@ -158,35 +177,78 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	goToNextSection: function() {
 		// Is this check even necessary?
 		// I think package doc validations takes care of it
-		if(this.packageDocument.hasNextSection() ) {
-			this.packageDocument.goToNextSection();	
+		if(this.hasNextSection() ) {
+			var pos = this.get("spine_position");
+			this.setSpinePos(pos + 1);
 		}
 	},
 	
 	goToPrevSection: function() {
 		// Is this check even necessary?
 		// I think package doc validations takes care of it
-		if(this.packageDocument.hasPrevSection() ) {
-			this.packageDocument.goToPrevSection();		
+		if(this.hasPrevSection() ) {
+			var pos = this.get("spine_position");
+			this.setSpinePosBackwards(pos - 1);	
 		}
 	},
-	
-	getSectionText: function(successCallback, failureCallback) {
-		var path = this.packageDocument.currentSection();
-		Readium.FileSystemApi(function(fs) {
-			fs.readTextFile(resolvePath(path), successCallback, failureCallback);
-		});
+
+	hasNextSection: function() {
+		return this.get("spine_position") < (this.packageDocument.spineLength() - 1);
+	},
+
+	hasPrevSection: function() {
+		return this.get("spine_position") > 0;
+	},
+
+	setSpinePos: function(pos) {
+		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
+			// invalid position
+			return;
+		}
+		var spineItems = this.get("rendered_spine_items");
+		this.set("spine_position", pos);
+		if(spineItems.indexOf(pos) >= 0) {
+			// the spine item is already on the page
+			if(spineItems.length > 1) {
+				// we are in fixed layout state, one spine item per page
+				this.goToPage(spineItems.indexOf(pos) + 1);
+			}
+			// else nothing to do, because the section is already rendered out
+			
+		}
+		else {
+			// the section is not rendered out, need to do so
+			var items = this.paginator.renderSpineItems(false);
+			this.set("rendered_spine_items", items);	
+		}
+		
+	},
+
+	setSpinePosBackwards: function(pos) {
+		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
+			// invalid position
+			return;
+		}
+		this.set("spine_position", pos);
+		if(this.get("rendered_spine_items").indexOf(pos) >= 0) {
+			// the spine item is already on the page, nothing to do
+			return;
+		}
+		var items = this.paginator.renderSpineItems(true);
+		this.set("rendered_spine_items", items);
 	},
 
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
 		// firs thing is to split off the hash frag from the reset
 		// of the url:
+		debugger;
 		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
 
 		// handle the base url first:
 		if(splitUrl[1]) {
-			this.packageDocument.goToHref(splitUrl[1]);
+			var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
+			this.setSpinePos(spine_pos);
 		}
 
 		// now try to handle the fragment if there was one,
@@ -225,18 +287,19 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
-	goToPage: function(page) {
-		if(this.get("two_up")) {
-			if(page % 2 === 0) {
-				this.set("current_page", [page, page + 1]);	
-			}
-			else {
-				this.set("current_page", [page - 1, page]);
-			}
+	setMetaSize: function() {
+
+		if(this.meta_section) {
+			this.meta_section.off("change:meta_height", this.setMetaSize);
 		}
-		else {
-			this.set("current_page", [page])
+		this.meta_section = this.getCurrentSection();
+		if(this.meta_section.get("meta_height")) {
+			this.set("meta_size", {
+				width: this.meta_section.get("meta_width"),
+				height: this.meta_section.get("meta_height")
+			});
 		}
+		this.meta_section.on("change:meta_height", this.setMetaSize, this);
 	},
 
 	// when the spine position changes we need to update the
@@ -245,7 +308,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	// to persist the position in a cookie
 	spinePositionChangedHandler: function() {
 		var that = this;
-		var sect = this.packageDocument.currentSection();
+		var sect = this.getCurrentSection();
 		var path = sect.get("href");
 		var url = this.packageDocument.resolveUri(path);;
 		path = this.resolvePath(path);
@@ -262,108 +325,17 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.savePosition();
 	},
 
-	// this method creates the JSON representation of a manifest item
-	// that is used to render out a page view.
-	buildSectionJSON: function(manifest_item, spine_index) {
-		if(!manifest_item) {
-			return null;
+	getCurrentSection: function(offset) {
+		if(!offset) {
+			offset = 0;
 		}
-		var section = Object.create(null);
-		section.width = this.get("meta_width") || 0;
-		section.height = this.get("meta_height") || 0;
-		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
-		section.page_class = this.getPositionClass(manifest_item, spine_index);
-		return section;
+		var spine_pos = this.get("spine_position") + offset;
+		return this.packageDocument.getSpineItem(spine_pos);
 	},
 
-	// when rendering fixed layout pages we need to determine whether the page
-	// should be on the left or the right in two up mode, options are:
-	// 	left_page: 		render on the left side
-	//	right_page: 	render on the right side
-	//	center_page: 	always center the page horizontally
-	getPositionClass: function(manifest_item, spine_index) {
-
-		if(this.get("apple_fixed")) {
-			// the logic for apple fixed layout is a little different:
-			if(!this.get("open_to_spread")) {
-				// page spread is disabled for this book
-				return	"center_page"
-			}
-			else if(spine_index === 0) {
-				// for ibooks, odd pages go on the right. This means
-				// the first page (0th index) will always be on the right
-				// without a left counterpart, so center it
-				return "center_page";
-			}
-			else if (spine_index % 2 === 1 && 
-				spine_index === this.packageDocument.get("spine").length ) {
-
-				// if the last spine item in the book would be on the left, then
-				// it would have no left counterpart, so center it
-				return "center_page";
-			}
-			else {
-				// otherwise first page goes on the right, and then alternate
-				// left - right - left - right etc
-				return (spine_index % 2 === 0 ? "right_page" : "left_page");
-			}
-		}
-		else {
-			return (spine_index % 2 === 0 ? "right_page" : "left_page");
-		}
-	},
-
-	getAllSections: function() {
-		var spine = this.packageDocument.getResolvedSpine();
-		var sections = [];
-		for(var i = 0; i < spine.length; i++) {
-			sections.push(this.buildSectionJSON( spine[i], i ));
-		}
-		return sections;
-	},
-
-	getCurrentSection: function(i) {
-		// i is an optional arg, if it was not passed in default to 0
-		i = i || 0; 
-		var spine_index = i + this.packageDocument.get("spine_position");
-		return this.buildSectionJSON(this.packageDocument.currentSection(i), spine_index);
-	},
-
-
-	parseViewportTag: function(viewportTag) {
-		// this is going to be ugly
-		var str = viewportTag.getAttribute('content');
-		str = str.replace(/\s/g, '');
-		var valuePairs = str.split(',');
-		var values = {};
-		var pair;
-		for(var i = 0; i < valuePairs.length; i++) {
-			pair = valuePairs[i].split('=');
-			if(pair.length === 2) {
-				values[ pair[0] ] = pair[1];
-			}
-		}
-		values['width'] = parseFloat(values['width']);
-		values['height'] = parseFloat(values['height']);
-		return values;
-	},
-
-	parseMetaTags: function() {
-		var parser = new window.DOMParser();
-		var dom = parser.parseFromString(this.get('current_content'), 'text/xml');
-		var tag = dom.getElementsByName("viewport")[0];
-		if(tag) {
-			var pageSize = this.parseViewportTag(tag);
-			this.set({"meta_width": pageSize.width, "meta_height": pageSize.height})
-			return {meta_width: pageSize.width, meta_height: pageSize.height};
-		}
-		return null;
-		
-		
-	},
-
-	CreatePaginator: function() {
-    	return new Readium.Models.Paginator({book: this});
-	},
+	// is this book set to fixed layout at the meta-data level
+	isFixedLayout: function() {
+		return this.get("fixed_layout") || this.get("apple_fixed");
+	}
 	
 });

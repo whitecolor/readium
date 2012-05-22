@@ -29,20 +29,19 @@ describe("ebook", function() {
 			expect(args[1].file_path).toEqual("banana");
 		});
 
+		it('passes a reference to itself to the package document', function() {
+			ebook = new Readium.Models.Ebook({"package_doc_path": "banana"});
+			var args = Readium.Models.PackageDocument.mostRecentCall.args;
+			expect(args[0].book).toEqual(ebook);
+		});
+
 		it("calls fetch on the package document", function() {
 			spyOn(pacDocStub, "fetch");
 			ebook = new Readium.Models.Ebook({"package_doc_path": "banana"});
 			expect(pacDocStub.fetch).toHaveBeenCalled()
 		});
 
-		it("sets the page number after successful fetch", function() {
-			spyOn(pacDocStub, "fetch");
-			spyOn(pacDocStub, "set");
-			ebook = new Readium.Models.Ebook({"package_doc_path": "banana"});
-			var args = pacDocStub.fetch.mostRecentCall.args;
-			args[0].success();
-			expect(pacDocStub.set).toHaveBeenCalled();	
-		});
+		
 
 	});
 

@@ -6,6 +6,31 @@ html, body {
 	overflow: hidden;
 }
 
+body {
+	padding-top: 45px;
+}
+
+#next-page-button {
+	right: 0;
+	background-image: url('/images/paginator/next_page.png');
+}
+
+#prev-page-button {
+	left: 0;
+	background-image: url('/images/paginator/previous_page.png');
+}
+
+#next-page-button, #prev-page-button {
+	position: fixed;
+	top: 50%;
+	width: 60px;
+	height: 108px;
+	margin-top: -54px;
+	background-repeat: no-repeat;
+	z-index: 1000;
+	@include user-select(none);
+}
+
 #readium-book-view-el, #container, #page-wrap {
 	margin: 0;
     padding: 0;

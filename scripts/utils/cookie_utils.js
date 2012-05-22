@@ -17,3 +17,7 @@ Readium.Utils.getCookie = function(c_name) {
 		}
 	}
 }
+
+Readium.Utils.trimString = function(str) {
+	return str.replace(/^\s+|\s+$/g, '');
+}

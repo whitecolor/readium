@@ -1,65 +1,31 @@
-/*
-Syntax error: Undefined mixin 'box-shadow'.
-        on line 12 of css/sass/light_theme.scss, in `box-shadow'
-        from line 12 of css/sass/light_theme.scss
+.default-theme {
+  background-color: white;
+  color: black; }
 
-7: }
-8: 
-9: // reflowable paginated style
-10: 
-11: 	.page-margin {
-12: 		@include box-shadow(0 0 5px 5px #777);
-13: 	}
-14: 
-15: 	.page-margin, .page {
-16: 		background-color: #FFF;
-17: 	}
+.vancouver-theme {
+  background-color: #DDD;
+  color: #576b96; }
 
-Backtrace:
-css/sass/light_theme.scss:12:in `box-shadow'
-css/sass/light_theme.scss:12
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:170:in `visit_mixin'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:18:in `visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:53:in `map'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:53:in `visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:27:in `block in visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:39:in `with_environment'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:26:in `visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `block in visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:238:in `visit_rule'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:18:in `visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:53:in `map'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:53:in `visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:27:in `block in visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:39:in `with_environment'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:26:in `visit_children'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `block in visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:47:in `visit_root'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:18:in `visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:7:in `visit'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/root_node.rb:20:in `render'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/engine.rb:299:in `_render'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/engine.rb:246:in `render'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:339:in `update_stylesheet'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:202:in `block in update_stylesheets'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:200:in `each'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:200:in `update_stylesheets'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:234:in `watch'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin.rb:107:in `method_missing'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:431:in `watch_or_update'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:302:in `process_result'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:41:in `parse'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:21:in `parse!'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/bin/sass:8:in `<top (required)>'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290/bin/sass:19:in `load'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290/bin/sass:19:in `<main>'
-*/
-body:before {
-  white-space: pre;
-  font-family: monospace;
-  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 12 of css/sass/light_theme.scss, in `box-shadow'\A         from line 12 of css/sass/light_theme.scss\A \A 7: }\A 8: \A 9: // reflowable paginated style\A 10: \A 11: 	.page-margin {\A 12: 		@include box-shadow(0 0 5px 5px #777);\A 13: 	}\A 14: \A 15: 	.page-margin, .page {\A 16: 		background-color: #FFF;\A 17: 	}"; }
+.ballard-theme {
+  background-color: #576b96;
+  color: #DDD; }
+
+.parchment-theme {
+  background-color: #f7f1cf;
+  color: #774c27; }
+
+.night-theme {
+  background-color: black;
+  color: white; }
+
+.dark-theme html, .dark-theme body, .dark-theme #container {
+  background-color: #000; }
+.dark-theme #readium-content-container {
+  color: #030303; }
+.dark-theme .page-margin {
+  border-left: 1px solid #000;
+  border-right: 1px solid #000; }
+.dark-theme .page-margin, .dark-theme .page {
+  background-color: #444; }
+.dark-theme #content {
+  color: #EEE; }
