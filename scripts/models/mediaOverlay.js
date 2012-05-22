@@ -2,7 +2,6 @@
 Readium.Models.MediaOverlay = Backbone.Model.extend({
     audioplayer: null,
     smilModel: null,
-    smilUrl: null,
     
     // observable properties
     defaults: {
@@ -14,6 +13,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         current_text_element_id: null        
     },
     
+    // initialize with URL!
     initialize: function() {
         var self = this;
         this.audioplayer = new Readium.Models.AudioClipPlayer();
@@ -28,10 +28,9 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         });
         
     },
-    // load a file; must provide a 'url' option
+    
     fetch: function(options) {
         this.set({is_ready: false});
-        this.smilUrl = options.url;
         options || (options = {});
         options.dataType="xml";
         Backbone.Model.prototype.fetch.call(this, options);
@@ -40,7 +39,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     parse: function(xml) {
         var self = this;
         this.smilModel = new Readium.Models.SmilModel();
-        this.smilModel.setUrl(this.smilUrl);
+        this.smilModel.setUrl(this.get("smilUrl"));
         this.smilModel.setNotifySmilDone(function() {
             self.set({is_document_done: true});
         });
@@ -95,7 +94,11 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         this.audioplayer.resume();        
     },
     findNodeByTextSrc: function(src) {
-        return this.smilModel.findNodeByAttrValue("text", "src", src);
+        var elm = this.smilModel.findNodeByAttrValue("text", "src", src);
+        if (elm == null){
+            elm = this.smilModel.findNodeByAttrValue("seq", "epub:textref", src);
+        }    
+        return elm;
     },
     setVolume: function(volume) {
         this.audioplayer.setVolume(volume);

@@ -126,25 +126,15 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	// attribute
 	resolveMediaOverlays: function(manifest) {
 		var that = this;
-		manifest = _.map(manifest, function(manItem) {
-
-			if(manItem.media_overlay) {
-				var mo = _.find(manifest, function(x) {
-					if(x["id"] === manItem["media_overlay"]) return x;
-				});	
-				if(mo && mo.href) {
-					manItem.media_overlay = that.resolveUri(mo.href);
-					manItem.media_overlay_mime = mo.media_type;	
-				}
-				else {
-					manItem.media_overlay = null;
-				}
-			}
-			else {
-				manItem.media_overlay = null;
-			}
-			
-			return manItem;
+        var momap = {};
+        
+        // create a bunch of media overlay objects
+	    manifest.forEach( function(item) {
+			if(item.media_type == "application/smil+xml") {
+                var url = that.resolveUri(item.href);
+                var moObject = new Readium.Models.MediaOverlay({smilUrl: url});
+                momap[item.id] = moObject;
+            }
 		});
 		return manifest;
 	},
