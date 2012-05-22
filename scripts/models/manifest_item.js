@@ -154,7 +154,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	},
     
     hasMediaOverlay: function() {
-        return !!this.media_overlay && !!this.getMediaOverlay();
+        return !!this.get("media_overlay") && !!this.getMediaOverlay();
     },
     
     getMediaOverlay: function() {
