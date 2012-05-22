@@ -122,35 +122,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		return spine;
 	},
 
-	// resolve the url of smils on any manifest items that have a MO
-	// attribute
 	resolveMediaOverlays: function(manifest) {
-		var that = this;
-		manifest = _.map(manifest, function(manItem) {
-
-			if(manItem.media_overlay) {
-				var mo = _.find(manifest, function(x) {
-					if(x["id"] === manItem["media_overlay"]) return x;
-				});	
-				if(mo && mo.href) {
-					manItem.media_overlay = that.resolveUri(mo.href);
-					manItem.media_overlay_mime = mo.media_type;	
-				}
-				else {
-					manItem.media_overlay = null;
-				}
-			}
-			else {
-				manItem.media_overlay = null;
-			}
-			
-			// crunch spine attrs and manifest attrs together into one obj
-			return manItem;
-		});
-		return manifest;
-	},
-
-    resolveMediaOverlays2: function(manifest) {
 		var that = this;
         var momap = {};
         
@@ -162,13 +134,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
                 momap[item.id] = moObject;
             }
 		});
-        
-        // assign MOs to manifest items
-	    manifest.forEach( function(item) {
-			if(item.media_overlay != "") {
-                item.mediaOverlayObject = momap[item.media_overlay];
-            }
-		});
+        return momap;
     },
     
 	paginateBackwards: function(xmlDom) {
@@ -206,8 +172,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			json.metadata.fixed_layout = true;
 		}
         
-        this.resolveMediaOverlays2(json.manifest);
-		//json.manifest = this.resolveMediaOverlays(json.manifest);
+        json.mo_map = this.resolveMediaOverlays(json.manifest);
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this})
 		json.spine = this.parseSpineProperties(json.spine);
 		return json;
@@ -451,6 +416,10 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		return null;
 	},
 
+    getMediaOverlay: function(idref) {
+        return this.get("mo_map")[idref];
+    },
+    
 	parse: function(data) {
 		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, data);
 		json.res_spine = this.crunchSpine(json.spine, json.manifest);
