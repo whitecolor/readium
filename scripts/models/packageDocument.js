@@ -144,7 +144,6 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 				manItem.media_overlay = null;
 			}
 			
-			// crunch spine attrs and manifest attrs together into one obj
 			return manItem;
 		});
 		return manifest;

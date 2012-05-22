@@ -2459,7 +2459,7 @@ img.details-cover-image {
   height: 150px; }
 
 .row-view .book-item:nth-child(odd) {
-  background-color: #DDD; }
+  background-color: #F3F3F3; }
 
 .row-view .cover-image {
   position: relative;
