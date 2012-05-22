@@ -117,8 +117,9 @@ Readium.Models.SmilModel = function() {
     };
     
     this.findNodeByAttrValue = function(nodename, attr, val) {
+        if (root == null) return null;
         var res = $(root).find(nodename + "[" + attr + "='" + val + "']");
-        res.length == 0 ? return null : return res[0];
+        return res.length == 0 ? null : res[0];
     };
     
     // see what the next audio node is going to be

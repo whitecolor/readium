@@ -151,9 +151,18 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 			this.view = new Readium.Views.FixedPageView({model: this});
 		}
 		return this.view;
-	}
-
-
+	},
+    
+    hasMediaOverlay: function() {
+        return this.media_overlay != null;
+    },
+    
+    getMediaOverlay: function() {
+        if (this.hasMediaOverlay() == false) {
+            return null;
+        }
+        // TODO return the MO object
+    }
 });
 
 
@@ -162,8 +171,8 @@ Readium.Collections.ManifestItems = Backbone.Collection.extend({
 	model: Readium.Models.ManifestItem,
 
 	initialize: function(models, options) {
-		this.packageDocument = options.packageDocument;
-	},
+		this.packageDocument = options.packageDocument;   
+    }
 });
 
 Readium.Collections.Spine = Backbone.Collection.extend({
