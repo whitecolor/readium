@@ -41,7 +41,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     parse: function(xml) {
         var self = this;
         this.smilModel = new Readium.Models.SmilModel();
-        this.smilModel.setUrl(this.get("smilUrl"));
+        this.smilModel.setUrl(this.get("smil_url"));
         this.smilModel.setNotifySmilDone(function() {
             self.set({is_document_done: true});
         });
