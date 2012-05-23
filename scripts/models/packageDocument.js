@@ -133,7 +133,8 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			if(item.get("media_type") === "application/smil+xml") {
                 var url = that.resolveUri(item.get("href"));
                 debugger;
-                var moObject = new Readium.Models.MediaOverlay({smilUrl: url});
+                var moObject = new Readium.Models.MediaOverlay({smil_url: url});
+                moObject.fetch(); // temp?
                 momap[item.id] = moObject;
             }
 		});

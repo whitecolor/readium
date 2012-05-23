@@ -18,6 +18,8 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         var self = this;
         this.audioplayer = new Readium.Models.AudioClipPlayer();
         this.audioplayer.setConsoleTrace(true);
+
+        this.url = this.get("smil_url");
         
         // always know whether we're playing or paused
         this.audioplayer.setNotifyOnPause(function() {
