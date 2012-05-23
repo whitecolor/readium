@@ -130,13 +130,14 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
         
         // create a bunch of media overlay objects
 	    manifest.forEach( function(item) {
-			if(item.media_type == "application/smil+xml") {
-                var url = that.resolveUri(item.href);
+			if(item.get("media_type") === "application/smil+xml") {
+                var url = that.resolveUri(item.get("href"));
+                debugger;
                 var moObject = new Readium.Models.MediaOverlay({smilUrl: url});
                 momap[item.id] = moObject;
             }
 		});
-		return manifest;
+		return momap;
 	},
 
 	paginateBackwards: function(xmlDom) {
@@ -173,9 +174,17 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 		if(json.metadata.layout === "pre-paginated") {
 			json.metadata.fixed_layout = true;
 		}
-		json.manifest = this.resolveMediaOverlays(json.manifest);
-		json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this})
+		
+		// parse the manifest into a proper collection
+		json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this});
+
+		// create a map of all the media overlay objects
+		json.mo_map = this.resolveMediaOverlays(json.manifest);
+
+		// parse the spine into a proper collection
 		json.spine = this.parseSpineProperties(json.spine);
+
+		// return the parse result
 		return json;
 	},
 
@@ -415,6 +424,12 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		}
 
 		return null;
+	},
+
+	getMediaOverlayItem: function(idref) {
+		// just look up the object in the mo_map
+		var map = this.get("mo_map");
+		return map && map[idref];
 	},
 
 	parse: function(data) {
