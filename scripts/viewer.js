@@ -6,6 +6,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	initialize: function() {
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
 		this.model.on("change:current_theme", this.renderTheme, this);
+		this.model.on("change:toolbar_visible", this.renderPageButtons, this);
 
 		this.optionsPresenter = new Readium.Models.OptionsPresenter({
 			book: this.model
@@ -58,7 +59,15 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		// right now we dont do anything but 
 		// convention is to return this from render
 		this.renderTheme();
+		this.renderPageButtons();
 		return this; 
+	},
+
+	renderPageButtons: function() {
+		var vis = this.model.get("toolbar_visible");
+		this.$("#prev-page-button").toggle(vis);
+		this.$("#next-page-button").toggle(vis);
+		return this;
 	},
 
 	renderTheme: function() {
