@@ -86,6 +86,12 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	needsMorePages: function() {
 		// this should be part of the regions API but last I checked it wasn't there yet
 		// for now we just check if content bottom is lower than page bottom
+		// todo, use modernerize to detect if this is available:
+		var overflow = $('.page').last()[0].webkitRegionOverflow;
+		if(overflow) {
+			return overflow === "overflow";
+		}
+		// old school
 		var getBotHelper = function( $elem ) {
 			return $elem.outerHeight(true) + $elem.offset().top;
 		};
@@ -94,6 +100,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var contEnd = getBotHelper( $('#content-end') );
 		return pageEnd < contEnd;
 		return false;
+		
 	},
 
 	renderPages: function() {
@@ -103,6 +110,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		html = "";
 
 		this.setUpMode();
+
+		// set the content to be invisible until we are done
+		this.$('#readium-content-container').css('visibility', 'invisible');
 		
 		
 		// start with an empty page in two up mode
@@ -129,8 +139,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		
 		this.model.changPageNumber(num);
-		this.$('#readium-content-container').
-			css('visibility', 'visible');
+		this.$('#readium-content-container').css('visibility', 'visible');
 		
 		// dunno that I should be calling this explicitly
 		this.changePage();
@@ -185,13 +194,13 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var wigglePos;
 		for(var i = 0; i < numPages; i++) {
 			// get the original position of the page
-			reset = pages[i].style.left || 0;
+			reset = pages[i].style.left;
 			// wiggle the page
 			pages[i].style.left = 100;
 			// get the position of the el of interest
 			wigglePos = el.getBoundingClientRect().left;
 			// move the page back
-			pages[i].style.left = 0;
+			pages[i].style.left = reset;
 
 			if(wigglePos - pos > 10) {
 				// the element wiggled we found it

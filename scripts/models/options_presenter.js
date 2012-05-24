@@ -16,6 +16,9 @@ Readium.Models.OptionsPresenter = Backbone.Model.extend({
 
 	applyOptions: function() {
 		var book = this.get("book");
+		if(this.get("two_up") !== book.get("two_up")) {
+			book.toggleTwoUp();
+		}
 		book.set(this.toJSON());
 	},
 
