@@ -273,7 +273,7 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 		this.set({
 			fixed_layout: ( fixedLayout && parseBool(fixedLayout.textContent) ),
 			open_to_spread: ( openToSpread && parseBool(openToSpread.textContent) ),
-			apple_fixed: true
+			apple_fixed: ( fixedLayout && parseBool(fixedLayout.textContent) )
 		})
 	},
 
