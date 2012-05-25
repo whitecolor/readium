@@ -3,6 +3,7 @@
 	width: 352px;
 	margin: -326px 0 0 -176px;
 	@include linear-gradient(top, #FFFFFF, #CCCCCC);
+	line-height: 1em;
 
 	.clickable {
 		@include user-select(none);
