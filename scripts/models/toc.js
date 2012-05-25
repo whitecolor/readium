@@ -16,6 +16,10 @@ Readium.Models.Toc = Backbone.Model.extend({
 		this.set("visible", this.book.get("toc_visible"));
 	},
 
+	hide: function() {
+		this.book.set("toc_visible", false)
+	},
+
 	defaults: {
 		visible: false
 	}

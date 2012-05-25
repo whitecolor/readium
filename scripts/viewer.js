@@ -7,16 +7,13 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
 		this.model.on("change:current_theme", this.renderTheme, this);
 		this.model.on("change:toolbar_visible", this.renderPageButtons, this);
+		this.model.on("change:toc_visible", this.renderTocVisible, this);
 
 		this.optionsPresenter = new Readium.Models.OptionsPresenter({
 			book: this.model
 		});
 		this.optionsView = new Readium.Views.OptionsView({model: this.optionsPresenter});
 		this.optionsView.render();
-		
-		// the little overlay
-		this.navWidget = new Readium.Views.NavWidgetView({model: _book});
-		this.navWidget.render();
 
 		// the top bar
 		this.toolbar = new Readium.Views.ToolbarView({model: _book});
@@ -60,6 +57,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		// convention is to return this from render
 		this.renderTheme();
 		this.renderPageButtons();
+		this.renderTocVisible();
 		return this; 
 	},
 
@@ -83,6 +81,11 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.$("#readium-book-view-el").toggleClass("parchment-theme", "parchment-theme" === theme);
 		this.$("#readium-book-view-el").toggleClass("ballard-theme", "ballard-theme" === theme);
 		this.$("#readium-book-view-el").toggleClass("vancouver-theme", "vancouver-theme" === theme);
+	},
+
+	renderTocVisible: function() {
+		this.$el.toggleClass("show-readium-toc", this.model.get("toc_visible"));
+		return this;
 	},
 
 	init_toc: function() {

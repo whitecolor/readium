@@ -30,7 +30,8 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 	events: {
 		"click #hide-toolbar-button": "hide_toolbar",
 		"click #show-toolbar-button": "show_toolbar",
-		"click #fs-toggle-btn": "toggle_fs"
+		"click #fs-toggle-btn": "toggle_fs",
+		"click #toggle-toc-btn": "toggle_toc"
 	},
 
 	show_toolbar: function(e) {
@@ -46,5 +47,10 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 	toggle_fs: function(e) {
 		e.preventDefault();
 		this.model.toggleFullScreen();
-	}
+	},
+
+	toggle_toc: function(e) {
+		e.preventDefault();
+		this.model.toggleToc();
+	},
 });

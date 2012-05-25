@@ -8,7 +8,8 @@ Readium.Views.TocViewBase = Backbone.View.extend({
 	},
 
 	events: {
-		"click a": "handleClick"
+		"click a": "handleClick",
+		"click #close-toc-button": "closeToc"
 	},
 
 	setVisibility: function() {
@@ -19,6 +20,11 @@ Readium.Views.TocViewBase = Backbone.View.extend({
 		e.preventDefault();
 		href = $(e.target).attr("href");
 		this.model.handleLink(href);
+	},
+
+	closeToc: function(e) {
+		e.preventDefault();
+		this.model.hide();
 	}
 
 });
@@ -38,8 +44,8 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 		for(var i = 0; i < navs.length; i++) {
 			ol.append( this.nav_template(navs[i]) );
 		}
-		this.$el.html("<h2>" + (this.model.get("title") || "Contents") + "</h2>")
-		this.$el.append(ol);
+		this.$('#toc-body').html("<h2>" + (this.model.get("title") || "Contents") + "</h2>")
+		this.$('#toc-body').append(ol);
 		return this;
 	}
 
@@ -48,7 +54,7 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({ 
 
 	render: function() {
-		this.$el.html( this.model.get("body").html() );
+		this.$('#toc-body').html( this.model.get("body").html() );
 		return this;
 	}
 
