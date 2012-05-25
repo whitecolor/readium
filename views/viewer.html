@@ -1,5 +1,6 @@
 <html>
 	<head xmlns="http://www.w3.org/2000/xmlns/" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ev="http://www.w3.org/2001/xml-events">
+
 		<!-- Keep track of usage stats via google analytics -->
 	  	<script>
 	    	var _gaq = _gaq || [];
@@ -96,8 +97,9 @@
 							</a>
 						</li>
 						<li>
-							<a href="#" id="nightmode-btn" data-toggle="modal">
-								<img src="/images/top_bar/ico_nightmode_toggle_off.png" class="small"/>
+							<a href="#" id="nightmode-btn" >
+								<img src="/images/top_bar/ico_nightmode_toggle_off.png" class="small" id="day-to-night-ico"/>
+								<img src="/images/top_bar/ico_nightmode_toggle_on.png" class="small" id="night-to-day-ico"/>
 							</a>
 						</li>
 						<li>
@@ -197,6 +199,7 @@
 			
 		</div><!-- end le info modal -->
 
+
 		<div class="modal fade" id="readium-info"  style="display: none"><!-- le info modal -->
 			<div>
 				<img src="/images/info_modal/about_readium_logo.png">
@@ -211,6 +214,21 @@
 				<img src="/images/info_modal/partner_logos.png">
 			</div>
 		</div><!-- end le info modal -->
+
+		<div class="modal fade" id="regions-not-available"  style="display: none"><!-- le info no regions -->
+			<div>
+				<strong>Uh Oh!</strong> We have detected that your browser does not have css regions enabled. Readium needs this feature to function properly. You will need to enable it. Don't worry, we've got your back.
+			</div> 
+			<div>
+				<strong>Please take the following actions:</strong>
+			</div>
+			<ol>
+				<li>type <code>about:flags</code> into Chrome's address bar</li>
+				<li>Find the entry called <strong>enable css regions</strong> and click <strong>enable</strong></li>
+				<li>Restart chrome when prompted</li>
+				<li>Open Readium and get back to reading!</li>
+			</ol>
+		</div><!-- end le info no regions -->
 
 
 		<!-- templates -->
@@ -281,5 +299,7 @@
 					class='binding-sandbox'>
 			</iframe>
 		</script>
+		<script src="/lib/modernizr-2.5.3.min.js" type="text/javascript" ></script>
+		<script src="/lib/modernizr.css-regions.js" type="text/javascript" ></script>
 	</body>
 </html>
