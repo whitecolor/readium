@@ -20,6 +20,7 @@ Readium.Models.OptionsPresenter = Backbone.Model.extend({
 			book.toggleTwoUp();
 		}
 		book.set(this.toJSON());
+		book.save();
 	},
 
 	resetOptions: function() {

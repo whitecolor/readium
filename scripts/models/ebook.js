@@ -27,6 +27,19 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.on("change:spine_position", this.setMetaSize, this);
 	},
 
+	save: function(attrs, options) {
+		// TODO: this should be done properly with a backbone sync
+		var ops = {
+			success: function() {}
+		}
+		_.extend(ops,options);
+		var that = this;
+		this.set("updated_at", new Date());
+		Lawnchair(function() {
+			this.save(that.toJSON(), ops.success);
+		});
+	},
+
 	defaults: {
 		"font_size": 10,
     	"current_page": [1],
@@ -41,6 +54,43 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"current_margin": 3
     	//"spine_position": 0
   	},
+
+  	toJSON: function() {
+
+  		// only save attrs that should be persisted:
+  		return {
+			"apple_fixed": this.get("apple_fixed"),
+			"author": this.get("author"),
+			"cover_href": this.get("cover_href"),
+			"created_at": this.get("created_at"),
+			"current_theme": this.get("current_theme"),
+			"description": this.get("description"),
+			"epub_version": this.get("epub_version"),
+			"fixed_layout": this.get("fixed_layout"),
+			"id": this.get("id"),
+			"key": this.get("key"),
+			"language": this.get("language"),
+			"layout": this.get("layout"),
+			"modified_date": this.get("modified_date"),
+			"ncx": this.get("ncx"),
+			"open_to_spread": this.get("open_to_spread"),
+			"orientation": this.get("orientation"),
+			"package_doc_path": this.get("package_doc_path"),
+			"page_prog_dir": this.get("page_prog_dir"),
+			"paginate_backwards": this.get("paginate_backwards"),
+			"pubdate": this.get("pubdate"),
+			"publisher": this.get("publisher"),
+			"rights": this.get("rights"),
+			"spread": this.get("spread"),
+			"src_url": this.get("src_url"),
+			"title": this.get("title"),
+			"updated_at": this.get("updated_at"),
+			"current_theme": this.get("current_theme"),
+			"current_margin": this.get("current_margin"),
+			"font_size": this.get("font_size"),
+			"two_up": this.get("two_up")
+		};
+	},
 
 	toggleTwoUp: function() {
 		if(this.get("can_two_up")) {
