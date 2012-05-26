@@ -118,24 +118,34 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 	// in the epub, because webkit filesystem urls are completely supported
 	// yet, see: http://code.google.com/p/chromium/issues/detail?id=114484
 	correctURIs: function() {
+	
 		var root = this.get("root_url");
 		var i = this.get("patch_position");
 		var manifest = this.get("manifest");
-		var uid = this.packageDoc.attributes.id; // XXX  OK?
+		var uid = this.packageDoc.get("id");
 		var that = this;
 		
-		if( i === manifest.length) {
+		if( i >= manifest.length) {
+			this.off("change:patch_position");
 			this.finish_extraction();
 		} 
 		else {			
 			this.set("log_message", "monkey patching: " + manifest[i]);
 			monkeyPatchUrls(root + "/" + manifest[i], function() {
-					that.set("patch_position", i + 1);
+					that.incPatchPos();
 				}, function() {
 					that.set("failure", "ERROR: unknown problem during unpacking process");
 				}, uid);
 		}
+	
+
 	},
+
+	incPatchPos: function() {
+		var pos = this.get("patch_position") || 0;
+		pos += 1;
+		this.set("patch_position", pos);
+	}
 
 });
 
