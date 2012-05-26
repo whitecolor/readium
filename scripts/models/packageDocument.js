@@ -366,7 +366,7 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		this.set({spine_position: (cp - 1) });	
 	},
 
-	spineIndexFromHref: function() {
+	spineIndexFromHref: function(href) {
 		var spine = this.get("res_spine");
 		href = this.resolveUri(href).replace(/#.*$/, "");
 		for(var i = 0; i < spine.length; i++) {
