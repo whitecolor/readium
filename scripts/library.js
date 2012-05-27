@@ -102,10 +102,17 @@ Readium.Views.LibraryItemsView = Backbone.View.extend({
 			$el.append( view.render().el );
 
 		});
-		
+		this.restoreViewType();
 		// i dunno if this should go here
-		$('#library-books-list').html(this.el)
+		$('#library-books-list').html(this.el);
 		return this;
+	},
+
+	restoreViewType: function() {
+		// restore the setting
+		if(Readium.Utils.getCookie("lib_view") === "block") {
+			this.$el.addClass("block-view").removeClass("row-view");
+		}
 	},
 
 	addOne: function(book) {

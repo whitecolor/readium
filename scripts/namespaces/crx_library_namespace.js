@@ -27,12 +27,18 @@ window.Readium = {
 		});
 
 		// TODO: this is not how we should do this, we should use a proper backbone view.
+
 		$("#block-view-btn").click(function(e) {
-			$('#library-items-container').addClass("block-view").removeClass("row-view")
+			$('#library-items-container').addClass("block-view").removeClass("row-view");
+			Readium.Utils.setCookie("lib_view", "block", 1000);
 		});
+
 		$("#row-view-btn").click(function(e) {
-			$('#library-items-container').addClass("row-view").removeClass("block-view")
-		});			
+			$('#library-items-container').addClass("row-view").removeClass("block-view");
+			Readium.Utils.setCookie("lib_view", "row", 1000);
+		});
+
+		
 	}
 };
 
