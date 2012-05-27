@@ -72,5 +72,6 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		else {
 			this.model.set("current_theme", "night-theme");
 		}
+		this.model.save();
 	}
 });
