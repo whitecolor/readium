@@ -34,6 +34,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.section.off("change:content", this.render);
 	},
 
+	buildDiv: function(dom) {
+		var $div = $('<div></div>');
+		$div.attr("class", dom.body.className);
+		$div.attr("id", dom.body.id);
+		$div.html(dom.body.innerHTML);
+		return $div[0];
+	},
+
 	render: function(goToLastPage) {
 		this.resetEl();
 		var htmlText = this.section.get("content");
@@ -45,7 +53,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var dom = parser.parseFromString( htmlText, 'text/xml' );
 		this.addStyleSheets( dom );
 		this.applyBindings( dom );
-		this.replaceContent( dom.body.innerHTML );
+		this.replaceContent( this.buildDiv(dom) );
 		var trigs = this.parseTriggers(dom);
 		this.applyTriggers(document, trigs);
 		this.applySwitches(document);

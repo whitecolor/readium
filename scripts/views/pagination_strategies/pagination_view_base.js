@@ -194,7 +194,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		// TODO: put this where it belongs
 		this.$('#readium-content-container').
 		css('visibility', 'hidden').
-		html(content + "<div id='content-end'></div>");
+		html(content).append("<div id='content-end'></div>");
 	},
 
 	toggleTwoUp: function() {
