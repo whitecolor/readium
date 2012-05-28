@@ -67,6 +67,19 @@ Readium.FileSystemApi = function(initCallback) {
 			}
 		}, fileSystemErrorHandler);
 	};
+
+	var writeExclusively = function(path, content, rootDir, successCallback, failureCallback)  {
+		// there is no way to truncate a file before writing to it with the html5 fs api,
+		// so we need to manually try to get it, and then delete it if we are successful
+		rootDir.getFile(path, { create: false }, function(fileEntry) {
+			fileEntry.remove(function() {
+				writeFile(path, content, rootDir, successCallback, failureCallback);		
+			});
+		}, function() {
+			writeFile(path, content, rootDir, successCallback, failureCallback);
+		});
+		
+	};
 	
 	var writeFile = function(path, content, rootDir, successCallback, failureCallback)  {
 		rootDir.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
@@ -117,7 +130,7 @@ Readium.FileSystemApi = function(initCallback) {
 		}
 		
 		if(folders.length === 1) {
-			writeFile(folders[0], content, rootDir, successCallback, failureCallback);
+			writeExclusively(folders[0], content, rootDir, successCallback, failureCallback);
 		}
 		else {
 			rootDir.getDirectory(folders[0], {create: true}, function(dirEntry) {
