@@ -1,5 +1,4 @@
 // seems like this is now fixed in chromium so soon it will no longer be necessary, YAY!
-
 // get rid of webkit prefix
 window.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
 window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
@@ -206,22 +205,11 @@ var readEntry = function(fileEntry, win, fail) {
 };
 
 var writeEntry = function(fileEntry, content, win, fail) {
-	
-	fileEntry.createWriter(function(fileWriter) {
 
-		fileWriter.onwriteend = function(e) {
-			win();
-		};
+	Readium.FileSystemApi(function(fs) {
+		fs.writeFile(fileEntry.fullPath, content, win, fail);
+	});
 
-		fileWriter.onerror = function(e) {
-			fail(e);
-		};
-
-		var bb = new BlobBuilder(); 
-		bb.append(content);
-		fileWriter.write( bb.getBlob('text/plain') );
-
-	}, fail);
 };
 
 var readBinEntry = function(fileEntry, win, fail) {
