@@ -219,7 +219,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     injectLinkHandler: function(iframe) {
     	var that = this;
     	$('a', iframe.contentDocument).click(function(e) {
-    		debugger;
     		that.linkClickHandler(e)
     	});
     },

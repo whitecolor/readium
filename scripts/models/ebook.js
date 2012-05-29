@@ -292,7 +292,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// URL's with hash fragments require special treatment, so
 		// firs thing is to split off the hash frag from the reset
 		// of the url:
-		debugger;
 		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
 
 		// handle the base url first:
@@ -381,6 +380,35 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 		var spine_pos = this.get("spine_position") + offset;
 		return this.packageDocument.getSpineItem(spine_pos);
+	},
+
+	playMo: function() {
+		var mo = this.getCurrentSection().getMediaOverlay();
+		if(mo) {
+			this.set("mo_playing", mo);
+			var that = this;
+			mo.on("change:current_text_document_url", function () {
+				that.goToHref(mo.get("current_text_document_url"));
+			});
+			mo.on("change:current_text_element_id", function () {
+				var frag = mo.get("current_text_element_id")
+				that.set("hash_fragment", frag);
+				that.set("current_mo_frag", frag);
+			});
+			mo.play();
+		}
+		else {
+			alert("Sorry, the current EPUB does not contain a media overlay for this content");
+		}
+	},
+
+	pauseMo: function() {
+		var mo = this.get("mo_playing");
+		if(mo) {
+			mo.off();
+			mo.pause();
+			this.set("mo_playing", null);
+		}
 	},
 
 	// is this book set to fixed layout at the meta-data level

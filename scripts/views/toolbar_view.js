@@ -41,7 +41,8 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		"click #show-toolbar-button": "show_toolbar",
 		"click #fs-toggle-btn": "toggle_fs",
 		"click #toggle-toc-btn": "toggle_toc",
-		"click #nightmode-btn": "toggle_night_mode"
+		"click #nightmode-btn": "toggle_night_mode",
+		"click #play-mo-btn": "play_mo"
 	},
 
 	show_toolbar: function(e) {
@@ -73,5 +74,15 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 			this.model.set("current_theme", "night-theme");
 		}
 		this.model.save();
+	},
+
+	play_mo: function() {
+		if(this.model.get("mo_playing")) {
+			this.model.pauseMo();
+		}
+		else {
+			this.model.playMo();
+		}
+		
 	}
 });

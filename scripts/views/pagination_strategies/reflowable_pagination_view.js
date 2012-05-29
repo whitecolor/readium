@@ -12,6 +12,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		//this.model.on("change:current_content", this.render, this);
 		this.model.on("change:two_up", this.renderPages, this);
+		this.model.on("change:mo_playing", this.renderMoPlaying, this);
+		this.model.on("change:current_mo_frag", this.renderMoFragHighlight, this);
 		this.section.on("change:content", function() { 
 			this.render(!!this.render_to_last) 
 		}, this);
@@ -31,6 +33,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.off("repagination_event", this.renderPages);
 		//this.model.off("change:current_content", this.render);
 		this.model.off("change:two_up", this.renderPages);
+		this.model.off("change:mo_playing", this.renderMoPlaying);
+		this.model.off("change:current_mo_frag", this.renderMoFragHighlight);
 		this.section.off("change:content", this.render);
 	},
 
@@ -79,6 +83,21 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		);
 		
 		return this;
+	},
+
+	renderMoPlaying: function() {
+		$('#readium-content-container').toggleClass("mo-playing", !!this.model.get("mo_playing"));
+	},
+
+	renderMoFragHighlight: function() {
+
+		// get rid of the last one
+		this.$('.current-mo-content').toggleClass('current-mo-content', false);
+		var frag = this.model.get("current_mo_frag");
+		if(frag) {
+			this.$("#" +  frag).toggleClass('current-mo-content', true);
+		}
+
 	},
 
 	guessPageNumber: function() {
