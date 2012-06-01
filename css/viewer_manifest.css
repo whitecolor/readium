@@ -1202,6 +1202,9 @@ button.btn, input[type="submit"].btn {
 
 .navbar .nav > li > a {
   padding: 5px 0; }
+.navbar li {
+  margin: 0;
+  padding: 0; }
 .navbar .brand {
   padding: 5px;
   margin-left: 10px; }
@@ -1210,6 +1213,12 @@ button.btn, input[type="submit"].btn {
 .navbar .divider-vertical.stubby {
   margin-top: 8px;
   height: 30px; }
+.navbar .nav-icon {
+  height: 36px;
+  width: 36px; }
+.navbar #bar-logo-img {
+  width: 142px;
+  height: 36px; }
 
 #show-toolbar-button {
   padding: 5px;
