@@ -10,10 +10,11 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         is_playing: false,
         should_highlight: true,
         current_text_document_url: null,
-        current_text_element_id: null        
+        current_text_element_id: null,
+        has_started_playback: false        
     },
     
-    // initialize with URL!
+    // initialize with a "smil_url" option
     initialize: function() {
         var self = this;
         this.audioplayer = new Readium.Models.AudioClipPlayer();
@@ -82,20 +83,37 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     // start playback
     // node is a SMIL node that indicates the starting point
     // if node is null, playback starts at the beginning
-    play: function(node) {
-        this.set({is_document_done: false});
+    startPlayback: function(node) {
         if (this.get("is_ready") == false) {
             return;
         }
+        this.set({is_document_done: false});
+        this.set({has_started_playback: true});
         this.smilModel.render(node);        
     },
     pause: function() {
+        if (this.get("is_ready") == false) {
+            return;
+        }
+        if (this.get("has_started_playback") == false) {
+            return;
+        }
         this.audioplayer.pause();
     },
     resume: function() {
+        if (this.get("is_ready") == false) {
+            return;
+        }
+        if (this.get("has_started_playback") == false) {
+            return;
+        }
         this.audioplayer.resume();        
     },
     findNodeByTextSrc: function(src) {
+        if (this.get("is_ready") == false) {
+            return;
+        }
+        
         var elm = this.smilModel.findNodeByAttrValue("text", "src", src);
         if (elm == null){
             elm = this.smilModel.findNodeByAttrValue("seq", "epub:textref", src);
@@ -103,6 +121,10 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         return elm;
     },
     setVolume: function(volume) {
+        if (this.get("is_ready") == false) {
+            return;
+        }
+        
         this.audioplayer.setVolume(volume);
     },
     
