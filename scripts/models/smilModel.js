@@ -104,7 +104,7 @@ Readium.Models.SmilModel = function() {
     
     // prepare the tree to start rendering from a node
     this.render = function(node) {
-        if (node == null || node == root) {
+        if (node == null || node == undefined || node == root) {
             root.render(null);
         }
         else {

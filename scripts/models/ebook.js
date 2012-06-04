@@ -395,7 +395,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				that.set("hash_fragment", frag);
 				that.set("current_mo_frag", frag);
 			});
-			mo.play();
+            if (mo.get("has_started_playback")) {
+                mo.resume();
+            }
+            else {
+                mo.startPlayback(null);
+            }
 		}
 		else {
 			alert("Sorry, the current EPUB does not contain a media overlay for this content");
