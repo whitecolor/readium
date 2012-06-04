@@ -1,23 +1,23 @@
 /*
 Syntax error: Undefined mixin 'box-shadow'.
-        on line 12 of css/sass/fixed_layout.scss, in `box-shadow'
-        from line 12 of css/sass/fixed_layout.scss
+        on line 16 of css/sass/fixed_layout.scss, in `box-shadow'
+        from line 16 of css/sass/fixed_layout.scss
 
-7: 
-8: .fixed-page-wrap {
-9: 	position: absolute;
-10: 	left: 25%;
-11: 	overflow: hidden; 
-12: 	@include box-shadow(0 0 5px 5px rgba(80,80,80,0.5));
-13: 	background-color: #FFF;
-14: }
-15: 
-16: .apple-fixed-layout #spine-divider {
-17: 	    position: absolute;
+11: 
+12: .fixed-page-wrap {
+13: 	position: absolute;
+14: 	left: 25%;
+15: 	overflow: hidden; 
+16: 	@include box-shadow(0 0 5px 5px rgba(80,80,80,0.5));
+17: 	background-color: #FFF;
+18: }
+19: 
+20: .apple-fixed-layout #spine-divider {
+21: 	    position: absolute;
 
 Backtrace:
-css/sass/fixed_layout.scss:12:in `box-shadow'
-css/sass/fixed_layout.scss:12
+css/sass/fixed_layout.scss:16:in `box-shadow'
+css/sass/fixed_layout.scss:16
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:170:in `visit_mixin'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/base.rb:37:in `visit'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/tree/visitors/perform.rb:18:in `visit'
@@ -49,7 +49,23 @@ css/sass/fixed_layout.scss:12
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:202:in `block in update_stylesheets'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:200:in `each'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:200:in `update_stylesheets'
-/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:234:in `watch'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:272:in `block (4 levels) in watch'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/path.rb:73:in `call'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/path.rb:73:in `run_callback'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/path.rb:55:in `callback_action'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/path.rb:35:in `update'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/state/directory.rb:39:in `block in modified'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/state/directory.rb:37:in `each'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/state/directory.rb:37:in `modified'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/state/directory.rb:18:in `refresh'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/backends/polling.rb:17:in `block (2 levels) in run'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/backends/polling.rb:17:in `each'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/backends/polling.rb:17:in `block in run'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/backends/polling.rb:15:in `loop'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/backends/polling.rb:15:in `run'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm/monitor.rb:26:in `run'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/fssm-0.2.8.1/lib/fssm.rb:70:in `monitor'
+/Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin/compiler.rb:265:in `watch'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/plugin.rb:107:in `method_missing'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:431:in `watch_or_update'
 /Users/matthew/.rvm/gems/ruby-1.9.2-p290@readium/gems/sass-3.1.15/lib/sass/exec.rb:302:in `process_result'
@@ -62,4 +78,4 @@ css/sass/fixed_layout.scss:12
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 12 of css/sass/fixed_layout.scss, in `box-shadow'\A         from line 12 of css/sass/fixed_layout.scss\A \A 7: \A 8: .fixed-page-wrap {\A 9: 	position: absolute;\A 10: 	left: 25%;\A 11: 	overflow: hidden; \A 12: 	@include box-shadow(0 0 5px 5px rgba(80,80,80,0.5));\A 13: 	background-color: #FFF;\A 14: }\A 15: \A 16: .apple-fixed-layout #spine-divider {\A 17: 	    position: absolute;"; }
+  content: "Syntax error: Undefined mixin 'box-shadow'.\A         on line 16 of css/sass/fixed_layout.scss, in `box-shadow'\A         from line 16 of css/sass/fixed_layout.scss\A \A 11: \A 12: .fixed-page-wrap {\A 13: 	position: absolute;\A 14: 	left: 25%;\A 15: 	overflow: hidden; \A 16: 	@include box-shadow(0 0 5px 5px rgba(80,80,80,0.5));\A 17: 	background-color: #FFF;\A 18: }\A 19: \A 20: .apple-fixed-layout #spine-divider {\A 21: 	    position: absolute;"; }

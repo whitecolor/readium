@@ -1420,6 +1420,9 @@ body {
   z-index: 10; }
 
 /*.apple-fixed-layout*/
+#readium-right-content {
+  height: 90%; }
+
 .invisible {
   visibility: hidden;
   z-index: 0; }
