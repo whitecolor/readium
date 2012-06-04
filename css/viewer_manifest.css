@@ -1360,7 +1360,7 @@ body {
   z-index: -10000; }
 
 .page-margin {
-  height: 96%;
+  height: 100%;
   width: 60%;
   margin: 0 auto;
   padding: 0;
@@ -1420,8 +1420,11 @@ body {
   z-index: 10; }
 
 /*.apple-fixed-layout*/
-#readium-right-content {
+.apple-fixed-layout #readium-right-content {
   height: 90%; }
+
+#readium-right-content {
+  height: 100%; }
 
 .invisible {
   visibility: hidden;

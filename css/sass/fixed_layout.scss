@@ -1,7 +1,11 @@
 /*.apple-fixed-layout*/
 
-#readium-right-content {
+.apple-fixed-layout #readium-right-content {
 	height: 90%;
+}
+
+#readium-right-content {
+	height: 100%;
 }
 
 .invisible {
