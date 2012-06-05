@@ -398,8 +398,10 @@ Readium.Models.Ebook = Backbone.Model.extend({
             mo.on("change:is_document_done", function() {
                 that.pauseMo();
                 // advance the spine position
-               that.goToNextSection();
-               that.playMo(true);
+                if (that.hasNextSection()) {
+                    that.goToNextSection();
+                    that.playMo(true);
+                }
             });
             if (mo.get("has_started_playback") && forceFromStart == false) {
                 mo.resume();
