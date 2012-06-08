@@ -382,20 +382,28 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		return this.packageDocument.getSpineItem(spine_pos);
 	},
 
-	playMo: function() {
+	playMo: function(forceFromStart) {
 		var mo = this.getCurrentSection().getMediaOverlay();
 		if(mo) {
 			this.set("mo_playing", mo);
 			var that = this;
 			mo.on("change:current_text_document_url", function () {
-				that.goToHref(mo.get("current_text_document_url"));
+                that.goToHref(mo.get("current_text_document_url"));
 			});
 			mo.on("change:current_text_element_id", function () {
 				var frag = mo.get("current_text_element_id")
 				that.set("hash_fragment", frag);
 				that.set("current_mo_frag", frag);
 			});
-            if (mo.get("has_started_playback")) {
+            mo.on("change:is_document_done", function() {
+                that.pauseMo();
+                // advance the spine position
+                if (that.hasNextSection()) {
+                    that.goToNextSection();
+                    that.playMo(true);
+                }
+            });
+            if (mo.get("has_started_playback") && forceFromStart == false) {
                 mo.resume();
             }
             else {
