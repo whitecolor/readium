@@ -197,7 +197,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		// If stylesheets have changed, remove current stylesheets and add the new ones
 		$('.readium-dynamic-sh').remove();
 
-		// Prepend in REVERSE order to preserve the stylesheet ordering 
+		// We're PREPENDING so that any application stylesheets are lower in the <head> than the book stylesheets. 
+		// As such, we're adding the book stylesheets in REVERSE order to preserve their ordering. 
 		$($bookStylesheets.get().reverse()).each(function() {
 
 			var $link = $(this);
