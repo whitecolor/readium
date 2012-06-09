@@ -7,6 +7,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.page_template = _.template( $('#reflowing-template').html() );
 		this.model.on("change:current_page", this.pageChangeHandler, this);
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
+		this.model.on("change:current_theme", this.injectTheme, this);
 	},
 
 	// sometimes these views hang around in memory before
@@ -14,6 +15,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// that were registered on the model
 	destruct: function() {
 		this.model.off("change:current_page", this.pageChangeHandler);
+		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
+		this.model.off("change:current_theme", this.windowSizeChangeHandler);
 
 		// call the super destructor
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
@@ -24,7 +27,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var json = this.model.getCurrentSection().toJSON();
 
 		// make everything invisible to prevent flicker
-		this.$el.css("visibility", "hidden");
+		
 
 
 		this.$('#container').html( this.page_template(json) );
@@ -33,13 +36,21 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			that.adjustIframeColumns();
 			that.iframeLoadCallback(e);
 			that.setFontSize();
-			if(goToLastPage) {
-				that.model.goToLastPage();
-			}
-			else {
-				that.model.goToPage(1);
-			}
-			that.$el.css("visibility", "visible");
+			that.injectTheme();
+
+			// wait for css to parse before setting page num
+			setTimeout(function() {
+				that.model.set("num_pages", that.calcNumPages());
+				that.pageChangeHandler();
+				if(goToLastPage) {
+					that.model.goToLastPage();
+				}
+				else {
+					that.model.goToPage(1);
+				}
+			}, 10);
+			
+			
 		});
 		return this;
 	},
@@ -65,9 +76,13 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"height": this.frame_height.toString() + "px"
 		});
 
-		this.model.set("num_pages", this.calcNumPages());
+		var that = this;
+		setTimeout(function() {
+			that.model.set("num_pages", that.calcNumPages());
 
-		this.pageChangeHandler();
+			that.pageChangeHandler();
+		}, 10);
+		
 	},
 
 	injectLinkHandler: function (iframe) {
@@ -146,8 +161,47 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		debugger;
 		var size = this.model.get("font_size") / 10;
 		$(this.getBody()).css("font-size", size + "em");
-		this.model.set("num_pages", this.calcNumPages());
+		// TODO RECALC PAGE COUNT
 	},
+
+	// sadly this is just a reprint of what is already in the
+	// themes stylesheet. It isn't very DRY but the implementation is
+	// cleaner this way
+	themes: {
+		"default-theme": {
+			"background-color": "white",
+			"color": "black"
+		},
+
+		"vancouver-theme": {
+			"background-color": "#DDD",
+			"color": "#576b96"
+		},
+
+		"ballard-theme": {
+			"background-color": "#576b96",
+			"color": "#DDD"
+		},
+
+		"parchment-theme": {
+			"background-color": "#f7f1cf",
+			"color": "#774c27"
+		},
+
+		"night-theme": {
+			"background-color": "black",
+			"color": "white"
+		}
+	},
+
+	injectTheme: function() {
+		var theme = this.model.get("current_theme");
+		debugger;
+		$(this.getBody()).css({
+			"color": this.themes[theme]["color"],
+			"background-color": this.themes[theme]["background-color"],
+		});
+	}
 
 
 

@@ -66,37 +66,3 @@
 
 	}
 }
-// reflowable paginated style
-
-	
-
-//	.page-margin, .page {
-//		background-color: #FFF;
-//	}
-
-//	#content {
-//		color: #EEE;
-//	}
-
-.dark-theme {
-	html, body, #container { 
-		background-color: #000;
-	}
-
-	#readium-content-container {
-		color: #030303;
-	}
-
-	.page-margin {
-		border-left: 1px solid #000;
-		border-right: 1px solid #000;
-	}
-
-	.page-margin, .page {
-		background-color: #444;
-	}
-
-	#content {
-		color: #EEE;
-	}
-}
