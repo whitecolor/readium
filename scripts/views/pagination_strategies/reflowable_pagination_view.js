@@ -5,9 +5,20 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.page_template = _.template( $('#reflowing-template').html() );
+
+		// if this book does right to left pagination we need to set the
+		// offset on the right
+		if(this.model.get("page_prog_dir") === "rtl") {
+			this.offset_dir = "right";
+		}
+		else {
+			this.offset_dir = "left";
+		}
+
 		this.model.on("change:current_page", this.pageChangeHandler, this);
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.model.on("change:current_theme", this.injectTheme, this);
+
 	},
 
 	// sometimes these views hang around in memory before
@@ -56,7 +67,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	adjustIframeColumns: function() {
-
+		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
 		this.frame_width = parseInt($frame.width(), 10);
 		this.frame_height = parseInt($frame.height(), 10);
@@ -70,7 +81,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"padding": "0px",
 			"margin": "0px",
 			"position": "absolute",
-			"left": "0px",
+			prop_dir: "0px",
 			"-webkit-column-width": this.frame_width.toString() + "px",
 			"width": this.frame_width.toString() + "px",
 			"height": this.frame_height.toString() + "px"
@@ -111,7 +122,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	calcNumPages: function() {
 		var width = this.getBody().scrollWidth;
-		width -= parseInt(this.getBody().style.left, 10); 
+		width -= parseInt(this.getBody().style[this.offset_dir], 10); 
 		return Math.floor( (width + this.gap_width) / (this.gap_width + this.frame_width) )
 	},
 
@@ -125,7 +136,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	goToPage: function(page) {
 		var offset = this.calcPageOffset(page).toString() + "px";
-		$(this.getBody()).css("left", "-" + offset);
+		$(this.getBody()).css(this.offset_dir, "-" + offset);
 		this.showContent();
 	},
 
@@ -146,9 +157,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	getElemPageNumber: function(elem) {
-		var shift = elem.getClientRects()[0].left;
+		var shift = elem.getClientRects()[0][this.offset_dir];
 		// less the amount we already shifted to get to cp
-		shift -= parseInt(this.getBody().style.left, 10); 
+		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
 		return Math.ceil( shift / (this.frame_width + this.gap_width) );
 	},
 
