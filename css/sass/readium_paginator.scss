@@ -63,8 +63,12 @@ body {
 #flowing-wrapper {
 	padding: 30px;
 	text-align: center;
-	padding-top: 5%;
+	padding-top: 3%;
 	height: 80%;
+	-webkit-transition-property: opacity;
+	-webkit-transition-duration: 0.1s;
+	-webkit-transition-timing-function: ease;
+	opacity: 0; /* start off invisible to prevent flicker */
 }
 
 /* Style declarations for two up mode */

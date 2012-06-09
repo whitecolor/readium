@@ -32,6 +32,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.$('#readium-flowing-content').on("load", function(e) {
 			that.adjustIframeColumns();
 			that.iframeLoadCallback(e);
+			that.setFontSize();
 			if(goToLastPage) {
 				that.model.goToLastPage();
 			}
@@ -61,10 +62,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"left": "0px",
 			"-webkit-column-width": this.frame_width.toString() + "px",
 			"width": this.frame_width.toString() + "px",
-			"height": this.frame_height.toString() + "px",
-			"-webkit-transition-property": "opacity",
-		    "-webkit-transition-duration": "0.1s",
-	    	"-webkit-transition-timing-function": "ease"
+			"height": this.frame_height.toString() + "px"
 		});
 
 		this.model.set("num_pages", this.calcNumPages());
@@ -85,11 +83,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	hideContent: function() {
-		$(this.getBody()).css("opacity", "0");
+		$("#flowing-wrapper").css("opacity", "0");
 	},
 
 	showContent: function() {
-		$(this.getBody()).css("opacity", "1");
+		$("#flowing-wrapper").css("opacity", "1");
 	},
 
 	calcPageOffset: function(page_num) {
@@ -140,8 +138,16 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	windowSizeChangeHandler: function() {
+		this.hideContent();
 		this.adjustIframeColumns();
-	}
+	},
+
+	setFontSize: function() {
+		debugger;
+		var size = this.model.get("font_size") / 10;
+		$(this.getBody()).css("font-size", size + "em");
+		this.model.set("num_pages", this.calcNumPages());
+	},
 
 
 
