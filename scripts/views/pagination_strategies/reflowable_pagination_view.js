@@ -98,6 +98,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	calcNumPages: function() {
 		var width = this.getBody().scrollWidth;
+		width -= parseInt(this.getBody().style.left, 10); 
 		return Math.floor( (width + this.gap_width) / (this.gap_width + this.frame_width) )
 	},
 
@@ -119,6 +120,12 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var fragment = this.model.get("hash_fragment");
 		if(fragment) {
 			var el = $("#" + fragment, this.getBody())[0];
+
+			// we get more precise results if we look at the first children
+			while(el.children.length > 0) {
+				el = el.children[0];
+			}
+
 			var page = this.getElemPageNumber(el);
 			this.model.goToPage(page);
 		}
@@ -127,7 +134,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	getElemPageNumber: function(elem) {
 		var shift = elem.getClientRects()[0].left;
-		return Math.floor( shift / (this.frame_width + this.gap_width) );
+		// less the amount we already shifted to get to cp
+		shift -= parseInt(this.getBody().style.left, 10); 
+		return Math.ceil( shift / (this.frame_width + this.gap_width) );
 	},
 
 	windowSizeChangeHandler: function() {
