@@ -1345,65 +1345,19 @@ body {
   -webkit-flow: 'foo';
   -webkit-flow-into: foo; }
 
-.page-wrap {
-  height: 90%;
-  width: 100%;
-  position: fixed;
-  padding: 0;
-  margin: 0;
-  overflow: visible;
-  z-index: 1;
-  margin: 2% 0; }
-
-.page-wrap.hidden-page {
-  visibility: hidden;
-  z-index: -10000; }
-
-.page-margin {
-  height: 100%;
-  width: 60%;
-  margin: 0 auto;
-  padding: 0;
-  overflow: visible; }
-
-.page-margin:before, .page-margin:after {
-  content: "";
-  display: block;
-  height: 5%;
-  clear: both; }
-
-.page {
-  border: none;
-  content: -webkit-from-flow("foo");
-  -webkit-flow-from: foo;
-  -webkit-region-overflow: auto;
-  overflow: visible;
-  height: 90%;
-  width: 90%;
-  margin: 0 auto; }
-
 .clearfix:after {
   content: " ";
   display: block;
   height: 0;
   clear: both; }
 
+#flowing-wrapper {
+  padding: 30px;
+  text-align: center;
+  padding-top: 5%;
+  height: 80%; }
+
 /* Style declarations for two up mode */
-.two-up .page-wrap {
-  width: 50%; }
-.two-up .page-wrap.right {
-  left: 50%; }
-.two-up .page-wrap.left {
-  left: 0; }
-.two-up .right, .two-up .left .page-margin {
-  float: right; }
-.two-up .left, .two-up .right .page-margin {
-  float: left; }
-.two-up .page-margin {
-  width: 90%;
-  margin: 0; }
-.two-up .page {
-  width: 85%; }
 .two-up #spine-divider {
   position: absolute;
   top: 11px;
