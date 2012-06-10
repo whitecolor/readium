@@ -1365,12 +1365,12 @@ body {
 /* Style declarations for two up mode */
 .two-up #spine-divider {
   position: absolute;
-  top: 4%;
+  top: 5%;
   left: 50%;
-  height: 84%;
+  height: 87%;
   margin: 0;
   margin-top: 40px;
-  /* for the top bar */
+  /* for the */
   width: 1px;
   -webkit-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
   -moz-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
@@ -1378,8 +1378,7 @@ body {
   display: none;
   background-color: #444;
   opacity: 0.6;
-  z-index: 10;
-  margin-top: 40px; }
+  z-index: 10; }
 
 /*.apple-fixed-layout*/
 .apple-fixed-layout #readium-right-content {
