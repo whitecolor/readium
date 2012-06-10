@@ -40,17 +40,18 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 	addGlobalEventHandlers: function() {
 		var book = this.model;
+		var that = this;
 		window.onresize = function(event) {
 			book.trigger("repagination_event");
 		}
 
 		$(document).keydown(function(e) {
 			if(e.which == 39) {
-				this.goLeft()
+				that.goRight();
 			}
 							
 			if(e.which == 37) {
-				this.goRight();
+				that.goLeft();
 			}
 		});
 	},
