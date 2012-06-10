@@ -4,6 +4,9 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	uiVisible: false,
 
 	initialize: function() {
+		// keep track of page prog dir
+		this.rtl = (this.model.get("page_prog_dir") === "rtl");
+
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
 		this.model.on("change:current_theme", this.renderTheme, this);
 		this.model.on("change:toolbar_visible", this.renderPageButtons, this);
@@ -43,11 +46,11 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 		$(document).keydown(function(e) {
 			if(e.which == 39) {
-				book.nextPage();
+				this.goLeft()
 			}
 							
 			if(e.which == 37) {
-				book.prevPage();
+				this.goRight();
 			}
 		});
 	},
@@ -97,10 +100,36 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		}
 	},
 
+	// move in the left dir through the book,
+	// regardless of page progression dir
+	goLeft: function() {
+		if(this.rtl) {
+			this.model.nextPage();
+		}
+		else {
+			this.model.prevPage();	
+		}
+	},
+
+	// move in the right dir through the book,
+	// regardless of page progression dir
+	goRight: function() {
+		if(this.rtl) {
+			this.model.prevPage();
+		}
+		else {
+			this.model.nextPage();	
+		}
+	},
+
 	
 	
 	events: {
-		"click #prev-page-button": 		function() { this.model.prevPage() },
-		"click #next-page-button": 		function() { this.model.nextPage() }
+		"click #prev-page-button": 	function() { 
+			this.goLeft();
+		},
+		"click #next-page-button": 	function() { 
+			this.goRight();
+		}
   	},
 });

@@ -17,7 +17,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		this.model.on("change:current_page", this.pageChangeHandler, this);
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
+		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
 		this.model.on("change:current_theme", this.injectTheme, this);
+
 
 	},
 
@@ -27,6 +29,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	destruct: function() {
 		this.model.off("change:current_page", this.pageChangeHandler);
 		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
+		this.model.off("repagination_event", this.windowSizeChangeHandler);
 		this.model.off("change:current_theme", this.windowSizeChangeHandler);
 
 		// call the super destructor
@@ -81,11 +84,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"padding": "0px",
 			"margin": "0px",
 			"position": "absolute",
-			prop_dir: "0px",
 			"-webkit-column-width": this.frame_width.toString() + "px",
 			"width": this.frame_width.toString() + "px",
 			"height": this.frame_height.toString() + "px"
 		});
+
+		// this line needs to be on its own for syntax reasons
+		// TODO: when does this actually need to be done?
+		$(this.getBody()).css(this.offset_dir, "0px");
 
 		var that = this;
 		setTimeout(function() {
