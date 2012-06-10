@@ -117,11 +117,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		
 	},
 
-	injectLinkHandler: function (iframe) {
-        var doc = iframe.contentDocument;
-		$("a", doc).click(this.linkClickHandler);
-	},
-
 	// helper method to get the a reference to the documentElement
 	// of the document in this strategy's iFrame.
 	// TODO this is a bad name for this function
