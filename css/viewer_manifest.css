@@ -1365,10 +1365,12 @@ body {
 /* Style declarations for two up mode */
 .two-up #spine-divider {
   position: absolute;
-  top: 11px;
+  top: 4%;
   left: 50%;
-  height: 87%;
+  height: 84%;
   margin: 0;
+  margin-top: 40px;
+  /* for the top bar */
   width: 1px;
   -webkit-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
   -moz-box-shadow: 0 0 15px 3px rgba(5, 5, 5, 0.7);
@@ -1376,7 +1378,8 @@ body {
   display: none;
   background-color: #444;
   opacity: 0.6;
-  z-index: 10; }
+  z-index: 10;
+  margin-top: 40px; }
 
 /*.apple-fixed-layout*/
 .apple-fixed-layout #readium-right-content {
@@ -1698,18 +1701,6 @@ body.apple-fixed-layout {
     color: #666; }
     .night-theme #readium-content-container.mo-playing .current-mo-content {
       color: white; }
-
-.dark-theme html, .dark-theme body, .dark-theme #container {
-  background-color: #000; }
-.dark-theme #readium-content-container {
-  color: #030303; }
-.dark-theme .page-margin {
-  border-left: 1px solid #000;
-  border-right: 1px solid #000; }
-.dark-theme .page-margin, .dark-theme .page {
-  background-color: #444; }
-.dark-theme #content {
-  color: #EEE; }
 
 #regions-not-available {
   padding: 10px;

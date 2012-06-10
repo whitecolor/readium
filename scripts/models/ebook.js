@@ -50,7 +50,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"toc_visible": false,
     	"can_two_up": true,
     	"rendered_spine_items": [],
-    	"current_theme": "default",
+    	"current_theme": "default-theme",
     	"current_margin": 3
     	//"spine_position": 0
   	},

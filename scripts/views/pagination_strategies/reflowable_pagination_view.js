@@ -19,6 +19,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
 		this.model.on("change:current_theme", this.injectTheme, this);
+		this.model.on("change:two_up", this.setUpMode, this);
+		this.model.on("change:two_up", this.adjustIframeColumns, this);
+		this.model.on("change:current_margin", this.marginCallback, this);
 
 
 	},
@@ -27,10 +30,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// the GC's get them. we need to remove all of the handlers
 	// that were registered on the model
 	destruct: function() {
+		
 		this.model.off("change:current_page", this.pageChangeHandler);
 		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
 		this.model.off("repagination_event", this.windowSizeChangeHandler);
 		this.model.off("change:current_theme", this.windowSizeChangeHandler);
+		this.model.off("change:two_up", this.setUpMode);
+		this.model.off("change:two_up", this.adjustIframeColumns);
+		this.model.off("change:current_margin", this.marginCallback);
 
 		// call the super destructor
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
@@ -41,10 +48,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var json = this.model.getCurrentSection().toJSON();
 
 		// make everything invisible to prevent flicker
-		
-
-
+		this.setUpMode();
 		this.$('#container').html( this.page_template(json) );
+		this.setFrameWidth();
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
 			that.adjustIframeColumns();
@@ -55,12 +61,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			// wait for css to parse before setting page num
 			setTimeout(function() {
 				that.model.set("num_pages", that.calcNumPages());
-				that.pageChangeHandler();
+				//that.pageChangeHandler();
 				if(goToLastPage) {
 					that.model.goToLastPage();
+					// page change handler will show the content
 				}
 				else {
 					that.model.goToPage(1);
+					that.showContent();
 				}
 			}, 10);
 			
@@ -74,7 +82,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var $frame = this.$('#readium-flowing-content');
 		this.frame_width = parseInt($frame.width(), 10);
 		this.frame_height = parseInt($frame.height(), 10);
-		this.gap_width = Math.floor(this.frame_width / 5);
+		this.gap_width = Math.floor(this.frame_width / 7);
+		if(this.model.get("two_up")) {
+			this.page_width = Math.floor((this.frame_width - this.gap_width) / 2);
+		}
+		else {
+			this.page_width = this.frame_width;
+		}
+		
 
 		// it is important for us to make sure there is no padding or
 		// margin on the <html> elem, or it will mess with our column code
@@ -84,8 +99,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"padding": "0px",
 			"margin": "0px",
 			"position": "absolute",
-			"-webkit-column-width": this.frame_width.toString() + "px",
-			"width": this.frame_width.toString() + "px",
+			"-webkit-column-width": this.page_width.toString() + "px",
+			"width": this.page_width.toString() + "px",
 			"height": this.frame_height.toString() + "px"
 		});
 
@@ -97,8 +112,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		setTimeout(function() {
 			that.model.set("num_pages", that.calcNumPages());
 
-			that.pageChangeHandler();
-		}, 10);
+		//	that.pageChangeHandler();
+		}, 1);
 		
 	},
 
@@ -123,13 +138,35 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	calcPageOffset: function(page_num) {
-		return (page_num - 1) * (this.frame_width + this.gap_width);
+		return (page_num - 1) * (this.page_width + this.gap_width);
+	},
+
+	setFrameWidth: function() {
+		var width;
+		var margin = this.model.get("current_margin");
+		if (margin === 1) {
+			this.model.get("two_up") ? (width = "90%") : (width = "80%");
+		}
+		else if (margin === 2) {
+			this.model.get("two_up") ? (width = "80%") : (width = "70%");
+		}
+		else if (margin === 3) {
+			this.model.get("two_up") ? (width = "70%") : (width = "60%");	
+		}
+		else if (margin === 4) {
+			this.model.get("two_up") ? (width = "60%") : (width = "50%");	
+		}
+		else {
+			this.model.get("two_up") ? (width = "50%") : (width = "40%");	
+		}
+		
+		this.$('#readium-flowing-content').attr("width", width);
 	},
 
 	calcNumPages: function() {
 		var width = this.getBody().scrollWidth;
 		width -= parseInt(this.getBody().style[this.offset_dir], 10); 
-		return Math.floor( (width + this.gap_width) / (this.gap_width + this.frame_width) )
+		return Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) )
 	},
 
 	pageChangeHandler: function() {
@@ -166,19 +203,23 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var shift = elem.getClientRects()[0][this.offset_dir];
 		// less the amount we already shifted to get to cp
 		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
-		return Math.ceil( shift / (this.frame_width + this.gap_width) );
+		return Math.ceil( shift / (this.page_width + this.gap_width) );
 	},
 
 	windowSizeChangeHandler: function() {
-		this.hideContent();
+		//this.hideContent();
 		this.adjustIframeColumns();
 	},
 
 	setFontSize: function() {
-		debugger;
 		var size = this.model.get("font_size") / 10;
 		$(this.getBody()).css("font-size", size + "em");
 		// TODO RECALC PAGE COUNT
+	},
+
+	marginCallback: function() {
+		this.setFrameWidth();
+		this.adjustIframeColumns();
 	},
 
 	// sadly this is just a reprint of what is already in the
@@ -213,7 +254,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	injectTheme: function() {
 		var theme = this.model.get("current_theme");
-		debugger;
+		if(theme === "default") theme = "default-theme";
 		$(this.getBody()).css({
 			"color": this.themes[theme]["color"],
 			"background-color": this.themes[theme]["background-color"],
