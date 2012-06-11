@@ -192,19 +192,32 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		if(fragment) {
 			var el = $("#" + fragment, this.getBody())[0];
 
+			if(!el) {
+				// couldn't find the el. just give up
+				return;
+			}
+
 			// we get more precise results if we look at the first children
 			while(el.children.length > 0) {
 				el = el.children[0];
 			}
 
 			var page = this.getElemPageNumber(el);
-			this.model.goToPage(page);
+			if(page > 0) {
+				this.model.goToPage(page);	
+			}
 		}
 		// else false alarm no work to do
 	},
 
 	getElemPageNumber: function(elem) {
-		var shift = elem.getClientRects()[0][this.offset_dir];
+		var rects, shift;
+		rects = elem.getClientRects();
+		if(!rects || rects.length < 1) {
+			// if there were no rects the elem had display none
+			return -1;
+		}
+		shift = rects[0][this.offset_dir];
 		// less the amount we already shifted to get to cp
 		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
 		return Math.ceil( shift / (this.page_width + this.gap_width) );
