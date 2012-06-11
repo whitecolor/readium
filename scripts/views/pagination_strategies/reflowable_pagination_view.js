@@ -56,22 +56,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			that.iframeLoadCallback(e);
 			that.setFontSize();
 			that.injectTheme();
+			that.setNumPages();
 
-			// wait for css to parse before setting page num
-			setTimeout(function() {
-				that.model.set("num_pages", that.calcNumPages());
-				//that.pageChangeHandler();
-				if(goToLastPage) {
-					that.model.goToLastPage();
-					// page change handler will show the content
-				}
-				else {
-					that.model.goToPage(1);
-					that.showContent();
-				}
-			}, 10);
-			
-			
+			if(goToLastPage) {
+				that.model.goToLastPage();
+			}
+			else {
+				that.model.goToPage(1);
+			}		
 		});
 		return this;
 	},
@@ -106,16 +98,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// this line needs to be on its own for syntax reasons
 		// TODO: when does this actually need to be done?
 		// $(this.getBody()).css(this.offset_dir, "0px");
-		
+		this.setNumPages();
 		var page = this.model.get("current_page")[0] || 1;
 		this.goToPage(page);
-
-		var that = this;
-		setTimeout(function() {
-			that.model.set("num_pages", that.calcNumPages());
-
-		//	that.pageChangeHandler();
-		}, 1);
+		//this.model.set("num_pages", this.calcNumPages());
 		
 	},
 
@@ -160,10 +146,36 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.$('#readium-flowing-content').attr("width", width);
 	},
 
+	// calculate the number of pages in the current section,
+	// based on section length : page size ratio
 	calcNumPages: function() {
-		var width = this.getBody().scrollWidth;
-		width -= parseInt(this.getBody().style[this.offset_dir], 10); 
-		return Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) )
+
+		var body, offset, width, num;
+		
+		// get a reference to the dom body
+		body = this.getBody();
+
+		// cache the current offset 
+		offset = body.style[this.offset_dir];
+
+		// set the offset to 0 so that all overflow is part of
+		// the scroll width
+		body.style[this.offset_dir] = "0px";
+
+		// grab the scrollwidth => total content width
+		width = this.getBody().scrollWidth;
+
+		// reset the offset to its original value
+		body.style[this.offset_dir] = offset;
+
+		// perform calculation and return result...
+		num = Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) );
+
+		// in two up mode, always set to an even number of pages
+		if( num % 2 === 0 && this.model.get("two_up")) {
+			//num += 1;
+		}
+		return num;
 	},
 
 	pageChangeHandler: function() {
@@ -256,6 +268,12 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"color": this.themes[theme]["color"],
 			"background-color": this.themes[theme]["background-color"],
 		});
+	},
+
+	setNumPages: function() {
+		var num = this.calcNumPages();
+		console.log('num pages is: ' + num);
+		this.model.set("num_pages", num);
 	}
 
 

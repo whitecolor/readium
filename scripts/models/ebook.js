@@ -94,6 +94,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	toggleTwoUp: function() {
 		if(this.get("can_two_up")) {
+			debugger;
 			var twoUp = this.get("two_up");
 			var displayed = this.get("current_page");
 			var newPages = [];
@@ -102,6 +103,16 @@ Readium.Models.Ebook = Backbone.Model.extend({
 					newPages[0] = 1;
 				} else {
 					newPages[0] = displayed[0];
+				}
+			}
+			else if(!this.getCurrentSection().isFixedLayout()) {
+				if(displayed[0] % 2 === 1) {
+					newPages[0] = displayed[0];
+					newPages[1] = displayed[0] + 1;
+				}
+				else {
+					newPages[0] = displayed[0] - 1;
+					newPages[1] = displayed[0];
 				}
 			}
 			else if(displayed[0] % 2 === 0) {
@@ -190,12 +201,27 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	goToPage: function(page) {
 		if(this.get("two_up")) {
-			if(page % 2 === 0) { // this logic needs to be smartened up
-				this.set("current_page", [page, page + 1]);	
+			// in two up mode we need to keep track of what side
+			// of the spine the odd pages go on
+			if(this.getCurrentSection().isFixedLayout()) {
+				if(page % 2 === 0) { // this logic needs to be smartened up
+					this.set("current_page", [page, page + 1]);	
+				}
+				else {
+					this.set("current_page", [page - 1, page]);
+				}
 			}
 			else {
-				this.set("current_page", [page - 1, page]);
+				// in reflowable format, we want this config always:
+				// ODD_PAGE |spine| EVEN_PAGE
+				if(page % 2 === 1) {
+					this.set("current_page", [page, page + 1]);	
+				}
+				else {
+					this.set("current_page", [page - 1, page]);
+				}	
 			}
+			
 		}
 		else {
 			this.set("current_page", [page])
