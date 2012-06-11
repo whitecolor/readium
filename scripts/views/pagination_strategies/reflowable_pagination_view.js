@@ -95,14 +95,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"height": this.frame_height.toString() + "px"
 		});
 
-		// this line needs to be on its own for syntax reasons
-		// TODO: when does this actually need to be done?
-		// $(this.getBody()).css(this.offset_dir, "0px");
 		this.setNumPages();
 		var page = this.model.get("current_page")[0] || 1;
 		this.goToPage(page);
-		//this.model.set("num_pages", this.calcNumPages());
-		
 	},
 
 	// helper method to get the a reference to the documentElement
@@ -216,14 +211,16 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	windowSizeChangeHandler: function() {
-		//this.hideContent();
 		this.adjustIframeColumns();
 	},
 
 	setFontSize: function() {
 		var size = this.model.get("font_size") / 10;
 		$(this.getBody()).css("font-size", size + "em");
-		// TODO RECALC PAGE COUNT
+
+		// the content size has changed so recalc the number of 
+		// pages
+		this.setNumPages();
 	},
 
 	marginCallback: function() {
