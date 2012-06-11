@@ -23,7 +23,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
 
-
 	},
 
 	// sometimes these views hang around in memory before
@@ -106,7 +105,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		// this line needs to be on its own for syntax reasons
 		// TODO: when does this actually need to be done?
-		$(this.getBody()).css(this.offset_dir, "0px");
+		// $(this.getBody()).css(this.offset_dir, "0px");
+		
+		var page = this.model.get("current_page")[0] || 1;
+		this.goToPage(page);
 
 		var that = this;
 		setTimeout(function() {
