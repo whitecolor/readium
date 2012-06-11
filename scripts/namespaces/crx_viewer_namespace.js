@@ -14,15 +14,6 @@ window.Readium = {
 };
 
 $(function() {
-	
-	if(Modernizr.regions) {
-		// if css3 regions are enabled:
-		// call the initialization code when the dom is loaded
-		window.Readium.Init();
-	}
-	else {
-		$('#regions-not-available').modal("show");
-
-	}
-	
+	// call the initialization code when the dom is loaded
+	window.Readium.Init();
 });

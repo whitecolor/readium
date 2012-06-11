@@ -18,51 +18,9 @@
 		<!-- Le styles -->
 		<link rel="stylesheet" type="text/css" href="/css/viewer_manifest.css">
 
-
-		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
+		<!-- Only include Modernizr at the top, everything else is at the bottom -->
+		<script src="/lib/modernizr-2.5.3.min.js" type="text/javascript" ></script>
 		
-		<!-- This one file: -->
-		<script src="/scripts/libs/plugins.js" type="text/javascript" ></script>
-		<script src="/lib/pan_and_zoom.js" type="text/javascript" ></script>
-		<!--/lib/pan_and_zoom.js-->
-		<!--contains the following concatenated in order: -->
-		<!--/lib/underscore.min.js-->
-		<!--/lib/backbone.min.js-->
-		<!--/lib/lawnchair-0.6.1.min.js-->
-		<!--/lib/bootstrap-custom.min.js-->
-		<!--/lib/jquery.mousewheel.js-->
-		<!--/lib/pan_and_zoom.js-->
-		<!--/lib/jath.js-->
-		<!--/lib/URI.js-->
-		<!--/lib/ZipFile.complete.js-->
-
-		<!-- Must include the namespace before any application code -->
-		<script src="/scripts/namespaces/crx_viewer_namespace.js" type="text/javascript"></script>
-		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
-		<script src="/scripts/utils/cookie_utils.js" type="text/javascript"></script>
-		<script src="/scripts/utils/bb_file_system_sync.js" type="text/javascript"></script>
-		<script src="/scripts/utils/local_storage_sync.js" type="text/javascript"></script>
-		<script src="/scripts/models/manifest_item.js" type="text/javascript"></script>
-		<script src="/scripts/models/packageDocument.js" type="text/javascript"></script>
-		<script src="/scripts/models/ebook.js" type="text/javascript"></script>
-		<script src="/scripts/models/options_presenter.js" type="text/javascript"></script>
-		<script src="/scripts/models/toc.js" type="text/javascript"></script>
-		<script src="/scripts/models/smilModel.js" type="text/javascript"></script>
-		<script src="/scripts/models/mediaOverlay.js" type="text/javascript"></script>
-		<script src="/scripts/models/audioClipPlayer.js" type="text/javascript"></script>
-		<script src="/scripts/models/paginator.js" type="text/javascript"></script>
-		<script src="/scripts/models/trigger.js" type="text/javascript"></script>
-		<script src="/scripts/views/pagination_strategies/pagination_view_base.js" type="text/javascript"></script>
-		<script src="/scripts/views/pagination_strategies/fixed_pagination_view.js" type="text/javascript"></script>
-		<script src="/scripts/views/pagination_strategies/reflowable_pagination_view.js" type="text/javascript"></script>
-		<script src="/scripts/views/pagination_strategies/scrolling_pagination_view.js" type="text/javascript"></script>
-		<!--<script src="/scripts/views/nav_widget_view.js" type="text/javascript"></script>-->
-		<script src="/scripts/views/toolbar_view.js" type="text/javascript"></script>
-		<script src="/scripts/views/toc_view.js" type="text/javascript"></script>
-		<script src="/scripts/views/options_view.js" type="text/javascript"></script>
-		<script src="/scripts/viewer.js" type="text/javascript"></script>
-		<script src="/scripts/routers/crx_viewer_router.js" type="text/javascript"></script>
-		<script src="/lib/mathjax/MathJax.js?config=readium" type="text/javascript"></script>
 	</head>
 	<body>
 
@@ -217,22 +175,6 @@
 			</div>
 		</div><!-- end le info modal -->
 
-		<div class="modal fade" id="regions-not-available"  style="display: none"><!-- le info no regions -->
-			<div>
-				<strong>Uh Oh!</strong> We have detected that your browser does not have css regions enabled. Readium needs this feature to function properly. You will need to enable it. If you don't know how, don't worry we've got your back.
-			</div> 
-			<div>
-				<strong>Please take the following actions:</strong>
-			</div>
-			<ol>
-				<li>type <code>about:flags</code> into Chrome's address bar</li>
-				<li>Find the entry called <strong>enable css regions</strong> and click <strong>enable</strong></li>
-				<li>Restart chrome when prompted</li>
-				<li>Open Readium and get back to reading!</li>
-			</ol>
-		</div><!-- end le info no regions -->
-
-
 		<!-- templates -->
 		<script type="text/template" id='reflowing-page-template'>
 			<div id="page-<%= page_num %>" class="page-wrap <%= (page_num % 2 === 0) ? "left" : "right" %>">
@@ -315,7 +257,50 @@
 				</iframe>
 			</div>
 		</script>
-		<script src="/lib/modernizr-2.5.3.min.js" type="text/javascript" ></script>
-		<script src="/lib/modernizr.css-regions.js" type="text/javascript" ></script>
+
+		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
+		
+		<!-- This one file: -->
+		<script src="/scripts/libs/plugins.js" type="text/javascript" ></script>
+		<script src="/lib/pan_and_zoom.js" type="text/javascript" ></script>
+		<!--/lib/pan_and_zoom.js-->
+		<!--contains the following concatenated in order: -->
+		<!--/lib/underscore.min.js-->
+		<!--/lib/backbone.min.js-->
+		<!--/lib/lawnchair-0.6.1.min.js-->
+		<!--/lib/bootstrap-custom.min.js-->
+		<!--/lib/jquery.mousewheel.js-->
+		<!--/lib/pan_and_zoom.js-->
+		<!--/lib/jath.js-->
+		<!--/lib/URI.js-->
+		<!--/lib/ZipFile.complete.js-->
+
+		<!-- Must include the namespace before any application code -->
+		<script src="/scripts/namespaces/crx_viewer_namespace.js" type="text/javascript"></script>
+		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
+		<script src="/scripts/utils/cookie_utils.js" type="text/javascript"></script>
+		<script src="/scripts/utils/bb_file_system_sync.js" type="text/javascript"></script>
+		<script src="/scripts/utils/local_storage_sync.js" type="text/javascript"></script>
+		<script src="/scripts/models/manifest_item.js" type="text/javascript"></script>
+		<script src="/scripts/models/packageDocument.js" type="text/javascript"></script>
+		<script src="/scripts/models/ebook.js" type="text/javascript"></script>
+		<script src="/scripts/models/options_presenter.js" type="text/javascript"></script>
+		<script src="/scripts/models/toc.js" type="text/javascript"></script>
+		<script src="/scripts/models/smilModel.js" type="text/javascript"></script>
+		<script src="/scripts/models/mediaOverlay.js" type="text/javascript"></script>
+		<script src="/scripts/models/audioClipPlayer.js" type="text/javascript"></script>
+		<script src="/scripts/models/paginator.js" type="text/javascript"></script>
+		<script src="/scripts/models/trigger.js" type="text/javascript"></script>
+		<script src="/scripts/views/pagination_strategies/pagination_view_base.js" type="text/javascript"></script>
+		<script src="/scripts/views/pagination_strategies/fixed_pagination_view.js" type="text/javascript"></script>
+		<script src="/scripts/views/pagination_strategies/reflowable_pagination_view.js" type="text/javascript"></script>
+		<script src="/scripts/views/pagination_strategies/scrolling_pagination_view.js" type="text/javascript"></script>
+		<script src="/scripts/views/toolbar_view.js" type="text/javascript"></script>
+		<script src="/scripts/views/toc_view.js" type="text/javascript"></script>
+		<script src="/scripts/views/options_view.js" type="text/javascript"></script>
+		<script src="/scripts/viewer.js" type="text/javascript"></script>
+		<script src="/scripts/routers/crx_viewer_router.js" type="text/javascript"></script>
+		<script src="/lib/mathjax/MathJax.js?config=readium" type="text/javascript"></script>
+		
 	</body>
 </html>
