@@ -22,6 +22,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
+		this.model.on("change:mo_playing", this.renderMoPlaying, this);
+		this.model.on("change:current_mo_frag", this.renderMoFragHighlight, this);
 
 	},
 
@@ -37,6 +39,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.off("change:two_up", this.setUpMode);
 		this.model.off("change:two_up", this.adjustIframeColumns);
 		this.model.off("change:current_margin", this.marginCallback);
+		this.model.off("change:mo_playing", this.renderMoPlaying);
+		this.model.off("change:current_mo_frag", this.renderMoFragHighlight);
 
 		// call the super destructor
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
@@ -247,27 +251,32 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	themes: {
 		"default-theme": {
 			"background-color": "white",
-			"color": "black"
+			"color": "black",
+			"mo-color": "#777"
 		},
 
 		"vancouver-theme": {
 			"background-color": "#DDD",
-			"color": "#576b96"
+			"color": "#576b96",
+			"mo-color": "#777"
 		},
 
 		"ballard-theme": {
 			"background-color": "#576b96",
-			"color": "#DDD"
+			"color": "#DDD",
+			"mo-color": "#888"
 		},
 
 		"parchment-theme": {
 			"background-color": "#f7f1cf",
-			"color": "#774c27"
+			"color": "#774c27",
+			"mo-color": "#eebb22"
 		},
 
 		"night-theme": {
 			"background-color": "black",
-			"color": "white"
+			"color": "white",
+			"mo-color": "#666"
 		}
 	},
 
@@ -278,12 +287,46 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"color": this.themes[theme]["color"],
 			"background-color": this.themes[theme]["background-color"],
 		});
+		this.renderMoPlaying();
 	},
 
 	setNumPages: function() {
 		var num = this.calcNumPages();
 		console.log('num pages is: ' + num);
 		this.model.set("num_pages", num);
+	},
+
+	renderMoPlaying: function() {
+		var theme = this.model.get("current_theme");
+		if(theme === "default") theme = "default-theme";
+		if(this.model.get("mo_playing")) {
+			$(this.getBody()).css("color", this.themes[theme]["mo-color"]);
+		}
+		else {
+			$(this.getBody()).css("color", this.themes[theme]["color"]);	
+			$('.current-mo-content', this.getBody()).
+				toggleClass('current-mo-content', false).
+				css("color", "");
+		}
+	},
+
+	renderMoFragHighlight: function() {
+
+		var theme = this.model.get("current_theme");
+		if(theme === "default") theme = "default-theme";
+
+		// get rid of the last content
+		$('.current-mo-content', this.getBody()).
+			toggleClass('current-mo-content', false).
+			css("color", "");
+		
+		var frag = this.model.get("current_mo_frag");
+		if(frag) {
+			$("#" +  frag, this.getBody()).
+				toggleClass('current-mo-content', true).
+				css("color", this.themes[theme]["color"]);
+		}
+
 	}
 
 
