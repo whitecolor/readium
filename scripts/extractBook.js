@@ -35,7 +35,7 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 				src_url: this.get("src")
 			}, {
 				file_path: this.base_dir_name + "/" + rootFile,
-				root_url: this.get("root_url") + "/" + rootFile,
+				root_url: this.get("root_url") + "/" + rootFile
 			}); 
 		this.packageDoc.reset(content);
 		this.trigger("parsed:root_file")		
@@ -318,7 +318,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		}, function() {
 			console.log("In beginUnpacking error handler. Does the root dir already exist?");
 		});
-	},
+	}
 	
 });
 
@@ -477,6 +477,6 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 		if(!found) {
 			throw ("asked to read non-existent file: " + name);
 		}
-	},
+	}
 
 });
