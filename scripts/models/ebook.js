@@ -357,7 +357,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			var that = this;
 			return Readium.Models.Toc.getToc(item, {
 				file_path: that.resolvePath(item.get("href")),
-				book: that,
+				book: that
 			});
 		}
 	},

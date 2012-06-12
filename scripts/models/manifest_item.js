@@ -59,7 +59,7 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 				console.log("Failed to load file: " + path);
 			})
 		});
-	},
+	}
 	
 });
 

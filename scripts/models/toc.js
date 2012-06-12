@@ -57,8 +57,8 @@ Readium.Models.NcxToc = Readium.Models.Toc.extend({
 
 		navs: [ "//ncx:navMap/ncx:navPoint", { 
 			text: "ncx:navLabel/ncx:text",
-			href: "ncx:content/@src",
-		} ],
+			href: "ncx:content/@src"
+		} ]
 	},
 
 	parse: function(xmlDom) {

@@ -285,7 +285,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		if(theme === "default") theme = "default-theme";
 		$(this.getBody()).css({
 			"color": this.themes[theme]["color"],
-			"background-color": this.themes[theme]["background-color"],
+			"background-color": this.themes[theme]["background-color"]
 		});
 		this.renderMoPlaying();
 	},

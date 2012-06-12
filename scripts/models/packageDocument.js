@@ -39,7 +39,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			spread: "//def:metadata/def:meta[@property='rendition:spread']",
 			orientation: "//def:metadata/def:meta[@property='rendition:orientation']",
 			ncx: "//def:spine/@toc",
-			page_prog_dir: "//def:spine/@page-progression-direction",
+			page_prog_dir: "//def:spine/@page-progression-direction"
 		 },
 
 		manifest: [ "//def:item", { 
@@ -47,7 +47,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			href: "@href",
 			media_type: "@media-type",
 			properties: "@properties",
-            media_overlay: "@media-overlay",
+            media_overlay: "@media-overlay"
 		} ],
 							 
 		spine: [ "//def:itemref", { idref: "@idref", properties: "@properties" } ],
@@ -256,7 +256,7 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 		cover_href: '/images/library/missing-cover-image.png', // default to no cover image
 		created_at: new Date(), // right now
 		updated_at: new Date(), // right now
-		paginate_backwards: false,
+		paginate_backwards: false
 	},
 
 	// Apple created its own fixed layout spec for ibooks.

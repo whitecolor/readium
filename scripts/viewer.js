@@ -132,5 +132,5 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		"click #next-page-button": 	function() { 
 			this.goRight();
 		}
-  	},
+  	}
 });

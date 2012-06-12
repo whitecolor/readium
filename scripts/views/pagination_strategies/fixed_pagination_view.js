@@ -81,7 +81,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.$(".fixed-page-wrap").each(function(index) {
 			$(this).toggle(that.isPageVisible(index + 1, currentPage));
 		});
-	},
+	}
 
 });
 

@@ -10,7 +10,7 @@ Readium.Models.LibraryItem = Backbone.Model.extend({
 		window.location = this.getViewBookUrl();
 	},
 
-	delete: function() {
+	destroy: function() {
 		var key = this.get('key');
 		Lawnchair(function() {
 			var that = this; // <=== capture Lawnchair scope
@@ -28,7 +28,7 @@ Readium.Models.LibraryItem = Backbone.Model.extend({
 
 Readium.Collections.LibraryItems = Backbone.Collection.extend({
 
-	model: Readium.Models.LibraryItem,
+	model: Readium.Models.LibraryItem
 	
 });
 
@@ -60,7 +60,7 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 
 			if(confirm(confMessage)) {
 				$(selector).modal('hide');
-				this.model.delete();
+				this.model.destroy();
 				this.remove();
 			}
 		},
@@ -157,7 +157,7 @@ Readium.Views.ExtractItemView = Backbone.View.extend({
 	extractionFailed: function(msg) {
 		alert(this.model.get("error"));
 		this.model.set("extracting", false);
-	},
+	}
 
 });
 
@@ -206,7 +206,7 @@ Readium.Views.FilePickerView = Backbone.View.extend({
 	events: {
 		"change #files": "handleFileSelect",
 		"change #dir_input": "handleDirSelect",
-		"click #url-button": "handleUrl",
+		"click #url-button": "handleUrl"
 	},
 
 	show: function() {
@@ -262,7 +262,7 @@ Readium.Views.FilePickerView = Backbone.View.extend({
 		extractor.extract();
 		this.resetForm();
 		this.hide();
-	},
+	}
 
 });
 
