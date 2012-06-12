@@ -5,7 +5,7 @@
 
 Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
-	initialize: function() {}
+	initialize: function() {},
 
 	// Activate style set; passed: A set of ePUB alternate style tags
 	activateStyleSet: function(altStyleTags, bookDom) {
@@ -14,12 +14,6 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		var styleSetNames;
 		var that = this;
 		var styleSetToActivate;
-
-		// Check input to ensure they are not mutually exclusive
-		if (!_altStyleTagsMutuallyExclusive(altStyleTags)) {
-
-			return; 
-		}
 
 		// Get all style sheets in the book dom
 		$bookStyleSheets = $("link[rel*='stylesheet']", bookDom);
@@ -44,7 +38,7 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 			$styleSet = $("link[title='" + styleSetNames[styleSetNum] + "']");
 
 			// Ignore any mutually exclusive tags on style sets
-			_removeMutuallyExclusiveAltTags($styleSet);
+			$styleSet = _removeMutuallyExclusiveAltTags($styleSet);
 
 			// Find the style set(s) with the most alt tag matches
 			styleSetTagMatches[styleSetNames[styleSetNum]] = _numAltStyleTagMatches();
@@ -69,10 +63,11 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 				$styleSet.attr("rel", "alternate stylesheet");
 			}
 		}
-	}
+	},
 
 	//styleSet: A JQuery object of a style set
 	//altStyleTags: An array of the style tags to active a style set
+
 	_numAltStyleTagMatches: function (styleSet, altStyleTags) {
 
 		var numMatches = 0;
@@ -81,52 +76,34 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		var altTagNum;
 		for (altTagNum = 0; altTagNum < altStyleTags.length; altTagNum += 1) {
 
-			if ($(styleSet, "link[class*='" + altStyleTags[altTagNum] + "']").length > 0) {
+			// filter used so top-level elements are selected
+			if (styleSet.filter("link[class*='" + altStyleTags[altTagNum] + "']").length > 0) {
 
-				numMatches++;
+				numMatches++;	
 			}
 		}
 
 		return numMatches;
-	}
+	},
 
 	// This method removes, thus ignoring, mututally exclusive alternate tags within a style set
 	//styleSet: A JQuery object of a style set
 	_removeMutuallyExclusiveAltTags: function (styleSet) {
 
-		if ($(styleSet, "link[class*='night']").length > 0 &&
-		    $(styleSet, "link[class*='day']").length > 0) {
+		if (styleSet.filter("link[class*='night']").length > 0 &&
+		    styleSet.filter("link[class*='day']").length > 0) {
 
 			styleSet.toggleClass("night");
 			styleSet.toggleClass("day");
 		}
 
-		if ($(styleSet, "link[class*='vertical']").length > 0 &&
-			$(styleSet, "link[class*='horizontal']").length > 0) {
+		if (styleSet.filter("link[class*='vertical']").length > 0 &&
+			styleSet.filter("link[class*='horizontal']").length > 0) {
 
 			styleSet.toggleClass("vertical");
 			styleSet.toggleClass("horizontal");
 		}
-	}
 
-
-	// is mutually exclusive; passed: a list of alternate style tags
-	//altStyleTags: An array of the style tags to active a style set
-	_altStyleTagsMutuallyExclusive: function(altStyleTags) {
-
-		// Assumes dom generated from xml so case-senstivity is not an issue
-		if (_.include(altStyleTags, "night") && 
-			_.include(altStyleTags, "day")) {
-
-			return false;
-		}
-
-		if (_.include(altStyleTags, "vertical") &&
-			_.include(altStyleTags, "horizontal")) {
-
-			return false;
-		}
-
-		return true;
-	}
+		return styleSet;
+	},
 });
