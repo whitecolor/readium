@@ -163,9 +163,23 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		var $appliedStylesheets; 
 	    var $bookStylesheets;
 	    var stylesheetsUnchanged = true;
+	    var selector;
 		
+		// Apply night theme for the book; nothing will be applied if the epubs style sheets do not contain a style
+		// set with the 'night' tag
+	    if (this.model.get("current_theme") === "night-theme") {
+
+	    	selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
+	    }
+	    else {
+
+			selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet(["day"], bookDom);
+	    }
+
 		$appliedStylesheets = $('.readium-dynamic-sh');
-		$bookStylesheets = $("link[rel*='stylesheet']", bookDom);	
+		$bookStylesheets = $("link[rel*='stylesheet']", bookDom);
 
 		// Check if both lists of stylesheets are the same:
 		// (1) Same number of elements 
