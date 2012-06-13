@@ -2,33 +2,61 @@
  * found at http://idpf.org/epub/altss-tags/. The model selects a "preferred" style sheet or style set 
  * with which to render an ePUB document. 
  */
+ // TODO: shorcut the processing if persistent style sheets exist? 
+ // TODO: More validation for style sets with mixed rel="alternate ..." and rel="stylesheet"
+ // TODO: Handling <style> elements
+ // TODO: Tagging of persistent sets
+ // TODO: Ensure that comments in the html are ignored
 
 Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
 	initialize: function() {},
 
 	// Activate style set; passed: A set of ePUB alternate style tags
-	activateStyleSet: function(altStyleTags, bookDom) {
+	activateAlternateStyleSet: function(altStyleTags, bookDom) {
 
 		var $bookStyleSheets;
-		var styleSetNames;
+		var styleSetTitles = [];
 		var that = this;
 		var styleSetToActivate;
 
-		// Maintain original information about stylesheets
+		// If there are no alternate tags supplied, do not change the style sets
+		if (altStyleTags.length === 0) {
+
+			return bookDom;
+		}
 
 		// Get all style sheets in the book dom
-		var $bookStyleSheets = $("link[rel*='stylesheet']", bookDom);
+		$bookStyleSheets = $("link[rel*='stylesheet']", bookDom);
 
-		// Get the unique styles set titles list here
+		// Maintain original information about stylesheets
+		$bookStyleSheets = this._storeOriginalAttributes($bookStyleSheets);
 
-		// Get the style title to activate
+		// Get a list of the unique style set titles 
+		styleSetTitles = this._getStyleSetTitles($bookStyleSheets);
 
-		// Turn on every style set that contains the alternate tags; style sheet ordering will determine which are applied
-		$bookStyleSheets.each(function () {
+		// Determine which style set should be activated
+		styleSetToActivate = this._getStyleSetTitleToActivate($bookStyleSheets, styleSetTitles, altStyleTags);
+
+		// If no style was found to activate, based on the supplied tags, do not change the style sets
+		if (styleSetToActivate === null) {
+
+			return bookDom;
+		}
+
+		// Activate the specified style set, de-activing all others
+		this._activateStyleSet($bookStyleSheets, styleSetToActivate)
+		
+		return bookDom;
+	},
+
+	// Activates the specified style set and de-activates all others
+	_activateStyleSet: function (bookStyleSheets, styleSetToActivate) {
+
+		bookStyleSheets.each(function () {
 
 			$styleSheet = $(this);
-			if ($.trim($styleSheet.attr('title')) === styleSetTitleToActivate) {
+			if ($.trim($styleSheet.attr('title')) === styleSetToActivate) {
 
 				$styleSheet.attr("rel", "stylesheet");
 			}
@@ -37,13 +65,35 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 				$styleSheet.attr("rel", "alternate stylesheet");
 			}
 		});
+
+		return bookStyleSheets;
+	},
+
+	// Creates data attributes to store the original stylesheet attribute values, only if they have not 
+	// been set
+	_storeOriginalAttributes: function(bookStyleSheets) {
+
+		var $styleSheet;
+
+		// For each style sheet, if the original value attributes are empty, set them
+		bookStyleSheets.each(function() {
+
+			$styleSheet = $(this);
+
+			if ($styleSheet.data('orig-rel') === undefined) {
+
+				$styleSheet.attr('data-orig-rel', $styleSheet.attr("rel"));
+			}
+		});
+
+		return bookStyleSheets;
 	},
 
 	// Returns null if no title requires activiation by tag
-	// TODO: Change the styleSetTagMatches to an array so that the order of the style sets are guaranteed
-	_getStyleTitleToActivate: function (bookStyleSheets, styleSetTitles, altStyleTags) {
+	// Maintains the order of the style sheets
+	_getStyleSetTitleToActivate: function (bookStyleSheets, styleSetTitles, altStyleTags) {
 
-		var styleSetTagMatches = {};
+		var styleSetTagMatches = [];
 		var styleSetNum;
 		var $styleSet;
 		var maxNumTagMatches;
@@ -54,11 +104,15 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
 			$styleSet = bookStyleSheets.filter("link[title='" + styleSetTitles[styleSetNum] + "']");
 			$styleSet = this._removeMutuallyExclusiveAltTags($styleSet);
-			styleSetTagMatches[styleSetTitles[styleSetNum]] = this._getNumAltStyleTagMatches($styleSet, altStyleTags);
+			styleSetTagMatches.push(
+				{ "numAltTagMatches" : this._getNumAltStyleTagMatches($styleSet, altStyleTags),
+				  "styleSetTitle" : styleSetTitles[styleSetNum] }
+			);
 		}
 
 		// Get a list of the style sets with the maximum number of tag matches
-		maxNumTagMatches = _.max(styleSetTagMatches);
+		// _.max returns one of the info elements with a maximum value, which is why the numAltTagMatches property is used to retrieve the actual max value
+		maxNumTagMatches = (_.max(styleSetTagMatches, function (styleSetTagMatchInfo) { return styleSetTagMatchInfo.numAltTagMatches } )).numAltTagMatches;
 
 		// Do nothing if there are no matching tags
 		if (maxNumTagMatches === 0) {
@@ -67,11 +121,11 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		}
 
 		// Get a list of the style sets that had the maximum number of alternate tag matches
-		_.each(styleSetTagMatches, function(numMatches, styleSetTitle) {
+		_.each(styleSetTagMatches, function(styleSetTagMatchInfo) {
 
-			if (numMatches === maxNumTagMatches) {
+			if (styleSetTagMatchInfo['numAltTagMatches'] === maxNumTagMatches) {
 
-				styleSetCandidates.push(styleSetTitle);
+				styleSetCandidates.push(styleSetTagMatchInfo["styleSetTitle"]);
 			}
 		});
 
@@ -86,8 +140,10 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 			var candidateNum;
 			for (candidateNum = 0; candidateNum < styleSetCandidates.length; candidateNum++) {
 
+				// TODO: This assumes that all the style sheets in the style set are marked as either preferred or alternate. It simply checks the first 
+				// style sheet of every style set.
 				$styleSet = bookStyleSheets.filter("link[title='" + styleSetCandidates[candidateNum] + "']");
-				if ($.trim($styleSet.attr("rel")) === "stylesheet") {
+				if ($.trim($($styleSet[0]).attr("data-orig-rel")) === "stylesheet") {
 
 					return styleSetCandidates[candidateNum];
 				}
@@ -137,20 +193,47 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
 	// This method removes, thus ignoring, mututally exclusive alternate tags within a style set
 	//styleSet: A JQuery object of a style set
+	//TODO: Maybe change this to act on data- attributes, rather than the actual class attribute
 	_removeMutuallyExclusiveAltTags: function (styleSet) {
+
+		var $styleSheet;
 
 		if (styleSet.filter("link[class*='night']").length > 0 &&
 		    styleSet.filter("link[class*='day']").length > 0) {
 
-			styleSet.toggleClass("night");
-			styleSet.toggleClass("day");
+			styleSet.each(function () { 
+
+				$styleSheet = $(this);
+
+				if ($styleSheet.filter('.night').length > 0) {
+
+					$styleSheet.toggleClass('night');
+				}
+
+				if ($styleSheet.filter('.day').length > 0) {
+
+					$styleSheet.toggleClass('day');
+				}
+			});
 		}
 
 		if (styleSet.filter("link[class*='vertical']").length > 0 &&
 			styleSet.filter("link[class*='horizontal']").length > 0) {
 
-			styleSet.toggleClass("vertical");
-			styleSet.toggleClass("horizontal");
+			styleSet.each(function () { 
+
+				$styleSheet = $(this);
+
+				if ($styleSheet.filter('.vertical').length > 0) {
+					
+					$styleSheet.toggleClass('vertical');
+				}
+
+				if ($styleSheet.filter('.horizontal').length > 0) {
+
+					$styleSheet.toggleClass('horizontal');
+				}
+			});
 		}
 
 		return styleSet;
