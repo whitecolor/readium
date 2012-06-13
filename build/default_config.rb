@@ -15,7 +15,8 @@
 # process
 @config[:exclude_scripts] = ["scripts/libs/plugins.js"]
 
-# the directory to publish into
+# the directory to publish into, the name of this dir will be used by
+# chrome as the name of the extension
 @config[:publish_dir] = "readium"
 
 # path the closure compiler jar

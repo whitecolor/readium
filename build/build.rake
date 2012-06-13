@@ -27,7 +27,6 @@ end
 # concatenate the list of scripts, in order in one file
 # specified by @output_path
 def concat_scripts script_files, output_path
-	puts script_files.join "\n"
 	File.open output_path, "w" do |out|
 		script_files.each { |in_path| out.puts(IO.read(in_path)) }
 	end
@@ -55,7 +54,7 @@ namespace :build do
 	end
 
 	desc "Minify and copy all scripts into publish dir"
-	task :copy_scripts => "create_workspace" do
+	task :scripts => "create_workspace" do
 		puts "compressing the individual scripts and moving into #{@config[:publish_dir]}"
 		jsfiles = File.join(@config[:scripts_dir], "**", "*.js")
 		script_list = Dir.glob(jsfiles)
@@ -77,7 +76,7 @@ namespace :build do
 	end
 
 	desc "copy over files that require no processing"
-	task :simple_copies do
+	task :copy do
 		cops = @config[:simple_copies] + @config[:js_libs]
 		cops.each do |pattrn|
 			Dir.glob(pattrn).each do |in_path|
@@ -97,7 +96,7 @@ namespace :build do
 	end
 
 	desc "copy over the html files and replace script tags with ref to one concat script"
-	task :copy_html do
+	task :html do
 		@config[:html_files].each do |in_path|
 			out_path = File.join(@config[:publish_dir], in_path)
 			content = IO.read(in_path)
@@ -133,10 +132,6 @@ namespace :build do
 		end
 	end
 
-	task :replace_tag do |t, args| 
-
-	end
-
 	desc "Create working dirs for the build process"
 	task :create_workspace => "clean:total" do
 		puts "creating the working dir"
@@ -146,12 +141,19 @@ namespace :build do
 	namespace :clean do
 
 		desc "clean up the results of the last build"
-		task :total do
+		task :total => ["publish", "crx"]
+
+		desc "remove the pubish direcory"
+		task :publish do
 			puts "removing the old publish dir if it exists"
 			`rm -rf #{@config[:publish_dir]}`
 		end
 
-		task :default => :total
+		desc "remove the .crx file"
+		task :crx do
+			puts "removing the .crx file"
+			`rm #{@config[:publish_dir]}.crx`
+		end
 
 	end
 
@@ -161,4 +163,4 @@ namespace :build do
 end
 
 #define the default build process
-task :build => ["build:copy_scripts", "build:simple_copies", "build:copy_html", "build:crx"]
+task :build => ["build:scripts", "build:copy", "build:html", "build:crx"]
