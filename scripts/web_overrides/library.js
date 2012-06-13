@@ -4,11 +4,11 @@ Readium.Models.LibraryItem = Backbone.Model.extend({
 	idAttribute: "key",
 	
 	getViewBookUrl: function(book) {
-		return "/view_book/" + this.get('key');
+		return "/views/viewer.html?book=" + this.get('key');
 	},
 
 	openInReader: function() {
-		window.router.navigate(this.getViewBookUrl(), {trigger: true});
+		window.location = this.getViewBookUrl();
 	}
 
 });
@@ -180,73 +180,6 @@ Readium.Views.ReadiumOptionsView = Backbone.View.extend({
 			this.model.save();
 			this.$el.modal("hide");
 		}
-
-});
-
-Readium.Views.FilePickerView = Backbone.View.extend({
-	el:"#add-book-modal",
-
-	events: {
-		"change #files": "handleFileSelect",
-		"change #dir_input": "handleDirSelect",
-		"click #url-button": "handleUrl"
-	},
-
-	show: function() {
-		this.$el.modal('show');
-	},
-
-	hide: function() {
-		this.$el.modal('hide');
-	},
-
-	resetForm: function() {
-
-	},
-
-	handleUrl: function(evt) {
-		var input = document.getElementById('book-url');
-		if(input.value === null || input.value.length < 1) {
-			alert("invalid url, cannot process");
-		}
-		else {
-			var url = input.value;
-			// TODO check src filename
-			var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: url});
-			this.beginExtraction(extractor);
-		}
-	},
-
-	handleFileSelect: function(evt) {
-		var files = evt.target.files; // FileList object
-		var url = window.webkitURL.createObjectURL(files[0]);
-		// TODO check src filename
-		var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: files[0].name});
-		this.beginExtraction(extractor);
-	},
-
-	handleDirSelect: function(evt) {
-		var dirpicker = evt.target; // FileList object		
-		var extractor = new Readium.Models.UnpackedBookExtractor({dir_picker: dirpicker});
-		this.beginExtraction(extractor);
-		
-	},
-
-	beginExtraction: function(extractor) {
-		window.extract_view = new ExtractItemView({model: extractor});
-		extractor.on("extraction_success", function() {
-			var book = extractor.packageDoc.toJSON();
-			window.Library.add(new window.LibraryItem(book));
-			setTimeout(function() {
-				chrome.tabs.create({url: "/views/viewer.html?book=" + book.key });
-			}, 800);
-		});
-		extractor.extract();
-		this.resetForm();
-		this.hide();
-	}
-
-	
 
 });
 
