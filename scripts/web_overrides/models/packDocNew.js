@@ -94,15 +94,19 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
       		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
 		}
 		
-		Jath.resolver = function( prefix ) {
-    		var mappings = { 
-	    		def: "http://www.idpf.org/2007/opf",
-    			dc: "http://purl.org/dc/elements/1.1/"
-    		};
-    		return mappings[ prefix ];
-		}
+		if (xmlDom.evaluate) {
+		    Jath.resolver = function( prefix ) {
+        		var mappings = { 
+	        		def: "http://www.idpf.org/2007/opf",
+        			dc: "http://purl.org/dc/elements/1.1/"
+        		};
+        		return mappings[ prefix ];
+		    }
 
-		json = Jath.parse( this.jath_template, xmlDom);
+		    json = Jath.parse( this.jath_template, xmlDom);
+		} else {
+		    json = Readium.Utils.OPFParser(xmlDom)
+		}
 
 		// try to find a cover image
 		cover = this.getCoverHref(xmlDom);
@@ -113,6 +117,7 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 			json.metadata.fixed_layout = true;
 		}
 		json.manifest = new Readium.Collections.ManifestItems(json.manifest);
+		
 		return json;
 	},
 
