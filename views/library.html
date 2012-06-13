@@ -1,57 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<!-- Keep track of usage stats via google analytics -->
-	  	<script>
-	    	var _gaq = _gaq || [];
-	    	_gaq.push(['_setAccount', 'UA-29665823-1']);
-	    	_gaq.push(['_trackPageview']);
 
-	    	(function() {
-	    		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	    		ga.src = 'https://ssl.google-analytics.com/ga.js';
-	    		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	    	})();
-		</script>
+		<meta charset="UTF-8">
 		<title>Readium Library</title>
-
-		
 		<link rel="stylesheet" type="text/css" href="/css/library.css" />
 
-		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
-
-		<!-- This one file: -->
-		<script src="/scripts/libs/plugins.js" type="text/javascript" ></script>
-		<!--contains the following concatenated in order: -->
-		<!--/lib/underscore.min.js-->
-		<!--/lib/backbone.min.js-->
-		<!--/lib/lawnchair-0.6.1.min.js-->
-		<!--/lib/bootstrap-custom.min.js-->
-		<!--/lib/jquery.mousewheel.js-->
-		<!--/lib/pan_and_zoom.js-->
-		<!--/lib/jath.js-->
-		<!--/lib/URI.js-->
-		<!--/lib/ZipFile.complete.js-->
-		
-		<!-- Must iclude the namespace code before any application code -->
-		<script src="/scripts/namespaces/crx_library_namespace.js" type="text/javascript"></script>
-		<script src="/scripts/utils/md5.js" type="text/javascript"></script>
-		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
-		<script src="/lib/2.5.3-crypto-sha1.js" type="text/javascript" ></script>
-		<script src="/scripts/utils/bb_file_system_sync.js" type="text/javascript"></script>
-		<script src="/scripts/utils/local_storage_sync.js" type="text/javascript"></script>
-		<script src="/scripts/utils/cookie_utils.js" type="text/javascript"></script>
-		<script src="/scripts/models/manifest_item.js" type="text/javascript"></script>
-		<script src="/scripts/models/packageDocument.js" type="text/javascript" ></script>
-		<script src="/scripts/models/path_resolver.js" type="text/javascript" ></script>
-		<script src="/scripts/models/readium_options.js" type="text/javascript" ></script>
-		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
-		<script src="/scripts/extractBook.js" type="text/javascript" ></script>
-		<script src="/scripts/routers/crx_library_router.js" type="text/javascript"></script>
-		<script src="/scripts/library.js" type="text/javascript"></script>
-        <script src="/scripts/models/audioClipPlayer.js" type="text/javascript"></script>
-        <script src="/scripts/models/smilModel.js" type="text/javascript"></script>
-		<script src="/scripts/models/mediaOverlay.js" type="text/javascript"></script>
+		<!-- Only include Modernizr at the top, everything else is at the bottom -->
+		<script src="/lib/modernizr-2.5.3.min.js" type="text/javascript" ></script>
         
 	</head>
 	<body>
@@ -323,5 +279,52 @@
 	  			<div class="bar" style="width: <%= progress %>%;"></div>
 			</div>
 		</script>
+
+
+		<script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
+
+		<!-- This one file: -->
+		<script src="/scripts/libs/plugins.js" type="text/javascript" ></script>
+		<script src="/lib/2.5.3-crypto-sha1.js" type="text/javascript" ></script>
+		<!--contains the following concatenated in order: -->
+		<!--/lib/underscore.min.js-->
+		<!--/lib/backbone.min.js-->
+		<!--/lib/lawnchair-0.6.1.min.js-->
+		<!--/lib/bootstrap-custom.min.js-->
+		<!--/lib/jquery.mousewheel.js-->
+		<!--/lib/pan_and_zoom.js-->
+		<!--/lib/jath.js-->
+		<!--/lib/URI.js-->
+		<!--/lib/ZipFile.complete.js-->
+		
+		<!-- scripts concatenated and minified via build script -->
+		<!-- Must iclude the namespace code before any application code -->
+		<script src="/scripts/namespaces/crx_library_namespace.js" type="text/javascript"></script>
+		<script src="/scripts/utils/md5.js" type="text/javascript"></script>
+		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
+		<script src="/scripts/utils/bb_file_system_sync.js" type="text/javascript"></script>
+		<script src="/scripts/utils/local_storage_sync.js" type="text/javascript"></script>
+		<script src="/scripts/utils/cookie_utils.js" type="text/javascript"></script>
+		<script src="/scripts/models/manifest_item.js" type="text/javascript"></script>
+		<script src="/scripts/models/packageDocument.js" type="text/javascript" ></script>
+		<script src="/scripts/models/path_resolver.js" type="text/javascript" ></script>
+		<script src="/scripts/models/readium_options.js" type="text/javascript" ></script>
+		<script src="/scripts/fileSystemApi.js" type="text/javascript" ></script>
+		<script src="/scripts/extractBook.js" type="text/javascript" ></script>
+		<script src="/scripts/routers/crx_library_router.js" type="text/javascript"></script>
+		<script src="/scripts/library.js" type="text/javascript"></script>
+        <script src="/scripts/models/audioClipPlayer.js" type="text/javascript"></script>
+        <script src="/scripts/models/smilModel.js" type="text/javascript"></script>
+		<script src="/scripts/models/mediaOverlay.js" type="text/javascript"></script>
+		<!-- end scripts -->
+
+
+		<!-- Asynchronous Google Analytics snippet: mathiasbynens.be/notes/async-analytics-snippet -->
+	    <script>
+	        var _gaq=[['_setAccount','UA-29665823-1'],['_trackPageview']];
+	        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+	        g.src='http://www.google-analytics.com/ga.js';
+	        s.parentNode.insertBefore(g,s)}(document,'script'));
+	    </script>
 	</body>
 </html>
