@@ -11,7 +11,7 @@ cc_jar_path = "build/tools/closure-compiler-v1346.jar"
 # list of files and dirs that need to be copied over to 
 # the deploy dir as are
 simple_copies = ["background/**/*", "css/viewer_manifest.css", "css/library.css", "images/**/*", "manifest.json", "LICENSE"]
-js_libs = ["lib/jquery-1.7.1.min.js", "lib/mathjax/**/*", "lib/pan_and_zoom.js", "scripts/libs/plugins.js"]
+js_libs = ["lib/jquery-1.7.1.min.js", "lib/mathjax/**/*", "lib/pan_and_zoom.js", "scripts/libs/plugins.js", "modernizr-2.5.3.min.js"]
 html_files = ["views/library.html", "views/viewer.html"]
 
 # absolute path to chrome pem key
