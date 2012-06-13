@@ -6,6 +6,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.page_template = _.template( $('#reflowing-template').html() );
 
+		// make sure we have proper vendor prefixed props for when we need them
+		this.stashModernizrPrefixedProps();
+
 		// if this book does right to left pagination we need to set the
 		// offset on the right
 		if(this.model.get("page_prog_dir") === "rtl") {
@@ -25,6 +28,26 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:mo_playing", this.renderMoPlaying, this);
 		this.model.on("change:current_mo_frag", this.renderMoFragHighlight, this);
 
+	},
+
+	// we are using experimental styles so we need to 
+	// use modernizr to generate prefixes
+	stashModernizrPrefixedProps: function() {
+		var cssIfy = function(str) {
+			return str.replace(/([A-Z])/g, function(str,m1){ 
+				return '-' + m1.toLowerCase(); 
+			}).replace(/^ms-/,'-ms-');
+		};
+
+		// ask modernizr for the vendor prefixed version
+		this.columAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
+		this.columGap =  Modernizr.prefixed('columnGap') || 'columnGap';
+		this.columWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
+
+		// we are interested in the css prefixed version
+		this.cssColumAxis =  cssIfy(this.columAxis);
+		this.cssColumGap =  cssIfy(this.columGap);
+		this.cssColumWidth =  cssIfy(this.columWidth);
 	},
 
 	// sometimes these views hang around in memory before
@@ -72,6 +95,19 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return this;
 	},
 
+	getBodyColumnCss: function() {
+		var css = {};
+		css[this.cssColumAxis] = "horizontal";
+		css[this.cssColumGap] = this.gap_width.toString() + "px";
+		css[this.cssColumWidth] = this.page_width.toString() + "px";
+		css["padding"] = "0px";
+		css["margin"] = "0px";
+		css["position"] = "absolute";
+		css["width"] = this.page_width.toString() + "px";
+		css["height"] = this.frame_height.toString() + "px";
+		return css;
+	},
+
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
@@ -88,16 +124,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		// it is important for us to make sure there is no padding or
 		// margin on the <html> elem, or it will mess with our column code
-		$(this.getBody()).css({
-			"-webkit-column-axis": "horizontal",
-			"-webkit-column-gap": this.gap_width.toString() + "px",
-			"padding": "0px",
-			"margin": "0px",
-			"position": "absolute",
-			"-webkit-column-width": this.page_width.toString() + "px",
-			"width": this.page_width.toString() + "px",
-			"height": this.frame_height.toString() + "px"
-		});
+		$(this.getBody()).css( this.getBodyColumnCss() );
 
 		this.setNumPages();
 		var page = this.model.get("current_page")[0] || 1;

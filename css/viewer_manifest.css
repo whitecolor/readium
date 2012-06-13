@@ -1360,9 +1360,11 @@ body {
   text-align: center;
   padding-top: 3%;
   height: 80%;
-  -webkit-transition-property: opacity;
-  -webkit-transition-duration: 0.1s;
-  -webkit-transition-timing-function: ease;
+  -webkit-transition: opacity 0.1s ease 0s;
+  -moz-transition: opacity 0.1s ease 0s;
+  -ms-transition: opacity 0.1s ease 0s;
+  -o-transition: opacity 0.1s ease 0s;
+  transition: opacity 0.1s ease 0s;
   opacity: 0;
   /* start off invisible to prevent flicker */ }
 
