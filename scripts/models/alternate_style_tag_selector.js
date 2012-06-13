@@ -15,60 +15,109 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		var that = this;
 		var styleSetToActivate;
 
+		// Maintain original information about stylesheets
+
 		// Get all style sheets in the book dom
-		$bookStyleSheets = $("link[rel*='stylesheet']", bookDom);
+		var $bookStyleSheets = $("link[rel*='stylesheet']", bookDom);
 
-		// Find the unique style sets from the 'title' property
-		$bookStyleSheets.each(function() {
+		// Get the unique styles set titles list here
 
-			if (!_.include(that.styleSetNames, $(this).attr("title"))) {
+		// Get the style title to activate
 
-				that.styleSetNames.push($(this).attr("title"));
+		// Turn on every style set that contains the alternate tags; style sheet ordering will determine which are applied
+		$bookStyleSheets.each(function () {
+
+			$styleSheet = $(this);
+			if ($.trim($styleSheet.attr('title')) === styleSetTitleToActivate) {
+
+				$styleSheet.attr("rel", "stylesheet");
+			}
+			else {
+
+				$styleSheet.attr("rel", "alternate stylesheet");
 			}
 		});
+	},
 
-		// For each style set
+	// Returns null if no title requires activiation by tag
+	// TODO: Change the styleSetTagMatches to an array so that the order of the style sets are guaranteed
+	_getStyleTitleToActivate: function (bookStyleSheets, styleSetTitles, altStyleTags) {
+
 		var styleSetTagMatches = {};
 		var styleSetNum;
 		var $styleSet;
 		var maxNumTagMatches;
-		for (styleSetNum = 0; styleSetNum < styleSetNames.length; styleSetNum += 1) {
+		var styleSetCandidates = [];
 
-			// Get style set from the dom
-			$styleSet = $("link[title='" + styleSetNames[styleSetNum] + "']");
+		// Find the style set with the most matching alternate tags, removing mututally exclusive tags
+		for (styleSetNum = 0; styleSetNum < styleSetTitles.length; styleSetNum += 1) {
 
-			// Ignore any mutually exclusive tags on style sets
-			$styleSet = _removeMutuallyExclusiveAltTags($styleSet);
-
-			// Find the style set(s) with the most alt tag matches
-			styleSetTagMatches[styleSetNames[styleSetNum]] = _numAltStyleTagMatches();
+			$styleSet = bookStyleSheets.filter("link[title='" + styleSetTitles[styleSetNum] + "']");
+			$styleSet = this._removeMutuallyExclusiveAltTags($styleSet);
+			styleSetTagMatches[styleSetTitles[styleSetNum]] = this._getNumAltStyleTagMatches($styleSet, altStyleTags);
 		}
 
+		// Get a list of the style sets with the maximum number of tag matches
 		maxNumTagMatches = _.max(styleSetTagMatches);
 
-		// Turn on every style set that contains the alternate tags; style sheet ordering will determine which are applied
-		var styleSetNum;
-		for (styleSetNum = 0; styleSetNum < styleSetNames.length; styleSetNum += 1) {
+		// Do nothing if there are no matching tags
+		if (maxNumTagMatches === 0) {
 
-			$styleSet = $("link[title='" + styleSetNames[styleSetNum] + "']");
-
-			// Find the style set(s) with the most alt tag matches
-			if (styleSetTagMatches[styleSetNames[styleSetNum]] === maxNumTagMatches) {
-
-				$styleSet.attr("rel", "stylesheet");
-			}
-			// Turn off every style set without the alternate tag
-			else {
-
-				$styleSet.attr("rel", "alternate stylesheet");
-			}
+			return null;
 		}
+
+		// Get a list of the style sets that had the maximum number of alternate tag matches
+		_.each(styleSetTagMatches, function(numMatches, styleSetTitle) {
+
+			if (numMatches === maxNumTagMatches) {
+
+				styleSetCandidates.push(styleSetTitle);
+			}
+		});
+
+		// If there is only one style set in the candidate list
+		if (styleSetCandidates === 1) {
+
+			return styleSetCandidates[0];
+		}
+		// Since there are multiple candidates, return the style set that is preferred (the first style set with rel="stylesheet")
+		else {
+
+			var candidateNum;
+			for (candidateNum = 0; candidateNum < styleSetCandidates.length; candidateNum++) {
+
+				$styleSet = bookStyleSheets.filter("link[title='" + styleSetCandidates[candidateNum] + "']");
+				if ($.trim($styleSet.attr("rel")) === "stylesheet") {
+
+					return styleSetCandidates[candidateNum];
+				}
+			}
+
+			// If none of the stylesheets were preferred (only rel="alternate stylesheet"), return the first style set title
+			return styleSetCandidates[0];
+		}
+	},
+
+	_getStyleSetTitles: function (bookStyleSheets) {
+
+		var styleSetTitles = [];
+
+		// Find the unique style sets from the 'title' property
+		bookStyleSheets.each(function() {
+
+			var styleSheetTitle = $(this).attr("title");
+			if (!_.include(styleSetTitles, styleSheetTitle)) {
+
+				styleSetTitles.push(styleSheetTitle);
+			}
+		});
+
+		return styleSetTitles;
 	},
 
 	//styleSet: A JQuery object of a style set
 	//altStyleTags: An array of the style tags to active a style set
-
-	_numAltStyleTagMatches: function (styleSet, altStyleTags) {
+	_getNumAltStyleTagMatches: function (styleSet, altStyleTags) {
 
 		var numMatches = 0;
 
