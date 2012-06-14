@@ -1,0 +1,1 @@
+Readium.HttpFileApi=function(){var b={readTextFile:function(a,c,b){$.ajax({url:a,dataType:"text",success:function(a,b,d){c(a,d)},error:function(a,c,d){b(a,c,d)}})},getFsUri:function(a,b){b(document.location.protocol+"//"+document.location.host+a)}};return function(a){a(b);return b}}();Readium.FileSystemApi=Readium.HttpFileApi;
