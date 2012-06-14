@@ -28,8 +28,8 @@ task :deploy do
 
 	# make sure we don't delete anything we didnt want to
 	to_keep = [ ".", "..", ".git", ".gitignore" ]
-	to_keep += @config[:publish_dir]
-	to_keep += @config[:web_keeps]
+	to_keep = to_keep + @config[:publish_dir]
+	to_keep = to_keep + @config[:web_keeps]
 
 	# delete the local branch
 	`git branch -D gh-pages`
