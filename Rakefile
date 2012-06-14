@@ -26,6 +26,7 @@ end
 
 namespace :deploy do
 
+	desc "pushes out the website using the contents of :publish dir via push to :gh-pages branch"
 	task :push do
 		# make sure we don't delete anything we didnt want to
 		to_keep = [ ".", "..", ".git", ".gitignore" ]
