@@ -64,7 +64,7 @@ body {
 	padding: 30px;
 	text-align: center;
 	padding-top: 3%;
-	height: 80%;
+	height: 89%;
 	@include transition (opacity 0.1s ease 0s);
 	opacity: 0; /* start off invisible to prevent flicker */
 }
@@ -78,7 +78,7 @@ body {
 	    position: absolute;
 	    
 	    left: 50%;
-	    height: 83%;
+	    height: 93%;
 	    margin: 0;
 	    width: 1px;
 	    @include box-shadow(0 0 15px 3px rgba(5, 5, 5, 0.7));
