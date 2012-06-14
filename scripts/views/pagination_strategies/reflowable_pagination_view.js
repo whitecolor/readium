@@ -168,19 +168,19 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var width;
 		var margin = this.model.get("current_margin");
 		if (margin === 1) {
-			this.model.get("two_up") ? (width = 0.90) : (width = 0.80);
+			this.model.get("two_up") ? (width = 0.95) : (width = 0.90);
 		}
 		else if (margin === 2) {
-			this.model.get("two_up") ? (width = 0.80) : (width = 0.70);
+			this.model.get("two_up") ? (width = 0.89) : (width = 0.80);
 		}
 		else if (margin === 3) {
-			this.model.get("two_up") ? (width = 0.70) : (width = 0.60);	
+			this.model.get("two_up") ? (width = 0.83) : (width = 0.70);	
 		}
 		else if (margin === 4) {
-			this.model.get("two_up") ? (width = 0.60) : (width = 0.50);	
+			this.model.get("two_up") ? (width = 0.77) : (width = 0.60);	
 		}
 		else {
-			this.model.get("two_up") ? (width = 0.50) : (width = 0.40);	
+			this.model.get("two_up") ? (width = 0.70) : (width = 0.50);	
 		}
 		
 		return Math.floor( $('#flowing-wrapper').width() * width );
