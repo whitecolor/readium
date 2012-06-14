@@ -1,13 +1,18 @@
-html, body { 
+html { 
 	margin: 0; 
-	padding: 0; 
-	height: 100%;  
+	padding: 0;
+	position: absolute;
 	width: 100%;
+	top: 0;
+	bottom: 0;
 	overflow: hidden;
 }
 
 body {
-	padding-top: 45px;
+	margin: 0; 
+	padding: 0;
+	position: relative;
+	padding-top: 45;
 }
 
 #next-page-button {
@@ -25,13 +30,13 @@ body {
 }
 
 #next-page-button, #prev-page-button {
-	position: fixed;
+	position: absolute;
 	top: 50%;
 	width: 60px;
 	height: 108px;
 	margin-top: -54px;
 	background-repeat: no-repeat;
-	z-index: 1000;
+	z-index: 2000000;
 	@include user-select(none);
 }
 

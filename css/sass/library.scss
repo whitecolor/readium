@@ -4,7 +4,17 @@
 @import 'clearfix';
 @import 'readium_info_modal';
 
-html, body, .library-container {
+html { 
+  margin: 0; 
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+body, .library-container {
   width: 100%;
   overflow-x: hidden;
 }
