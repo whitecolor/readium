@@ -146,6 +146,30 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		var vis = this.get("toc_visible");
 		this.set("toc_visible", !vis);
 	},
+
+	// turn pages in the rightward direction
+	// ie progression direction is dependent on 
+	// page progression dir
+	goRight: function() {
+		if (this.get("page_prog_dir") === "rtl") {
+			this.prevPage();
+		}
+		else {
+			this.nextPage();	
+		}
+	},
+
+	// turn pages in the leftward direction
+	// ie progression direction is dependent on 
+	// page progression dir
+	goLeft: function() {
+		if (this.get("page_prog_dir") === "rtl") {
+			this.nextPage();
+		}
+		else {
+			this.prevPage();	
+		}
+	},
 	
 	prevPage: function() {
 		var curr_pg = this.get("current_page");
