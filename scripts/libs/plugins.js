@@ -12,8 +12,7 @@
 // 7. Jath
 // 8. URI.js
 // 9. ZipFile.complete.js
-// 10. jQuery Mobile Touch Events
-// 11. crypto SHA1
+// 10. crypto SHA1
 
 // Underscore.js 1.3.1
 // (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
