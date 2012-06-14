@@ -207,6 +207,20 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		});
 	},
 
+	addSwipeHandlers: function(dom) {
+		var that = this;
+		$(dom).on("swipeleft", function(e) {
+			e.preventDefault();
+			that.model.goRight();
+			
+		});
+
+		$(dom).on("swiperight", function(e) {
+			e.preventDefault();
+			that.model.goLeft();
+		});
+	},
+
 	setUpMode: function() {
 		var two_up = this.model.get("two_up");
 		this.$el.toggleClass("two-up", two_up);
@@ -292,6 +306,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		
 		this.applyBindings( $(e.srcElement).contents() );
 		this.applySwitches( $(e.srcElement).contents() );
+		this.addSwipeHandlers( $(e.srcElement).contents() );
         this.injectMathJax(e.srcElement);
         this.injectLinkHandler(e.srcElement);
         var trigs = this.parseTriggers(e.srcElement.contentDocument);

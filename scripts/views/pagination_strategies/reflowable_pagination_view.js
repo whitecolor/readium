@@ -76,7 +76,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// make everything invisible to prevent flicker
 		this.setUpMode();
 		this.$('#container').html( this.page_template(json) );
-		this.setFrameSize();
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
 			that.adjustIframeColumns();
@@ -111,6 +110,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
+		this.setFrameSize();
 		this.frame_width = parseInt($frame.width(), 10);
 		this.frame_height = parseInt($frame.height(), 10);
 		this.gap_width = Math.floor(this.frame_width / 7);
@@ -286,7 +286,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	marginCallback: function() {
-		this.setFrameSize();
 		this.adjustIframeColumns();
 	},
 
