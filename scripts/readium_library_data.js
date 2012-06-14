@@ -113,6 +113,6 @@ window.ReadiumLibraryData = [
 		"spread": "",
 		"src_url": "webb-precious-bane.epub",
 		"title": "Precious Bane",
-		"updated_at": "2012-04-10T21:48:57.267Z",
+		"updated_at": "2012-04-10T21:48:57.267Z"
 	}
 ]

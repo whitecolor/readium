@@ -1,13 +1,5 @@
 require 'digest/md5'
 
-# load in the config file
-require './build/default_config.rb'
-
-# load in custom config file if it exists
-if File.exists? './build/custom_config.rb'
-	require './build/custom_config.rb'
-end
-
 # get a temporary name for a script file to hold concatenated
 # scripts in an html file
 def concat_script_name html_name
@@ -51,6 +43,9 @@ namespace :build do
 		path = File.join @config[:proj_root_dir], @config[:publish_dir]
 		puts "packaging contents of #{path} as a .crx"
 		puts `#{@config[:chrome_command]} --pack-extension=#{path} --pack-extension-key=#{@config[:pem_path]}`
+
+		# have to manually move it where it needs to go:
+		`mv #{@config[:publish_dir]}.crx #{@config[:crx_path]}`
 	end
 
 	desc "Minify and copy all scripts into publish dir"
@@ -152,7 +147,7 @@ namespace :build do
 		desc "remove the .crx file"
 		task :crx do
 			puts "removing the .crx file"
-			`rm #{@config[:publish_dir]}.crx`
+			`rm #{@config[:crx_path]}`
 		end
 
 	end
