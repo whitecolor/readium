@@ -28,8 +28,8 @@ task :deploy do
 
 	# make sure we don't delete anything we didnt want to
 	to_keep = [ ".", "..", ".git", ".gitignore" ]
-	to_keep << @config[:publish_dir]
-	to_keep << @config[:web_keeps]
+	to_keep += @config[:publish_dir]
+	to_keep += @config[:web_keeps]
 
 	# delete the local branch
 	`git branch -D gh-pages`
@@ -59,13 +59,13 @@ task :deploy do
 	`git commit -m 'deploying'`
 
 	# destroy the remote branch
-	`git push origin :gh-pages`
+	#{}`git push origin :gh-pages`
 
 	# push up the new remote branch
-	`git push origin gh-pages`
+	#{}`git push origin gh-pages`
 
 	# checkout the master branch
-	`git checkout master`
+	#{}`git checkout master`
 
 	puts "The app has been deployed successfully!"
 
