@@ -89,8 +89,8 @@
  		</div> 
  		<div id="readium-right-content">
 
-    	<a id="next-page-button"></a>
-    	<a id="prev-page-button"></a>
+    	<a id="next-page-button" onclick="void(0)"></a>
+    	<a id="prev-page-button" onclick="void(0)"></a>
 
 
 		<div id="readium-book-view-el">
@@ -242,10 +242,11 @@
 						frameborder="0" 
 						marginwidth="0" 
 						marginheight="0" 
-						width="50%" 
-						height="100%" 
+						width="500px" 
+						height="750px" 
 						src="<%= uri %>"
-						id="readium-flowing-content">
+						id="readium-flowing-content"
+						style="overflow: hidden; height: 750px; width: 500px">
 				</iframe>
 			</div>
 		</script>

@@ -1200,6 +1200,18 @@ button.btn, input[type="submit"].btn {
 .invisible {
   visibility: hidden; }
 
+html {
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  overflow: hidden; }
+
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
 .navbar .nav > li > a {
   padding: 5px 0; }
 .navbar li {
@@ -1294,15 +1306,6 @@ span.setting-button:hover {
 
 #settings.hover-fade:hover {
   opacity: 0.9; }
-
-html {
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  width: 100%;
-  top: 0;
-  bottom: 0;
-  overflow: hidden; }
 
 body {
   margin: 0;

@@ -76,7 +76,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// make everything invisible to prevent flicker
 		this.setUpMode();
 		this.$('#container').html( this.page_template(json) );
-		this.setFrameWidth();
+		this.setFrameSize();
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
 			that.adjustIframeColumns();
@@ -150,26 +150,44 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return (page_num - 1) * (this.page_width + this.gap_width);
 	},
 
-	setFrameWidth: function() {
+	// on iOS frames are automatically expanded to fit the content dom
+	// thus we cannot use relative size for the iframe and must set abs 
+	// pixel size
+	setFrameSize: function() {
+		var width = this.getFrameWidth().toString() + "px";
+		var height = this.getFrameHeight().toString() + "px";
+
+		this.$('#readium-flowing-content').attr("width", width);
+		this.$('#readium-flowing-content').attr("height", height);
+		this.$('#readium-flowing-content').css("width", width);
+		this.$('#readium-flowing-content').css("height", height);
+		
+	},
+
+	getFrameWidth: function() {
 		var width;
 		var margin = this.model.get("current_margin");
 		if (margin === 1) {
-			this.model.get("two_up") ? (width = "90%") : (width = "80%");
+			this.model.get("two_up") ? (width = 0.90) : (width = 0.80);
 		}
 		else if (margin === 2) {
-			this.model.get("two_up") ? (width = "80%") : (width = "70%");
+			this.model.get("two_up") ? (width = 0.80) : (width = 0.70);
 		}
 		else if (margin === 3) {
-			this.model.get("two_up") ? (width = "70%") : (width = "60%");	
+			this.model.get("two_up") ? (width = 0.70) : (width = 0.60);	
 		}
 		else if (margin === 4) {
-			this.model.get("two_up") ? (width = "60%") : (width = "50%");	
+			this.model.get("two_up") ? (width = 0.60) : (width = 0.50);	
 		}
 		else {
-			this.model.get("two_up") ? (width = "50%") : (width = "40%");	
+			this.model.get("two_up") ? (width = 0.50) : (width = 0.40);	
 		}
 		
-		this.$('#readium-flowing-content').attr("width", width);
+		return Math.floor( $('#flowing-wrapper').width() * width );
+	},
+
+	getFrameHeight: function() {
+		return $('#flowing-wrapper').height();
 	},
 
 	// calculate the number of pages in the current section,
@@ -268,7 +286,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	marginCallback: function() {
-		this.setFrameWidth();
+		this.setFrameSize();
 		this.adjustIframeColumns();
 	},
 
