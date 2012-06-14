@@ -13,7 +13,7 @@
 
 # a list of scripts that should not be compressed durring the build
 # process
-@config[:exclude_scripts] = ["scripts/libs/plugins.js"]
+@config[:exclude_scripts] = ["scripts/libs/plugins.js", "scripts/libs/web_plugins.js"]
 
 # the directory to publish into, the name of this dir will be used by
 # chrome as the name of the extension
@@ -27,7 +27,7 @@
 @config[:simple_copies] = ["background/**/*", "css/viewer_manifest.css", "css/library.css", "images/**/*", "manifest.json", "LICENSE", ]
 
 # list of js libraries that need to be copied over (right now these are just simple copies)
-@config[:js_libs] = ["lib/jquery-1.7.1.min.js", "lib/mathjax/**/*", "lib/pan_and_zoom.js", "scripts/libs/plugins.js", "lib/modernizr-2.5.3.min.js", "lib/2.5.3-crypto-sha1.js"]
+@config[:js_libs] = ["lib/jquery-1.7.1.min.js", "lib/mathjax/**/*", "lib/pan_and_zoom.js", "scripts/libs/plugins.js", "scripts/libs/web_plugins.js", "lib/modernizr-2.5.3.min.js", "lib/2.5.3-crypto-sha1.js"]
 
 # html view files that need to have be processed (scripts) and copied over
 @config[:html_files] = ["views/library.html", "views/viewer.html", "index.html", "viewer.html"]
