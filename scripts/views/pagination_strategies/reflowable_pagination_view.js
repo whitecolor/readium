@@ -77,7 +77,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.setUpMode();
 		this.$('#container').html( this.page_template(json) );
 		this.setFrameWidth();
-		
+
 		this.$('#readium-flowing-content').on("load", function(e) {
 			that.adjustIframeColumns();
 			that.iframeLoadCallback(e);
@@ -310,10 +310,16 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	injectTheme: function() {
 		var theme = this.model.get("current_theme");
 		if(theme === "default") theme = "default-theme";
+
+		// Inject Readium styles
 		$(this.getBody()).css({
 			"color": this.themes[theme]["color"],
 			"background-color": this.themes[theme]["background-color"]
 		});
+
+		// Activate any additional styles included with the current ePub for the current theme (e.g. day-night)
+		this.activateEPubStyle(this.getBody());
+
 		this.renderMoPlaying();
 	},
 
