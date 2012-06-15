@@ -76,6 +76,9 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 			$styleSheet.attr("rel", "stylesheet");
 			if ($.trim($styleSheet.attr('title')) === styleSetToActivate) {
 
+				// Chrome is buggy and change to disabled = false is only
+				// picked up if you first set it to true
+				$styleSheet[0].disabled = true;
 				$styleSheet[0].disabled = false;
 			}
 			else {

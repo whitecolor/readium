@@ -318,7 +318,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		},
 
 		"night-theme": {
-			"background-color": "black",
+			"background-color": "#141414",
 			"color": "white",
 			"mo-color": "#666"
 		}
@@ -331,7 +331,19 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"color": this.themes[theme]["color"],
 			"background-color": this.themes[theme]["background-color"]
 		});
+		
+		// stop flicker due to application for alternate style sheets
+		// just set content to be invisible
+		$("#flowing-wrapper").css("visibility", "hidden");
 		this.activateEPubStyle(this.getBody());
+
+		// wait for new stylesheets to parse before setting back to visible
+		setTimeout(function() {
+			$("#flowing-wrapper").css("visibility", "visible");	
+		}, 100);
+		
+		
+		
 		this.renderMoPlaying();
 	},
 
