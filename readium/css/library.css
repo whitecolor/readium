@@ -1,3 +1,15 @@
+html {
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  overflow: hidden; }
+
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
 .clearfix {
   *zoom: 1; }
   .clearfix:before, .clearfix:after {
@@ -2359,7 +2371,7 @@ a.label:hover, a.badge:hover {
     text-rendering: optimizelegibility;
     display: block; }
 
-html, body, .library-container {
+body, .library-container {
   width: 100%;
   overflow-x: hidden; }
 
