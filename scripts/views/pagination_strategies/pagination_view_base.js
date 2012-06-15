@@ -144,67 +144,28 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
     /*
-     * Description:
-     * 1) Check if any of the stylesheets have changed.
-     * 2) If none have changed, do nothing.
-     * 3) If there is at least one change, remove all the currently applied stylesheets
-     * and add the new ones in their original order. 
-     * 
-     * Rationale:
-     * 1) Removing and adding stylesheets preemptively causes the table of contents to flicker. 
-     * Thus, we must detect and add changes only when required, as at this time changing a stylesheet without inducing flicker is not possible. 
-     * 2) The original order of the stylesheets must be preserved. It is reasonably complex to detect
-     * and add/remove changed stylesheets, while preserving the correct order. As such, it is simpler to 
-     * change all the stylesheets if a single change is detected. The assumption is that stylesheet changes
-     * will be rare. 
+     * Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
+     * only the day-night alternate tags are available as an option. 
+     * TODO: Create a transition from day to night and vice-versa to prevent flickering.
+     * TODO: If Readium is initialized in night mode, the night style may not be applied on initialization
     */
-	addStyleSheets: function(bookDom) {
+	activateEPubStyle: function(bookDom) {
 
-		var $appliedStylesheets; 
-	    var $bookStylesheets;
-	    var stylesheetsUnchanged = true;
+	    var selector;
 		
-		$appliedStylesheets = $('.readium-dynamic-sh');
-		$bookStylesheets = $("link[rel*='stylesheet']", bookDom);	
+		// Apply night theme for the book; nothing will be applied if the ePub's style sheets do not contain a style
+		// set with the 'night' tag
+	    if (this.model.get("current_theme") === "night-theme") {
 
-		// Check if both lists of stylesheets are the same:
-		// (1) Same number of elements 
-		if ($appliedStylesheets.length === $bookStylesheets.length) {
+	    	selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
 
-			// (2) matching URLs in the right order
-			$appliedStylesheets.each(function(index) {
+	    }
+	    else {
 
-				var appliedStylesheetURL = $($appliedStylesheets[index]).attr("href");
-				var bookStylesheetURL = $($bookStylesheets[index]).attr("href");
-				
-				if (appliedStylesheetURL !== bookStylesheetURL) {
-
-					stylesheetsUnchanged = false;
-				}
-			});
-		}
-		else {
-
-			stylesheetsUnchanged = false;
-		}
-
-		// If stylesheets are unchanged, do nothing
-		if (stylesheetsUnchanged) {
-
-			return;
-		}
-
-		// If stylesheets have changed, remove current stylesheets and add the new ones
-		$('.readium-dynamic-sh').remove();
-
-		// We're PREPENDING so that any application stylesheets are lower in the <head> than the book stylesheets. 
-		// As such, we're adding the book stylesheets in REVERSE order to preserve their ordering. 
-		$($bookStylesheets.get().reverse()).each(function() {
-
-			var $link = $(this);
-			$link.addClass('readium-dynamic-sh');
-			$('head').prepend($link);			
-		});
+			selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet([""], bookDom);
+	    }
 	},
 
 	addSwipeHandlers: function(dom) {
