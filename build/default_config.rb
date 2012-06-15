@@ -48,5 +48,5 @@
 # when the website is generated, all files in the root outside of the root are deleted
 # add files to this array to keep them. Basically stuff here is needed by the website but
 # not by the crx
-@config[:web_keeps] = ["CNAME", "releases", "epub_content"]
+@config[:web_keeps] = ["CNAME", "releases", "epub_content", "docs"]
 

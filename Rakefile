@@ -24,6 +24,13 @@ task :styles  do
 	`sass --watch css/sass:css -r ./css/sass/bourbon/lib/bourbon.rb`
 end
 
+desc "generate annotated source code with docco"
+task :docs do
+	puts "docco-ing the docs"
+	puts `docco scripts/**/*.js`
+	puts "the docs have been docco-ed"
+end
+
 namespace :deploy do
 
 	desc "pushes out the website using the contents of :publish dir via push to :gh-pages branch"
@@ -77,4 +84,4 @@ end
 
 load 'build/build.rake'
 
-task :deploy => ["build", "deploy:push"]
+task :deploy => ["build", "docs", "deploy:push"]
