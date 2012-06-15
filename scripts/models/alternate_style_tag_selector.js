@@ -1,18 +1,26 @@
 /* Description: This model is responsible for implementing the Alternate Style Tags specification
  * found at http://idpf.org/epub/altss-tags/. The model selects a "preferred" style sheet or style set 
  * with which to render an ePUB document. 
+ * 
+ * Notes: The convention in this model is to prepend the names of "private" methods with an underscore ('_')
  */
  // TODO: shorcut the processing if persistent style sheets exist? 
- // TODO: More validation for style sets with mixed rel="alternate ..." and rel="stylesheet"
+ // TODO: More validation for style sets with mixed rel="alternate ..." and rel="stylesheet"?
  // TODO: Handling <style> elements
  // TODO: Tagging of persistent sets
- // TODO: Ensure that comments in the html are ignored
+ // TODO: Ensure that the "default" style set (the default in the ePub) is activated if no tags are supplied
+ 
 
 Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
 	initialize: function() {},
 
-	// Activate style set; passed: A set of ePUB alternate style tags
+	/* Description: Activate a style set based on a single, or set, of ePub alternate style tags
+	 * Arguments (
+	 *   altStyleTags: An array of ePUB alternate style tags
+	 *   bookDom: An epub document object
+	 * )
+	 */
 	activateAlternateStyleSet: function(altStyleTags, bookDom) {
 
 		var $bookStyleSheets;
@@ -45,32 +53,47 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		}
 
 		// Activate the specified style set, de-activing all others
-		this._activateStyleSet($bookStyleSheets, styleSetToActivate)
-		
+		this._activateStyleSet($bookStyleSheets, styleSetToActivate);
+
 		return bookDom;
 	},
 
-	// Activates the specified style set and de-activates all others
+	/* Description: Activate the specified style set and de-activate all others
+	 * Design rationale: The disabled property is used to activate/de-activate the style sheets, as opposed to changing 
+	 * attribute values, as this ensures that the document is re-rendered
+	 * Arguments (
+	 *   bookStyleSheets: A JQuery object of the ePubs style sheets
+	 *   styleSetToActivate: The attribute value for the "title" property of the style set to activate
+	 * )
+	 */
 	_activateStyleSet: function (bookStyleSheets, styleSetToActivate) {
 
 		bookStyleSheets.each(function () {
 
 			$styleSheet = $(this);
+
+			// The stylesheets must all be set as preferred so that when enabled, they will be activated
+			$styleSheet.attr("rel", "stylesheet");
 			if ($.trim($styleSheet.attr('title')) === styleSetToActivate) {
 
-				$styleSheet.attr("rel", "stylesheet");
+				$styleSheet[0].disabled = false;
 			}
 			else {
 
-				$styleSheet.attr("rel", "alternate stylesheet");
+				$styleSheet[0].disabled = true;
 			}
 		});
 
 		return bookStyleSheets;
 	},
 
-	// Creates data attributes to store the original stylesheet attribute values, only if they have not 
-	// been set
+	/* Description: Creates data attributes to store the original stylesheet attribute values
+	 * Design rationale: The "rel" attribute must be modified in other methods but we need to "remember" 
+	 * the author's original style sheet specification
+	 * Arguments (
+	 *   bookStyleSheets: A JQuery object of the ePubs style sheets
+	 * )
+	 */
 	_storeOriginalAttributes: function(bookStyleSheets) {
 
 		var $styleSheet;
@@ -89,8 +112,15 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		return bookStyleSheets;
 	},
 
-	// Returns null if no title requires activiation by tag
-	// Maintains the order of the style sheets
+	/* Description: Finds the title of the style set to activate using HTML preference rules for style sheets, as well as ePub 
+	 * alternate style tags.
+	 * Arguments (
+	 *   bookStyleSheets: A JQuery object of the ePubs style sheets 
+	 *   styleSetTitles: An array of the unique style set titles for the ePub
+	 *   altStyleTags: An array of ePUB alternate style tags
+	 * )
+	 * Error handling: Returns null if not title is found
+	 */
 	_getStyleSetTitleToActivate: function (bookStyleSheets, styleSetTitles, altStyleTags) {
 
 		var styleSetTagMatches = [];
@@ -154,6 +184,11 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		}
 	},
 
+	/* Description: Finds the unique list of style set titles from the set of style sheets for the ePub
+	 * Arguments (
+	 *   bookStyleSheets: A JQuery object of the ePub's style sheets 
+	 * )
+	 */
 	_getStyleSetTitles: function (bookStyleSheets) {
 
 		var styleSetTitles = [];
@@ -171,8 +206,12 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		return styleSetTitles;
 	},
 
-	//styleSet: A JQuery object of a style set
-	//altStyleTags: An array of the style tags to active a style set
+	/* Description: Finds the number of alternate style tags in a style set's class attribute
+	 * Arguments (
+	 *   styleSet: A JQuery object that represents a single style set
+	 *   altStyleTags: An array of ePUB alternate style tags
+	 * )
+	 */
 	_getNumAltStyleTagMatches: function (styleSet, altStyleTags) {
 
 		var numMatches = 0;
@@ -191,8 +230,12 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		return numMatches;
 	},
 
-	// This method removes, thus ignoring, mututally exclusive alternate tags within a style set
-	//styleSet: A JQuery object of a style set
+	// 
+	/* Description: This method removes, thus ignoring, mututally exclusive alternate tags within a style set
+	 * Arguments (
+	 *   styleSet: A JQuery object that represents a single style set
+	 * )
+	 */
 	//TODO: Maybe change this to act on data- attributes, rather than the actual class attribute
 	_removeMutuallyExclusiveAltTags: function (styleSet) {
 

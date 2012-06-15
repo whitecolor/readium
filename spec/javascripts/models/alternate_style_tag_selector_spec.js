@@ -22,6 +22,24 @@ describe("alternate_style_tag_selector", function() {
 
 	describe("alternate style tag selection", function () {
 
+		it ("ignores commented out style elements", function () {
+
+			var testEPubDom = getEPubContentDom();
+
+			// Initialize a set of style sheets grouped into style sets
+			var styles = '<!--<link rel="stylesheet" ref="day_orig.css" class="day"   title="day_orig"/>-->'
+					   + '<link rel="stylesheet" href="day.css"   class="day"     title="day"/>';
+
+			$('head', testEPubDom)[0].appendChild($(styles)[0]);
+			$('head', testEPubDom)[0].appendChild($(styles)[1]);
+
+			selector = new Readium.Models.AlternateStyleTagSelector;
+			selector.activateAlternateStyleSet(["day"], testEPubDom);
+
+			expect($('link[title="day_orig"]', testEPubDom)[0]).toEqual(undefined);
+			expect($('link[title="day"]', testEPubDom)[0].disabled).toEqual(false);
+		});
+
 		it ("correctly activates an alternate style sheet with a single tag", function () {
 
 			var testEPubDom = getEPubContentDom();
@@ -36,8 +54,8 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["day"], testEPubDom);
 
-			expect($('link[title="night"]', testEPubDom).attr("rel")).toEqual("alternate stylesheet");
-			expect($('link[title="day"]', testEPubDom).attr("rel")).toEqual("stylesheet");
+			expect($('link[title="night"]', testEPubDom)[0].disabled).toEqual(true);
+			expect($('link[title="day"]', testEPubDom)[0].disabled).toEqual(false);
 		});
 
 		it ("correctly activates an alternate style set with a single tag", function () {
@@ -66,14 +84,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["night"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
 		it ("correctly activates a style set if only alternate style sets are provided, using a subset of tags", function () {
@@ -102,14 +120,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["night"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 
 		it ("correctly activates a style set if only alternate style sets are provided, with multiple tags in the class attribute", function () {
@@ -138,14 +156,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["night", "horizontal"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
 		it ("correctly activates style sets, in an arbitrary order, with a single tag", function () {
@@ -174,14 +192,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["horizontal"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
 		it ("correctly activates style sets with multiple tags in the class attribute", function () {
@@ -210,14 +228,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["vertical", "night"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 
 		it ("correctly chooses among a preferred and alterate style set tagged the same way", function () {
@@ -246,14 +264,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["horizontal", "day"], testEPubDom);
 
-			expect($($('link[title="Horizontal Day 2"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day 2"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
+			expect($($('link[title="Horizontal Day 2"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day 2"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 
 		it ("correctly activates style sets with a subset of multiple tags", function () {
@@ -282,14 +300,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["horizontal", "day"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 
 		it ("does nothing when no alternate tags are supplied", function () {
@@ -318,14 +336,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet([], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
 		it ("ignores unknown alternate tags", function () {
@@ -354,14 +372,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["blah", "somethingElse"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
 		it ("ignores mutually exclusive alternate tags", function () {
@@ -390,14 +408,14 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			selector.activateAlternateStyleSet(["vertical", "night"], testEPubDom);
 
-			expect($($('link[title="Vertical Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[0]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Vertical Night"]', testEPubDom)[1]).attr("rel")).toEqual("stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Day"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($('link[title="Horizontal Night"]', testEPubDom)[1]).attr("rel")).toEqual("alternate stylesheet");
+			expect($($('link[title="Vertical Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[0])[0].disabled).toEqual(false);
+			expect($($('link[title="Vertical Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Day"]', testEPubDom)[1])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
+			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 	});
 
@@ -427,12 +445,12 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			$bookStyleSheets = selector._activateStyleSet($bookStyleSheets, "styleSet2");
 
-			expect($($bookStyleSheets[0]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($bookStyleSheets[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($bookStyleSheets[2]).attr("rel")).toEqual("stylesheet");
-			expect($($bookStyleSheets[3]).attr("rel")).toEqual("stylesheet");
-			expect($($bookStyleSheets[4]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($bookStyleSheets[5]).attr("rel")).toEqual("alternate stylesheet");
+			expect($($bookStyleSheets[0])[0].disabled).toEqual(true);
+			expect($($bookStyleSheets[1])[0].disabled).toEqual(true);
+			expect($($bookStyleSheets[2])[0].disabled).toEqual(false);
+			expect($($bookStyleSheets[3])[0].disabled).toEqual(false);
+			expect($($bookStyleSheets[4])[0].disabled).toEqual(true);
+			expect($($bookStyleSheets[5])[0].disabled).toEqual(true);
 		});
 
 		it ("activates the correct style set when the style sheets are in an arbitrary order", function () {
@@ -459,12 +477,12 @@ describe("alternate_style_tag_selector", function() {
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			$bookStyleSheets = selector._activateStyleSet($bookStyleSheets, "styleSet2");
 
-			expect($($bookStyleSheets[0]).attr("rel")).toEqual("stylesheet");
-			expect($($bookStyleSheets[1]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($bookStyleSheets[2]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($bookStyleSheets[3]).attr("rel")).toEqual("alternate stylesheet");
-			expect($($bookStyleSheets[4]).attr("rel")).toEqual("stylesheet");
-			expect($($bookStyleSheets[5]).attr("rel")).toEqual("alternate stylesheet");
+			expect($($bookStyleSheets[0])[0].disabled).toEqual(false);
+			expect($($bookStyleSheets[1])[0].disabled).toEqual(true);
+			expect($($bookStyleSheets[2])[0].disabled).toEqual(true);
+			expect($($bookStyleSheets[3])[0].disabled).toEqual(true);
+			expect($($bookStyleSheets[4])[0].disabled).toEqual(false);
+			expect($($bookStyleSheets[5])[0].disabled).toEqual(true);
 		});
 	});
 
