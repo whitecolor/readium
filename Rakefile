@@ -31,10 +31,10 @@ task :docs do
 	puts "the docs have been docco-ed"
 end
 
-namespace :deploy do
+namespace :site do
 
 	desc "pushes out the website using the contents of :publish dir via push to :gh-pages branch"
-	task :push do
+	task :deploy do
 		# make sure we don't delete anything we didnt want to
 		to_keep = [ ".", "..", ".git", ".gitignore" ]
 		to_keep << @config[:publish_dir]
@@ -84,4 +84,4 @@ end
 
 load 'build/build.rake'
 
-task :deploy => ["build", "docs", "deploy:push"]
+task :deploy => ["build", "docs", "site:deploy"]
