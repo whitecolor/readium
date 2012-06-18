@@ -26,7 +26,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		var spineItem = book.getCurrentSection();
 		if(this.shouldRenderAsFixed(spineItem)) {
 			this.should_two_up = book.get("two_up");
-			book.set("two_up", false);
+			
 			//this.rendered_spine_positions.push(spine_position);
 			this.v = new Readium.Views.FixedPaginationView({model: book});
 

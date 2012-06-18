@@ -33,6 +33,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		// wipe the html
 		this.$('#container').html("");
 		this.setContainerSize();
+		this.setUpMode();
 
 		// add the current section
 		//this.addPage( this.model.getCurrentSection(), 1 );
