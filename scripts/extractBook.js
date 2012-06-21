@@ -69,10 +69,12 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		var xmlDoc = parser.parseFromString(content, "text/xml");
 		var rootFiles = xmlDoc.getElementsByTagName("rootfile");
 
-		if(rootFiles.length !== 1) {
-			this.set("error", "Error processing " + CONTAINER);
+		if(rootFiles.length < 1) {
+			// all epubs must have a rootfile
+			this.set("error", "This epub is not valid. The rootfile could not be located.");
 		}
 		else {
+			// According to the spec more than one rootfile can be specified but we are required to parse the first one only for now...
 			if (rootFiles[0].hasAttribute("full-path")) {
 				this.set("root_file_path", rootFiles[0].attributes["full-path"].value);
 			}
