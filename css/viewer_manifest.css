@@ -1706,7 +1706,7 @@ body.apple-fixed-layout {
       color: #774c27; }
 
 .night-theme {
-  background-color: #141414;
+  background-color: black;
   color: white; }
   .night-theme #readium-content-container.mo-playing {
     color: #666; }
