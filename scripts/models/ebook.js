@@ -1,29 +1,62 @@
+// **Welcome the Annotated Readium Souce Code** 
+//
+// The content on these pages is generated directly from the comments in
+// Readium's souce code using a tool called [docco](http://jashkenas.github.com/docco/).
+// At the moment it is a bit of a work in progress but we are working hard
+// generate some comprehensive documentation for Readium.
+//
+// # Ebook
+// 
+// The **Ebook** class is the main buisness object used for maintaining
+// application state in the Readium viewer.
+
 Readium.Models.Ebook = Backbone.Model.extend({
 
 	initialize: function() {
+
+		// capture context for use in callback functions
 		var that = this;
-		// the book's pages
+		
+		// create a [`Paginator`](/docs/paginator.html) object used to initialize
+		// pagination strategies for the spine items of this book
 		this.paginator = new Readium.Models.Paginator({book: this});
 
+		// intantiate a [`PackageDocument`](/docs/packageDocument.html)
 		this.packageDocument = new Readium.Models.PackageDocument({ book: that }, {
 			file_path: this.get("package_doc_path")
 		});
-		//this.packageDocument.on("change:spine_position", this.spinePositionChangedHandler, this);
+		
+		//  load the `packageDocument` from the HTML5 filesystem asynchroniously
 		this.packageDocument.fetch({
+
+			// success callback is executed once the filesSystem contents have 
+			// been read and parsed
 			success: function() {
+
+				// restore the position the reader left off at from cookie storage
 				var pos = that.restorePosition();
 				that.set("spine_position", pos);
+
+				// tell the paginator to start rendering spine items from the 
+				// freshly restored position
 				var items = that.paginator.renderSpineItems(false);
 				that.set("rendered_spine_items", items);
-
-				//that.packageDocument.set({spine_position: pos}); // TODO: get rid of this
-				//that.packageDocument.trigger("change:spine_position"); // TODO: get rid of this
 				
+				// check if a TOC is specified in the `packageDocument`
 				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
+
+		// if content reflows and the number of pages in the section changes
+		// we need to adjust the the current page
 		this.on("change:num_pages", this.adjustCurrentPage, this);
+
+		// `change:spine_position` is triggered whenver the reader turns pages
+		// accross a `spine_item` boundary. We need to cache thier new position
+		// and 
 		this.on("change:spine_position", this.savePosition, this);
+
+		// If a new fixed layout 
 		this.on("change:spine_position", this.setMetaSize, this);
 	},
 
