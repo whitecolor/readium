@@ -457,6 +457,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.savePosition();
 	},
 
+	// Info: "Section" actually refers to a spine item
 	getCurrentSection: function(offset) {
 		if(!offset) {
 			offset = 0;
