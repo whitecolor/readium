@@ -156,7 +156,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			}
 				// A single fixed-layout even-numbered page is currently displayed;
 				// find two pages to display
-	/*fuck fuck*/ else if(displayed[0] % 2 === 0) {
+	/*hmmmm*/ else if(displayed[0] % 2 === 0) {
 					newPages[0] = displayed[0];
 					newPages[1] = displayed[0] + 1;
 				}
