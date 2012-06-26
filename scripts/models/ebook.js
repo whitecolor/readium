@@ -125,12 +125,17 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		};
 	},
 
+	// Description: This method determines which page numbers to display when switching
+	// between a single page and side-by-side page views and vice versa.
 	toggleTwoUp: function() {
+
 		if(this.get("can_two_up")) {
 			debugger;
 			var twoUp = this.get("two_up");
 			var displayed = this.get("current_page");
 			var newPages = [];
+
+			// Two pages are currently displayed; find the single page number to display
 			if(twoUp) {
 				if (displayed[0] === 0) {
 					newPages[0] = 1;
@@ -138,6 +143,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 					newPages[0] = displayed[0];
 				}
 			}
+			// A single reflowable page is currently displayed; find two pages to display
 			else if(!this.getCurrentSection().isFixedLayout()) {
 				if(displayed[0] % 2 === 1) {
 					newPages[0] = displayed[0];
@@ -148,14 +154,19 @@ Readium.Models.Ebook = Backbone.Model.extend({
 					newPages[1] = displayed[0];
 				}
 			}
-			else if(displayed[0] % 2 === 0) {
-				newPages[0] = displayed[0];
-				newPages[1] = displayed[0] + 1;
-			}
-			else {
-				newPages[0] = displayed[0] - 1;
-				newPages[1] = displayed[0];
-			}
+				// A single fixed-layout even-numbered page is currently displayed;
+				// find two pages to display
+	/*fuck fuck*/ else if(displayed[0] % 2 === 0) {
+					newPages[0] = displayed[0];
+					newPages[1] = displayed[0] + 1;
+				}
+				// A single fixed-layout odd-numbered page is currently displayed;
+				// find two pages to display
+				else {
+					newPages[0] = displayed[0] - 1;
+					newPages[1] = displayed[0];
+				}
+
 			this.set({two_up: !twoUp, current_page: newPages});
 		}	
 	},
