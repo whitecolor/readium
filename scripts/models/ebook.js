@@ -163,7 +163,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 						newPages[0] = displayed[0] - 1;
 						newPages[1] = displayed[0];
 					}
-					else if (this.displayedPageIsRight) {
+					else if (this.displayedPageIsRight(displayed[0])) {
 						newPages[0] = displayed[0];
 						newPages[1] = displayed[0] + 1;
 					}
@@ -177,7 +177,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 						newPages[0] = displayed[0];
 						newPages[1] = displayed[0] + 1;
 					}
-					else if (this.displayedPageIsRight) {
+					else if (this.displayedPageIsRight(displayed[0])) {
 						newPages[0] = displayed[0] - 1;
 						newPages[1] = displayed[0];
 					}
