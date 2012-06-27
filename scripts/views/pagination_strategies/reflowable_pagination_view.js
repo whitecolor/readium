@@ -236,7 +236,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.showContent();
 	},
 
+	// navigate to a url hash fragment by calculating the page of
+	// the corresponding elem and setting the page number on `this.model`
+	//
+	// as precondition the hash fragment should identify an element in the
+	// section rendered by this view
 	goToHashFragment: function() {
+
+		// this method is triggered in response to 
 		var fragment = this.model.get("hash_fragment");
 		if(fragment) {
 			var el = $("#" + fragment, this.getBody())[0];
