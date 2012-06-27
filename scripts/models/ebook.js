@@ -430,7 +430,18 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.goToPage(page);
 	},
 
+	// is the param pageNumber currenly displayed
+	isPageVisible: function(pageNumber) {
+		return this.get("current_page").indexOf(pageNumber) > -1;
+	},
+
 	goToPage: function(pageNumber) {
+
+		// if the we are already at that page then there is no work to do
+		// break out eary to prevent page change events
+		if(this.isPageVisible(pageNumber)) {
+			return;
+		}
 
 		// in two up mode we need to keep track of what side
 		// of the spine the odd pages go on
@@ -573,7 +584,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
-		// firs thing is to split off the hash frag from the reset
+		// first thing is to split off the hash frag from the rest
 		// of the url:
 		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
 
@@ -667,6 +678,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	playMo: function(forceFromStart) {
+		// there is way too much code in this method that does
+		// does not belong here. TODO: Clean up
 		var mo = this.getCurrentSection().getMediaOverlay();
 		if(mo) {
 			this.set("mo_playing", mo);
@@ -702,6 +715,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	pauseMo: function() {
 		var mo = this.get("mo_playing");
 		if(mo) {
+
+			// mo.off() and mo.pause() seem like they should be in the same call
 			mo.off();
 			mo.pause();
 			this.set("mo_playing", null);
