@@ -279,6 +279,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// Single page navigation
 		else if(!this.get("two_up")){
 			this.set("current_page", [lastPage]);
+
+			// Reset spine position
 			if(this.get("rendered_spine_items").length > 1) {
 				var pos = this.get("rendered_spine_items")[lastPage - 1];
 				this.set("spine_position", pos);
@@ -286,20 +288,61 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 		// Move to previous page with two side-by-side pages
 		else {
-			this.set("current_page", [lastPage - 1, lastPage]);
 
+			this.setCurrentPagesForPrevPage(lastPage);
+
+			// Reset spine position
 			if(this.get("rendered_spine_items").length > 1) {
-
 				var ind = (lastPage > 1 ? lastPage - 2 : 0);
 				var pos = this.get("rendered_spine_items")[ind];
 				this.set("spine_position", pos);
 			}
 		}
 	},
+
+	setCurrentPagesForPrevPage: function (prevPageNumber) {
+
+		// If fixed layout
+		if (this.getCurrentSection().isFixedLayout()) {
+
+			if (this.get("page_prog_dir") === "rtl") {
+
+				// If the first page is a left page in rtl progression, only one page 
+				// can be displayed, even in two-up mode
+				if (this.displayedPageIsLeft(prevPageNumber) && 
+					this.displayedPageIsRight(prevPageNumber - 1)) {
+
+					this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
+				}
+				else {
+
+					this.set("current_page", [prevPageNumber]);
+				}
+			}
+			// Left-to-right progresion
+			else {
+
+				if (this.displayedPageIsRight(prevPageNumber) &&
+					this.displayedPageIsLeft(prevPageNumber - 1)) {
+
+					this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
+				}
+				else {
+
+					this.set("current_page", [prevPageNumber]);
+				}
+			}
+		}
+		// A reflowable text
+		else {
+
+			this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
+		}
+	},
 	
 	nextPage: function() {
 		var curr_pg = this.get("current_page");
-		var firstPage = curr_pg[curr_pg.length-1] + 1;
+		var firstPage = curr_pg[curr_pg.length - 1] + 1;
 
 		// For fixed layout pubs, check if the last page is displayed; if so, end navigation
 		if (this.getCurrentSection().isFixedLayout()) {
@@ -313,22 +356,72 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			}
 		}
 
-		if (curr_pg[curr_pg.length-1] >= this.get("num_pages") ) {
+		if (curr_pg[curr_pg.length - 1] >= this.get("num_pages")) {
+
 			this.goToNextSection();
 		}
-		else if(!this.get("two_up")){
+		else if (!this.get("two_up")) {
+
 			this.set("current_page", [firstPage]);
-			if(this.get("rendered_spine_items").length > 1) {
+
+			// Reset the spine position
+			if (this.get("rendered_spine_items").length > 1) {
+
 				var pos = this.get("rendered_spine_items")[firstPage - 1];
 				this.set("spine_position", pos);
 			}
 		}
+		// Two pages are being displayed
 		else {
-			this.set("current_page", [firstPage, firstPage+1]);
-			if(this.get("rendered_spine_items").length > 1) {
+
+			this.setCurrentPagesForNextPage(firstPage);
+
+			// Reset the spine position
+			if (this.get("rendered_spine_items").length > 1) {
+
 				var pos = this.get("rendered_spine_items")[firstPage - 1];
 				this.set("spine_position", pos);
 			}
+		}
+	},
+
+	setCurrentPagesForNextPage: function (nextPageNumber) {
+
+		// If fixed layout
+		if (this.getCurrentSection().isFixedLayout()) {
+
+			if (this.get("page_prog_dir") === "rtl") {
+
+				// If the first page is a left page in rtl progression, only one page 
+				// can be displayed, even in two-up mode
+				if (this.displayedPageIsRight(nextPageNumber) &&
+					this.displayedPageIsLeft(nextPageNumber + 1)) {
+
+					this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
+				}
+				else {
+
+					this.set("current_page", [nextPageNumber]);
+				}
+			}
+			else {
+
+				if (this.displayedPageIsLeft(nextPageNumber) && 
+					this.displayedPageIsRight(nextPageNumber + 1)) {
+
+					this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
+				}
+				else {
+
+					this.set("current_page", [nextPageNumber]);
+				}
+			}
+
+		}
+		// Reflowable section
+		else {
+
+			this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
 		}
 	},
 
