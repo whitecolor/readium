@@ -193,15 +193,21 @@ Readium.Models.PackageDocumentBase = Backbone.Model.extend({
 	// data to build useful set of backbone objects
 	crunchSpine: function(spine, manifest) {
 		//var bbSpine = new Readium.Collections.Spine(spine, {packageDocument: this});
+		var that = this;
 		var index = -1; // to keep track of the index of each spine item
+		
 		var bbSpine = _.map(spine, function(spineItem) {
 			index += 1;
+			
 			var manItem = manifest.find(function(x) {
 				if(x.get("id") === spineItem["idref"]) return x;
 			});
+
 			// crunch spine attrs and manifest attrs together into one obj
-			return _.extend({}, spineItem, manItem.attributes, {"spine_index": index});
+			var book = that.get("book");
+			return _.extend({}, spineItem, manItem.attributes, {"spine_index": index}, {"page_prog_dir": book.get("page_prog_dir")});
 		});
+
 		return new Readium.Collections.Spine(bbSpine, {packageDocument: this});
 	},
 

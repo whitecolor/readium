@@ -130,7 +130,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	toggleTwoUp: function() {
 
 		if(this.get("can_two_up")) {
-			debugger;
 			var twoUp = this.get("two_up");
 			var displayed = this.get("current_page");
 			var newPages = [];
@@ -154,21 +153,65 @@ Readium.Models.Ebook = Backbone.Model.extend({
 					newPages[1] = displayed[0];
 				}
 			}
-				// A single fixed-layout even-numbered page is currently displayed;
-				// find two pages to display
-	/*hmmmm*/ else if(displayed[0] % 2 === 0) {
-					newPages[0] = displayed[0];
-					newPages[1] = displayed[0] + 1;
+			// A single fixed layout page is displayed
+			else {
+
+				// page progression is right-to-left
+				if (this.get("page_prog_dir") === "rtl") {
+
+					if (this.displayedPageIsLeft(displayed[0])) {
+						newPages[0] = displayed[0] - 1;
+						newPages[1] = displayed[0];
+					}
+					else if (this.displayedPageIsRight) {
+						newPages[0] = displayed[0];
+						newPages[1] = displayed[0] + 1;
+					}
+
+					// TODO: Handle center pages and all adjacent left-left, right-right pages
 				}
-				// A single fixed-layout odd-numbered page is currently displayed;
-				// find two pages to display
+				// page progression is left-to-right
 				else {
-					newPages[0] = displayed[0] - 1;
-					newPages[1] = displayed[0];
+
+					if (this.displayedPageIsLeft(displayed[0])) {
+						newPages[0] = displayed[0];
+						newPages[1] = displayed[0] + 1;
+					}
+					else if (this.displayedPageIsRight) {
+						newPages[0] = displayed[0] - 1;
+						newPages[1] = displayed[0];
+					}
+
+					// TODO: Handle center pages and all adjacent left-left, right-right pages
 				}
+			}
 
 			this.set({two_up: !twoUp, current_page: newPages});
 		}	
+	},
+
+	// Description: The displayedPageIs** methods determine if the page is right, left or center.
+	//
+	// Note: This is not an ideal approach, as we're pulling properties directly out of the dom, rather than
+	// out of our models. The rationale is that as of Readium 0.4.1, the page-spread-* value
+	// is not maintained in the model hierarchy accessible from an ebook object. An alternative
+	// would be to infer the left/right/center value from model attributes on ebook, or other objects in
+	// ebook's object hierarchy. However, this would duplicate the logic that exists elsewhere for determining right/left/center
+	// for a page, which is probably worse than pulling out of the dom. This approach also avoids having to convert
+	// from the page number (based on what is rendered on the screen) to spine index.   
+	displayedPageIsRight: function (displayedPageNum) {
+
+		return $("#page-" + displayedPageNum).hasClass("right_page") ? true : false;
+	},
+
+	displayedPageIsLeft: function (displayedPageNum) {
+
+		return $("#page-" + displayedPageNum).hasClass("left_page") ? true : false;
+	},
+
+	displayedPageIsCenter: function (displayedPageNum) {
+
+		return $("#page-" + displayedPageNum).hasClass("center_page") ? true : false;
 	},
 
 	toggleFullScreen: function() {
@@ -219,9 +262,21 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
+		// For fixed layout pubs, check if the last page is displayed; if so, end navigation.
+		// TODO: This is a bit of a hack, but the this entire model underlying the part of the pub that 
+		// is displayed on the screen probably needs to change. 
+		if (this.getCurrentSection().isFixedLayout()) {
+
+			if (this.get("two_up") && curr_pg[0] === 1) {
+
+				return;
+			}
+		}
+
 		if(curr_pg[0] <= 1) {
 			this.goToPrevSection();
 		}
+		// Single page navigation
 		else if(!this.get("two_up")){
 			this.set("current_page", [lastPage]);
 			if(this.get("rendered_spine_items").length > 1) {
@@ -229,8 +284,10 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				this.set("spine_position", pos);
 			}
 		}
+		// Move to previous page with two side-by-side pages
 		else {
 			this.set("current_page", [lastPage - 1, lastPage]);
+
 			if(this.get("rendered_spine_items").length > 1) {
 
 				var ind = (lastPage > 1 ? lastPage - 2 : 0);
@@ -243,6 +300,19 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	nextPage: function() {
 		var curr_pg = this.get("current_page");
 		var firstPage = curr_pg[curr_pg.length-1] + 1;
+
+		// For fixed layout pubs, check if the last page is displayed; if so, end navigation
+		if (this.getCurrentSection().isFixedLayout()) {
+
+			if (this.get("two_up") && 
+				(curr_pg[0] === this.get("rendered_spine_items").length || 
+				 curr_pg[1] === this.get("rendered_spine_items").length)
+				) {
+
+				return;
+			}
+		}
+
 		if (curr_pg[curr_pg.length-1] >= this.get("num_pages") ) {
 			this.goToNextSection();
 		}
@@ -267,32 +337,58 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.goToPage(page);
 	},
 
-	goToPage: function(page) {
+	goToPage: function(pageNumber) {
+
+		// in two up mode we need to keep track of what side
+		// of the spine the odd pages go on
 		if(this.get("two_up")) {
-			// in two up mode we need to keep track of what side
-			// of the spine the odd pages go on
+			
+			// Fixed layout page
 			if(this.getCurrentSection().isFixedLayout()) {
-				if(page % 2 === 0) { // this logic needs to be smartened up
-					this.set("current_page", [page, page + 1]);	
+
+				if (this.get("page_prog_dir") === "rtl") {
+
+					if (this.displayedPageIsLeft(pageNumber)) {
+
+						this.set("current_page", [pageNumber - 1, pageNumber]);	
+					}
+					else if (this.displayedPageIsRight(pageNumber)) {
+
+						this.set("current_page", [pageNumber, pageNumber + 1]);
+					}
+
+					// Handle center pages
 				}
+				// Left-to-right page progression
 				else {
-					this.set("current_page", [page - 1, page]);
+
+					if (this.displayedPageIsLeft(pageNumber)) {
+
+						this.set("current_page", [pageNumber, pageNumber + 1]);	
+					}
+					else if (this.displayedPageIsRight(pageNumber)) {
+
+						this.set("current_page", [pageNumber - 1, pageNumber]);
+					}
+
+					// TODO: Handle center pages
 				}
 			}
+			// This is a reflowable page
 			else {
 				// in reflowable format, we want this config always:
 				// ODD_PAGE |spine| EVEN_PAGE
-				if(page % 2 === 1) {
-					this.set("current_page", [page, page + 1]);	
+				if(pageNumber % 2 === 1) {
+					this.set("current_page", [pageNumber, pageNumber + 1]);	
 				}
 				else {
-					this.set("current_page", [page - 1, page]);
+					this.set("current_page", [pageNumber - 1, pageNumber]);
 				}	
 			}
 			
 		}
 		else {
-			this.set("current_page", [page])
+			this.set("current_page", [pageNumber])
 		}
 	},
 

@@ -159,10 +159,22 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 					return "center_page";
 				}
 			}
-			// If the page spread property is not set, use the even-pages-on-the-right, odd-pages-on-the-left heuristic
+			// If the page spread property is not set, use a even/odd page index heuristic that depends on the 
+			// page progression order:
+			//   - Even-numbered pages on the right for rtl text
+			//   - Odd-numbered pages on the left for ltr text
 			else {
 
-				return (spine_index % 2 === 0 ? "right_page" : "left_page");
+				// Check for right-to-left page progression direction
+				if (this.get("page_prog_dir") === "rtl") {
+
+					return (spine_index % 2 === 0 ? "right_page" : "left_page");
+				}
+				// Text is left-to-right
+				else {
+
+					return (spine_index % 2 === 0 ? "left_page" : "right_page");
+				}
 			}
 		}
 	},
