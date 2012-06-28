@@ -56,7 +56,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		}
 	},
 
-	// Description: Creates an iFrame, which contains a page view to represent a spine item, and appends it to an 
+	// Description: Creates/gets an iFrame, which contains a page view to represent a spine item, and appends it to an 
 	// element that contains the content of the current ePub. Each of these spine item views is not necessarily displayed
 	// immediately. 
 	addPage: function(spineItem, pageNum) {

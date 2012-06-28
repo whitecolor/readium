@@ -1497,7 +1497,11 @@ body.apple-fixed-layout {
   background-image: -ms-linear-gradient(top, white, #cccccc);
   background-image: -o-linear-gradient(top, white, #cccccc);
   background-image: linear-gradient(top, white, #cccccc);
-  line-height: 1em; }
+  line-height: 1em;
+  max-height: 99%;
+  overflow: scroll;
+   }
+
   #viewer-settings-modal .clickable {
     -webkit-user-select: none;
     -moz-user-select: none;
